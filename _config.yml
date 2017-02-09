@@ -18,7 +18,7 @@ email:
 description: >
   The premier restaurant development platform to bring your food business into the 21st century.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://blanco.io/chefboyrd" # the base hostname & protocol for your site
+url: "http://blanco.io/ChefBoyRD" # the base hostname & protocol for your site
 twitter_username: 
 github_username:
 show_downloads: true
