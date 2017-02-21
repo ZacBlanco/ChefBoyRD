@@ -1,0 +1,25 @@
+language: python
+python:
+ - "3.3"
+ - "3.4"
+ - "3.5"
+ - "3.6"
+notifications:
+ email:
+  recipients:
+   - zac.blanco@rutgers.edu
+  on_success: never
+  on_failure: always
+
+# command to install dependencies
+install: 
+ - sudo apt install python3-numpy python3-scipy
+ - pip install -r requirements.txt
+
+
+# command to run tests
+script:
+ - python3 -m unittest discover -s chefboyrd/tests
+ 
+after_success:
+ coveralls
