@@ -2,6 +2,8 @@
 
 This is the repository for our Software Engineering course project, ChefBoyRD, which was completed during the spring semester of 2017.
 
+[![Build Status](https://travis-ci.org/ZacBlanco/ChefBoyRD.svg?branch=master)](https://travis-ci.org/ZacBlanco/ChefBoyRD) [![Python 3.3+](https://img.shields.io/badge/Python-3.3%2B-orange.svg)](https://python.org) [![GitHub license](https://img.shields.io/badge/license-AGPL-blue.svg)](https://raw.githubusercontent.com/zacblanco/ChefBoyRD/master/LICENSE)
+
 ## Team Members:
 
 * Richard Ahn
