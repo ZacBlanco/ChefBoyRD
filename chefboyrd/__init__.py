@@ -33,6 +33,7 @@ Other helpful sources of documentaiton and reading:
 
 - http://docs.peewee-orm.com/en/latest/index.html
 - https://github.com/coleifer/peewee (See example apps at the bottom of the readme)
+- http://flask.pocoo.org/docs/0.12/blueprints/
 
 
 
