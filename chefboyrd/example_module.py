@@ -21,6 +21,3 @@ def fib(num):
     if not isinstance(num, int):
         raise TypeError("Number must be int")
     return 0 if num == 0 else (1 if num == 1 else fib(num-1) + fib(num-2))
-
-
-

@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+{% include "head.html" %}
+{% include "header.html" %}
+
+
+<body>
+
+    {% block body %}
+        Hello, world!
+
+        <ul>
+        {% for user in users %}
+            <li>{{ user }}</li>
+        {% endfor %}
+        </ul>
+    {% endblock %}
+</body>
+
+
+
+{% include "footer.html" %}
+<html>
