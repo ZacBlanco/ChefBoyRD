@@ -42,10 +42,14 @@ import configparser
 from flask import Flask
 from peewee import SqliteDatabase
 
+def init_db(dbname):
+    global DB
+    DB = SqliteDatabase(dbname)
+
 CONF = configparser.ConfigParser()
 CONF.read('config.ini')
 
-DB = SqliteDatabase(CONF['database']['dbfile'])
+init_db(CONF['database']['dbfile'])
 APP = Flask(__name__)
 
 # Register all views after here
@@ -57,3 +61,4 @@ APP.register_blueprint(root.page, url_prefix='/test')
 # ==================================
 from chefboyrd.models import customers
 customers.Customer.create_table(True)
+    
