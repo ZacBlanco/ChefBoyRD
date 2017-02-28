@@ -39,8 +39,10 @@ Other helpful sources of documentaiton and reading:
 
 '''
 import configparser
+import flask_login
 from flask import Flask
 from peewee import SqliteDatabase
+
 
 def init_db(dbname):
     global DB
@@ -50,15 +52,41 @@ CONF = configparser.ConfigParser()
 CONF.read('config.ini')
 
 init_db(CONF['database']['dbfile'])
-APP = Flask(__name__)
+
+APP = Flask(__name__, template_folder="views/templates")
+APP.secret_key = 'ENG-</rutgers-chefboyrd?>-<oij!$9ui%^98A*FSD>@2018!'
+
+LM = flask_login.LoginManager()
+LM.init_app(APP)
+import chefboyrd.auth # register the login and authentication functions
+
+@APP.before_request
+def before_request():
+    """Connect to the database before each request."""
+    DB.connect()
+
+
+@APP.after_request
+def after_request(response):
+    """Close the database connection after each request."""
+    DB.close()
+    return response
+
 
 # Register all views after here
 # =======================
-from chefboyrd.views import root
+from chefboyrd.views import root, stat_dash
 APP.register_blueprint(root.page, url_prefix='/test')
+APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
 
 # Put all table creations after here
 # ==================================
-from chefboyrd.models import customers
+from chefboyrd.models import customers, user
+
 customers.Customer.create_table(True)
-    
+user.User.create_table(True)
+
+try:
+    user.User.create_user('zac', 'zac', 'zac', 'admin')
+except:
+    pass
