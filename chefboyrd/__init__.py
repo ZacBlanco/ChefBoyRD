@@ -21,7 +21,7 @@ don't already exist) when starting the application. We do this by making the cal
     model.create_table(True)
 
 The ``True`` argument forces any failures to be silent when creating the table - i.e. not crash
-the application. Other than that we shouldn't need to add much else to this file. 
+the application. Other than that we shouldn't need to add much else to this file.
 
 Please see the following files for examples of each part of the MVC structure of this project
 
@@ -87,6 +87,15 @@ customers.Customer.create_table(True)
 user.User.create_table(True)
 
 try:
+    # Test User:
+    # email: zac
+    # Password: zac 
     user.User.create_user('zac', 'zac', 'zac', 'admin')
+except:
+    pass
+
+try:
+    # email: caz, pw: caz
+    user.User.create_user('caz', 'caz', 'caz', 'notanadmin')
 except:
     pass
