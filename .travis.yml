@@ -19,7 +19,7 @@ install:
 
 # command to run tests
 script:
- - python3 -m unittest discover -s chefboyrd/tests
+ - make test
  
 after_success:
  coveralls
