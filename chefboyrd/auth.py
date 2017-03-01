@@ -1,70 +1,97 @@
 '''Module for authentication
 '''
+from functools import wraps
 import flask
-from flask import render_template, url_for, redirect
+from flask import Blueprint, render_template, url_for, redirect
 import flask_login
 from chefboyrd import LM as login_manager
 from chefboyrd.models.user import User
 from chefboyrd import APP
 from werkzeug.security import check_password_hash
 
+auth_pages = Blueprint('auth_pages', __name__, template_folder="./views/templates")
 
 @login_manager.user_loader
 def user_loader(email):
+    '''Loads the user via a DB call'''
     users = User.select().where(User.email == email)
-    if len(users) == 1:
+    if len(users) > 0:
         return users[0]
     else:
         return
 
-@login_manager.request_loader
-def request_loader(request):
-    email = request.form.get('email')
-    users = User.select().where(User.email == email)
-    if len(users) == 0:
-        return
-    user = users[0]
+@login_manager.unauthorized_handler
+def unauth():
+    '''Function to handle requests to resources that are not authorized.'''
+    return render_template('unauthorized.html')
 
-    # DO NOT ever store passwords in plaintext and always compare password
-    # hashes using constant-time comparison!
-    user.is_authenticated = check_password_hash(user.password, request.form['pw'])
+def require_login(func):
+    '''Wrapper around the login_required wrapper from flask-login
 
-    return user
+        This allows us to keep the same style and also not have to have multiple imports for
+        roles and require_login
+    '''
+    @wraps(func)
+    @flask_login.login_required
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
 
-# def role_required(r):
-#     @wraps(r)
-#     return
+    return wrapper
 
-@APP.route('/login', methods=['GET', 'POST'])
+def require_role(role):
+    '''Decorate a function with this in order to require a specific role to access a view.
+
+    By decorating a function with @require_role you are implicity forcing @login_required as well.
+    Example:
+
+            @APP.route('/admin-dashboard')
+            @require_role('admin')
+            def view_dash():
+                ...
+
+    If a user is not authorized then the flask_login.unauthorized handler is called.
+    '''
+    def real_wrap(func):
+        @wraps(func)
+        @flask_login.login_required
+        def wrapper(*args, **kwargs):
+            user = flask_login.current_user
+            print("User role: {} and required role {}".format(user.role, role))
+            if user.role == role:
+                return func(*args, **kwargs)
+            else:
+                return login_manager.unauthorized()
+        return wrapper
+    return real_wrap
+
+@auth_pages.route('/login', methods=['GET', 'POST'])
 def login():
-
+    '''Function which logs a user into the application'''
     if flask_login.current_user.is_authenticated:
-        return redirect(url_for('protected'))
+        return redirect(url_for('index'))
 
     if flask.request.method == 'GET':
         return render_template('login.html')
 
     email = flask.request.form['email']
+    print('email {}'.format(email))
     users = User.select().where(User.email == email)
-    if len(users) == 0:
+
+    if len(users) <= 0:
         return render_template('login.html', error='Unable to login user {}'.format(email))
     else:
         user = users[0]
+
     if check_password_hash(user.password, flask.request.form['pw']):
-        user = User()
-        user.id = email
+        user.id = user.email
         flask_login.login_user(user)
-        return flask.redirect(flask.url_for('protected'))
+        return flask.redirect(flask.url_for('index'))
 
-    return 'Bad login'
+    # Last resort - just return an error about logging in
+    return render_template('login.html', error='Unable to login user {}'.format(email))
 
-@APP.route('/logout')
+@auth_pages.route('/logout')
 def logout():
     ''''Logs a user out and renders the default template'''
     flask_login.logout_user()
-    return render_template('default.html')
-
-@APP.route('/protected')
-@flask_login.login_required
-def protected():
-    return 'Logged in as: {}'.format(flask_login.current_user.email)
+    return render_template('login.html', error="Successfully logged out")

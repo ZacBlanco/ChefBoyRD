@@ -40,7 +40,7 @@ Other helpful sources of documentaiton and reading:
 '''
 import configparser
 import flask_login
-from flask import Flask
+from flask import Flask, render_template
 from peewee import SqliteDatabase
 
 
@@ -53,8 +53,10 @@ CONF.read('config.ini')
 
 init_db(CONF['database']['dbfile'])
 
-APP = Flask(__name__, template_folder="views/templates")
+APP = Flask(__name__, template_folder="views/templates", static_url_path='/static')
 APP.secret_key = 'ENG-</rutgers-chefboyrd?>-<oij!$9ui%^98A*FSD>@2018!'
+APP.config['DEBUG'] = True
+APP.config['AUTO_RELOAD_TEMPLATES'] = True
 
 LM = flask_login.LoginManager()
 LM.init_app(APP)
@@ -75,9 +77,12 @@ def after_request(response):
 
 # Register all views after here
 # =======================
+from chefboyrd.auth import auth_pages
 from chefboyrd.views import root, stat_dash
+
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
+APP.register_blueprint(auth_pages, url_prefix='/auth')
 
 # Put all table creations after here
 # ==================================
