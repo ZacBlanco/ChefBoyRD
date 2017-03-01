@@ -6,7 +6,6 @@ from flask import Blueprint, render_template, url_for, redirect
 import flask_login
 from chefboyrd import LM as login_manager
 from chefboyrd.models.user import User
-from chefboyrd import APP
 from werkzeug.security import check_password_hash
 
 auth_pages = Blueprint('auth_pages', __name__, template_folder="./views/templates")
@@ -22,8 +21,8 @@ def user_loader(email):
 
 @login_manager.unauthorized_handler
 def unauth():
-    '''Function to handle requests to resources that are not authorized.'''
-    return render_template('unauthorized.html')
+    '''Function to handle requests to resources that are not authorized or authenticated.'''
+    return render_template('unauthorized.html'), 401
 
 def require_login(func):
     '''Wrapper around the login_required wrapper from flask-login
@@ -56,7 +55,6 @@ def require_role(role):
         @flask_login.login_required
         def wrapper(*args, **kwargs):
             user = flask_login.current_user
-            print("User role: {} and required role {}".format(user.role, role))
             if user.role == role:
                 return func(*args, **kwargs)
             else:
@@ -75,7 +73,6 @@ def login():
         return render_template('login.html')
 
     email = flask.request.form['email']
-    print('email {}'.format(email))
     users = User.select().where(User.email == email)
 
     if len(users) <= 0:
@@ -89,7 +86,7 @@ def login():
         return flask.redirect(flask.url_for('index'))
 
     # Last resort - just return an error about logging in
-    return render_template('login.html', error='Unable to login user {}'.format(email))
+    return render_template('login.html', error='Unable to login user {}'.format(email)), 401
 
 @auth_pages.route('/logout')
 def logout():
