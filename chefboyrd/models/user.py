@@ -18,6 +18,21 @@ class User(UserMixin, BaseModel):
 
     @classmethod
     def create_user(cls, email, password, name, role):
+        '''Creates a new user
+
+        Args:
+            email(str): The user email
+            password(str): The password string - no need to hash beforehand
+            name(str): name, doesn't have to be unique
+            role(str): The user role. admin, manager, chef, host, etc..
+
+        Returns:
+            N/A
+
+        Raises:
+            ValueError: When user email already exists
+        '''
+
         try:
             cls.create(
                 email=email,

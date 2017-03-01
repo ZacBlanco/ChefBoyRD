@@ -67,6 +67,7 @@ def require_role(role):
 @auth_pages.route('/login', methods=['GET', 'POST'])
 def login():
     '''Function which logs a user into the application'''
+
     if flask_login.current_user.is_authenticated:
         return redirect(url_for('index'))
 
@@ -92,6 +93,6 @@ def login():
 
 @auth_pages.route('/logout')
 def logout():
-    ''''Logs a user out and renders the default template'''
+    ''''Logs a user out and renders the login template with a message'''
     flask_login.logout_user()
     return render_template('login.html', error="Successfully logged out")
