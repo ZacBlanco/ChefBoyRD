@@ -55,8 +55,6 @@ init_db(CONF['database']['dbfile'])
 
 APP = Flask(__name__, template_folder="views/templates", static_url_path='/static')
 APP.secret_key = 'ENG-</rutgers-chefboyrd?>-<oij!$9ui%^98A*FSD>@2018!'
-APP.config['DEBUG'] = True
-APP.config['AUTO_RELOAD_TEMPLATES'] = True
 
 LM = flask_login.LoginManager()
 LM.init_app(APP)
@@ -90,6 +88,20 @@ from chefboyrd.models import customers, user
 
 customers.Customer.create_table(True)
 user.User.create_table(True)
+
+# ==================================== Universal Routes ======================================== #
+@APP.route('/')
+def index():
+    ''''Renders the default template'''
+    if flask_login.current_user.is_authenticated:
+        return render_template('default.html',
+                               message='Hello {}'.format(flask_login.current_user.name),
+                               logged_in=True)
+    else:
+        return render_template('default.html')
+
+# =============================================================================================== #
+
 
 try:
     # Test User:
