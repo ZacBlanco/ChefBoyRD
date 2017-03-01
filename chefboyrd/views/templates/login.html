@@ -2,7 +2,7 @@
 {% block body %}
     {% if error %}
         <div class="alert alert-warning">
-            Uh oh! {{ error }}
+            {{ error }}
         </div>
     {% endif %}
     <form action='login' method='POST'>
