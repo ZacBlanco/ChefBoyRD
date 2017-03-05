@@ -1,23 +1,51 @@
 <!doctype html>
 <html>
 {% include "head.html" %}
-{% include "header.html" %}
 
+<body class="container bg-gray-lighter">
 
-<body>
+    <div class="page-header">
+        <h2 class="td-none"><a class="td-none" href="/">ChefBoyRD</a></h2>
+    </div>
+    
+        {% include "header.html" %}
+    </div>
+    <div class="row">
+    <div class="col-md-6">
+        
+            <!-- Main -->
+            {% if message %}
+                    <h3>{{ message }}</h3>
+            {% endif %}
+            <section id="main">    
+                <br>
+                {% block body %}
+                    <span class="avatar"><img src="http://dematori.github.io/projects/ChefBoyRD/static/images/avatar.jpg" alt="" /></span>
+                    <p>ChefBoy R.D.</p>
+                {% endblock %}
+                <br>
+            </section>
+    </div>
+    <div class="col-md-2">
+        {% if not logged_in %}
+            <a class="btn btn-default pull-right" href="/auth/login">Login</a>
+        {% else %}
+            <a class="btn btn-warning pull-right" href="/auth/logout">Logout</a>
+        {% endif %}
+    </div>
+    </div>
+    <hr>
+    <div class="row col-xs-12 bg-default">
+        {% include "footer.html" %}
+    </div>
 
-    {% block body %}
-        Hello, world!
-
-        <ul>
-        {% for user in users %}
-            <li>{{ user }}</li>
-        {% endfor %}
-        </ul>
-    {% endblock %}
+    <script>
+        if ('addEventListener' in window) {
+            window.addEventListener('load', function() {
+                document.body.className = document.body.className.replace(/\bis-loading\b/, '');
+            });
+            document.body.className += (navigator.userAgent.match(/(MSIE|rv:11\.0)/) ? ' is-ie' : '');
+        }
+    </script>
 </body>
-
-
-
-{% include "footer.html" %}
 <html>
