@@ -24,7 +24,7 @@ Dive deeper into the documentation for a better understanding of how this all wo
 '''
 from flask import Blueprint, render_template, abort
 from jinja2 import TemplateNotFound
-from chefboyrd.controllers import customer_controller
+from chefboyrd.controllers import customer_controller, send_sms
 
 page = Blueprint('main', __name__, template_folder='templates')
 
@@ -53,3 +53,9 @@ def new_cust(name):
         return render_template('default.html', users=[name])
     else:
         return render_template('default.html', users=['Failed'])
+@page.route('/sms')
+def sms():
+    '''
+	get a list of all messages sent to Twilio
+    '''
+    send_sms.rcv_sms()
