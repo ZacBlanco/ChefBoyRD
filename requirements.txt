@@ -3,3 +3,4 @@ flask
 peewee
 flask-login
 werkzeug
+gunicorn

@@ -63,13 +63,19 @@ import chefboyrd.auth # register the login and authentication functions
 @APP.before_request
 def before_request():
     """Connect to the database before each request."""
-    DB.connect()
+    try:
+        DB.connect()
+    except:
+        pass
 
 
 @APP.after_request
 def after_request(response):
     """Close the database connection after each request."""
-    DB.close()
+    try:
+        DB.close()
+    except:
+        pass
     return response
 
 
