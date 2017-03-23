@@ -15,15 +15,12 @@ peewee Quickstart and documentation
 See http://docs.peewee-orm.com/en/latest/peewee/quickstart.html
 
 '''
-from chefboyrd import DB as db
 from peewee import Model, CharField
+from chefboyrd.models import BaseModel
 
-class Customer(Model):
+class Customer(BaseModel):
     '''A sample customer model
     Please modify this to fit our needs
     '''
     name = CharField()
-
-    class Meta:
-        database = db # Database for customers
         

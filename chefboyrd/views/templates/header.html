@@ -1,3 +1,17 @@
-<header>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-</header>
+<div class="col-md-3">
+    <header>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation" class="active"><a href="/">Home</a></li>
+            <li role="presentation" class=""><a href="/dashboard">Dashboard</a></li>
+        </ul>
+    </header>
+</div>
