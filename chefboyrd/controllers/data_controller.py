@@ -1,5 +1,5 @@
 '''DataController - This is used to get relevant data for the model controller.'''
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from chefboyrd.models import Orders, Tabs, Meals
 from peewee import JOIN
 
@@ -15,7 +15,7 @@ def get_orders_date_range(dt_min=None, dt_max=None):
         dt_max (datetime): A datetime object for the range end begin at. (Inclusive)
 
     Returns:
-        list: A list of order models (peewee set).
+        iterable: An iterable of order models (peewee set).
     '''
     ords = None
     if dt_min is None and dt_max is None:
@@ -43,7 +43,7 @@ def get_tabs_range(dt_min=None, dt_max=None):
         dt_max (datetime): A datetime object for the range end begin at. (Inclusive)
 
     Returns:
-        list: A list of order models (peewee set).
+        iterable: An iterable of order models (peewee set).
     '''
     tabs = None
     if dt_min is None and dt_max is None:
@@ -58,9 +58,27 @@ def get_tabs_range(dt_min=None, dt_max=None):
         tabs = Tabs.select().where(Tabs.timestamp >= dt_min, Tabs.timestamp <= dt_max)
     return tabs
 
-def get_dotw_orders():
-    '''Gets all orders on a given day of the week'''
-    pass
+def get_dotw_orders(dotw):
+    '''Gets all orders on a given day of the week
+    
+    Interesting challenge because we only have a datetime value.
+    Args:
+        dotw (int): An integer representing the day of the week. 0 for Monday, 6 for Sunday.
+    
+    Returns:
+        list: A list of all order models on a given day of the week.
+    '''
+    if dotw < 0 or dotw > 6:
+        raise ValueError("DoTW {} is not in the valid range of [0, 6]".format(dotw))
+    
+    ords = []
+    orders = Orders.select()
+    for order_t in orders:
+        order = order_t.tab
+        if date(order.timestamp.year, order.timestamp.month, order.timestamp.day).weekday() == dotw:
+            ords.append(order)
+    return ords
+
 
 def get_dollars_in_range():
     '''Returns the total sum of revenue from a range of dates'''

@@ -2,7 +2,7 @@
 import os
 import unittest
 from unittest.mock import patch
-from datetime import datetime
+from datetime import datetime, date
 import tempfile
 import chefboyrd
 from chefboyrd.models import *
@@ -11,6 +11,7 @@ from chefboyrd.controllers import data_controller
 
 class ModelTest(unittest.TestCase):
 
+    @classmethod
     def setUp(self):
         self.db_fd, self.db_name = tempfile.mkstemp()
         chefboyrd.init_db(self.db_name)
@@ -29,6 +30,7 @@ class ModelTest(unittest.TestCase):
         Quantities._meta.database = chefboyrd.DB
         Quantities.create_table(True)
 
+    @classmethod
     def tearDown(self):
         os.close(self.db_fd)
         os.unlink(self.db_name)
@@ -128,4 +130,21 @@ class ModelTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             data_controller.get_tabs_range(times[5], times[4])
         
+    def test_get_dotw(self):
+        m1 = Meals.create(name="Burger", price=8.99)
+        for x in range(5):
+            tm = datetime.now()
+            for y in range(7):
+                td = tm.replace(day=(tm.day-y))
+                t = Tabs.create(timestamp=td, had_reservation=False, party_size=x)
+                Orders.create(tab=t.get_id(), meal=m1.get_id())
+        for x in range(7):
+            self.assertEqual(len(data_controller.get_dotw_orders(x)), 5)
+
+        with self.assertRaises(ValueError):
+            data_controller.get_dotw_orders(-1)
+        with self.assertRaises(ValueError):
+            data_controller.get_dotw_orders(8)
+            
+
 
