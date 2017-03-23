@@ -1,21 +1,6 @@
-'''The base model sets up the database connections for all classes which inherit from it.
-'''
-
-from chefboyrd import DB as db
-from peewee import Model
-import json
-
-class BaseModel(Model):
-    '''A base model which sets up the database connection for all inherited classes
-    '''
-    class Meta:
-        database = db # Database for customers
-
-    def __str__(self):
-        r = {}
-        for k in self._data.keys():
-            try:
-                r[k] = str(getattr(self, k))
-            except:
-                r[k] = json.dumps(getattr(self, k))
-        return str(r)
+'''Reimports all class models within the module to make them more easily accessible'''
+from chefboyrd.models.base_model import BaseModel
+from chefboyrd.models.customers import Customer
+from chefboyrd.models.user import User
+from chefboyrd.models.statistics import Meals, Tabs, MealIngredients
+from chefboyrd.models.statistics import Ingredients, Quantities, Orders

@@ -90,10 +90,18 @@ APP.register_blueprint(auth_pages, url_prefix='/auth')
 
 # Put all table creations after here
 # ==================================
-from chefboyrd.models import customers, user
+from chefboyrd.models import Customer, User
+from chefboyrd.models import Meals, Ingredients, MealIngredients, Quantities, Tabs, Orders
 
-customers.Customer.create_table(True)
-user.User.create_table(True)
+Customer.create_table(True)
+User.create_table(True)
+
+Meals.create_table(True)
+Ingredients.create_table(True)
+MealIngredients.create_table(True)
+Quantities.create_table(True)
+Tabs.create_table(True)
+Orders.create_table(True)
 
 # ==================================== Universal Routes ======================================== #
 @APP.route('/')
@@ -112,13 +120,13 @@ def index():
 try:
     # Test User:
     # email: zac
-    # Password: zac 
-    user.User.create_user('zac', 'zac', 'zac', 'admin')
+    # Password: zac
+    User.create_user('zac', 'zac', 'zac', 'admin')
 except:
     pass
 
 try:
     # email: caz, pw: caz
-    user.User.create_user('caz', 'caz', 'caz', 'notanadmin')
+    User.create_user('caz', 'caz', 'caz', 'notanadmin')
 except:
     pass
