@@ -1,9 +1,11 @@
 '''An example tet module to demonstrate the python unittest structure'''
 
 import unittest
+import datetime
 from unittest.mock import patch
 
 from chefboyrd import example_module
+from chefboyrd.controllers import send_sms
 
 class MyModuleTest(unittest.TestCase):
     '''Example Test Module'''
@@ -13,6 +15,11 @@ class MyModuleTest(unittest.TestCase):
 
         self.assertEqual("I am Equal", "I am Equal", 'Assert equal on testcase should always pass')
         self.assertNotEqual("Not equal", 'nOt EqUaL', "These two should always not be equal")
+
+    def test_sms(self):
+        '''test send sms function'''
+        dt = datetime.datetime(2017,2,22)
+        self.assertEqual(send_sms.update_db(dt),1,"got all msgs")
 
     def test_fib(self):
         '''Second sample testcase'''

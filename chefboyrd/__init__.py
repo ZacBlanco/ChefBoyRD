@@ -54,11 +54,14 @@ APP = Flask(__name__)
 
 # Register all views after here
 # =======================
-from chefboyrd.views import root
+from chefboyrd.views import root, sms_test
 APP.register_blueprint(root.page, url_prefix='/test')
+APP.register_blueprint(sms_test.page, url_prefix='/')
 
 # Put all table creations after here
 # ==================================
 from chefboyrd.models import customers
+from chefboyrd.models import sms
+sms.Sms.create_table(True)
 customers.Customer.create_table(True)
     
