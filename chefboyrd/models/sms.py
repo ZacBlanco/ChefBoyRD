@@ -6,6 +6,7 @@ class Sms(Model):
 	submission_time = DateTimeField()
 	body = TextField()
 	phone_number = TextField()
+	#additional categories to associate
 	
 	class Meta:
 		database = db
