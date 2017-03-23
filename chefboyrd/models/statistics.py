@@ -42,5 +42,4 @@ class MealIngredients(BaseModel):
 class Orders(BaseModel):
     '''A model for storing every meal ordered and providing mappings to the tabs to meals'''
     meal = ForeignKeyField(Meals)
-    tab = ForeignKeyField(Tabs)
-
+    tab = ForeignKeyField(Tabs) # ID is a unique timestamp
