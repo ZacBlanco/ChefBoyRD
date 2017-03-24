@@ -1,0 +1,115 @@
+{% extends "default.html" %}
+{% block body %}
+    <h2>Welcome</h2>
+    <div>
+        This is the Table Management page
+        Here are a list of reservations made
+                 <div id="buttons">
+    <button id="addTable">
+      Add Table
+    </button>
+    </div>
+        <div id="container"></div>
+        <br>
+        {{table}}
+        <br>
+
+  <script>
+    var width = window.innerWidth / 1.5;
+    var height = window.innerHeight;
+    function addCircle(layer, posX, posY, occupied,id) {
+        var randX = Math.random() * stage.getWidth();
+        var randY = Math.random() * stage.getHeight();
+        var circle = new Konva.Circle({
+            id: id,
+            x: posX,
+            y: posY,
+            radius: 50,
+            fill: (occupied == 'True') ? 'red' : 'green'
+        });
+        layer.add(circle);
+    }
+   var text = new Konva.Text({
+      x: 200,
+      y: 10,
+      fontFamily: 'Calibri',
+      fontSize: 24,
+      text: '',
+      fill: 'black'
+    });
+    function writeMessage(message) {
+      text.setText(message);
+      layer.draw();
+    }
+    var stage = new Konva.Stage({
+        container: 'container',
+        width: width,
+        height: height
+    });
+    var dragLayer = new Konva.Layer();
+    var layersArr = [];
+    /*
+    * create 10 layers each containing 1000 shapes to create
+    * 10,000 shapes.  This greatly improves performance because
+    * only 1,000 shapes will have to be drawn at a time when a
+    * circle is removed from a layer rather than all 10,000 shapes.
+    * Keep in mind that having too many layers can also slow down performance.
+    * I found that using 10 layers each made up of 1,000 shapes performs better
+    * than 20 layers with 500 shapes or 5 layers with 2,000 shapes
+    */
+    var layer = new Konva.Layer();
+    {% for tb in tables.Table.select() %}
+        addCircle(layer,{{tb.posX}},{{tb.posY}},'{{tb.occupied}}',{{tb.id}});
+    {% endfor %}
+    layer.add(text);
+    stage.add(layer);
+    stage.add(dragLayer);
+
+   stage.on('dblclick dbltap', function(evt) {
+        var circle = evt.target;
+        var x = circle.x();
+        var y = circle.y();
+        var id = circle.id();
+        occupied =  (circle.fill() == 'red') ? 0 : 1
+        $.post( "/table_manager/change_table", {
+            occupied: occupied,
+            type: 1,
+            id: id
+        });
+        circle.setFill((circle.fill() == 'red') ? 'green' : 'red')
+        var layer = circle.getLayer();
+        circle.moveTo(dragLayer);
+        layer.draw();
+    });
+    stage.on('mousedown', function(evt) {
+        var circle = evt.target;
+        // circle.setFill('red')
+        var layer = circle.getLayer();
+        circle.moveTo(dragLayer);
+        layer.draw();
+        circle.startDrag();
+    });
+
+    stage.on('mouseup', function(evt) {
+        var circle = evt.target;
+        // circle.setFill('red')
+        var x = circle.x();
+        var y = circle.y();
+        var id = circle.id();
+        $.post( "/table_manager/change_table", {
+            type: 0,
+            posX: x,
+            posY: y,
+            id: id
+        });
+        writeMessage('Table: ' + circle.id() + ' at ' + 'x: ' + x + ', y: ' + y);
+        layer.draw();
+    });
+
+    document.getElementById('addTable').addEventListener('click', function() {
+      addCircle(layer);
+      layer.draw();
+    }, false);
+  </script>
+    </div>
+{% endblock %}
