@@ -81,7 +81,7 @@
         circle.moveTo(dragLayer);
         layer.draw();
     });
-    stage.on('mousedown', function(evt) {
+    stage.on('mousedown touchstart', function(evt) {
         var circle = evt.target;
         // circle.setFill('red')
         var layer = circle.getLayer();
@@ -90,11 +90,11 @@
         circle.startDrag();
     });
 
-    stage.on('mouseup', function(evt) {
+    stage.on('mouseup touchend', function(evt) {
         var circle = evt.target;
         // circle.setFill('red')
-        var x = circle.x();
-        var y = circle.y();
+        var x = Math.floor(circle.x());
+        var y = Math.floor(circle.y());
         var id = circle.id();
         $.post( "/table_manager/change_table", {
             type: 0,
