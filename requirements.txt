@@ -2,3 +2,5 @@ requests
 flask
 peewee
 twilio
+flask-login
+werkzeug

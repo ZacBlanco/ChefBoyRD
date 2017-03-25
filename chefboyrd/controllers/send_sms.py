@@ -1,7 +1,6 @@
-from flask import Flask, request, redirect
+from chefboyrd.models.sms import Sms
 from twilio.rest import TwilioRestClient
 from datetime import datetime, date
-from chefboyrd.models.sms import Sms
 import twilio.twiml
 import configparser
 import os
@@ -18,40 +17,47 @@ try:
 except:
     print("Could not communicate with rest client");
 
-#print(account_sid)
-#print(auth_token)
-def rcv_sms():
-    '''
-    Currently this outputs all the messages received by Seobo's twilio account.
-    '''
-    
-    messages = client.messages.list()
-    for message in messages:
-        try:
-            print(message.body)
-        except ValueError:
-            print("End of messages reached.")
-
 '''
 need the sms information in the database so we can create tables with multiple objects
 '''
-def update_db(date_from):
+def update_db(*date_from):
     '''
-	updates the sms in the database starting from the date_from specified (at time midnight)
-	'''
-    #date_from_twil = ("%s-%s-%s"%(date_from.year,"{0:0>2}".format(date_from.month),"{0:0>2}".format(date_from.day)))
-    d = date(date_from.year, date_from.month, date_from.day)
-    #messages = client.messages.list(date_sent=d) #doesnt work
-    messages = client.messages.list() 
-    print(messages)
+    updates the sms in the database starting from the date_from specified (at time midnight)
+    no param = updates the sms feedback in database with all message entries
+    TODO: this may create duplicate entries, should test this 
+    '''
+    if date_from == ():
+        messages = client.messages.list() # this may have a long random string first
+    else:
+        date_from = date_from[0]
+        messages = client.messages.list(date_sent=date_from)
     for message in messages:
         try:
-            sms_tmp = Sms(body=message.body, phone_number=message.from_, submission_time=message.date_sent)
+            sms_tmp = Sms(
+                sid=message.sid,
+                submission_time=message.date_sent,
+                body=message.body, 
+                phone_number=message.from_
+                )
             print(sms_tmp.body)
-            print(sms_tmp.submission_time) 
+            #print(sms_tmp.submission_time) 
             if not (sms_tmp.save()):
                 print("sms could not be saved in sb")
         except ValueError:
             print("End of messages reached.")
             return 0
     return 1 #this should be on success
+
+#only need to do this before demo
+# def delete_feedback():
+#     '''
+#     wipe all message history on twilio
+#     '''
+#     messages = client.messages.list()
+#     for message in messages:
+#         try:
+#             client.messages.delete(message.sid)
+#         except ValueError:
+#             print("End of messages list reached.")
+#             return 0
+#     return 1

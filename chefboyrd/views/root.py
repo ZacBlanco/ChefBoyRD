@@ -58,5 +58,8 @@ def sms():
     '''
 	get a list of all messages sent to Twilio
     '''
-    
-    send_sms.rcv_sms()
+    import datetime
+    d  = datetime.date.today()
+    send_sms.update_db(d)
+    return 'sms'
+    #send_sms.rcv_sms()

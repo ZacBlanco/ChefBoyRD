@@ -1,12 +1,12 @@
-from chefboyrd import DB as db
 from peewee import *
+from chefboyrd.models import BaseModel
 
 class Sms(Model):
-	id = PrimaryKeyField()
+	'''
+	sid is an unique id assigned by twilio. it will help us keep track of sms that is in, or not in db
+	'''
+	sid = TextField()
 	submission_time = DateTimeField()
 	body = TextField()
 	phone_number = TextField()
-	#additional categories to associate
-	
-	class Meta:
-		database = db
+	#additional categories to associate	
