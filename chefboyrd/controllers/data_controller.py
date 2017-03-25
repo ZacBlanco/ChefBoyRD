@@ -165,12 +165,12 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
         # 2. Add the ingredient to ingredients table
         # 3. Add the quantity to quantities table
         # 4. Add the MealIngredients after getting the ingredient ID and quanitity ID
-        meal = Meals.create_or_get(name=item, price=menu[item]['price'])[0]
+        meal = Meals.get_or_create(name=item, price=menu[item]['price'])[0]
         for ingredient in menu[item]['ingredients']:
             qna = menu[item]['ingredients'][ingredient].strip().split('=')
-            ingredient = Ingredients.create_or_get(name=ingredient)[0]
-            quant = Quantities.create_or_get(name=qna[1])[0]
-            m_ingr = MealIngredients.create_or_get(meal_id=meal.get_id(),
+            ingredient = Ingredients.get_or_create(name=ingredient)[0]
+            quant = Quantities.get_or_create(name=qna[1])[0]
+            m_ingr = MealIngredients.get_or_create(meal_id=meal.get_id(),
                                                    ingredient_id=ingredient.get_id(),
                                                    quantity_meas_id=quant.get_id(),
                                                    quantity_amt=qna[0])
