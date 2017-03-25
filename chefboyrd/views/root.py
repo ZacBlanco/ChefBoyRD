@@ -25,6 +25,7 @@ Dive deeper into the documentation for a better understanding of how this all wo
 from flask import Blueprint, render_template, abort
 from jinja2 import TemplateNotFound
 from chefboyrd.controllers import customer_controller, send_sms
+import datetime
 
 page = Blueprint('main', __name__, template_folder='templates')
 
@@ -56,10 +57,9 @@ def new_cust(name):
 @page.route('/sms')
 def sms():
     '''
-	get a list of all messages sent to Twilio
+	get a list of all messages sent to Twilio today
     '''
-    import datetime
     d  = datetime.date.today()
-    send_sms.update_db(d)
+    send_sms.update_db()
     return 'sms'
     #send_sms.rcv_sms()

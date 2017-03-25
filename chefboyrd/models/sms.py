@@ -1,4 +1,4 @@
-from peewee import *
+from peewee import TextField, DateTimeField, Model
 from chefboyrd.models import BaseModel
 
 class Sms(Model):
@@ -8,5 +8,5 @@ class Sms(Model):
 	sid = TextField()
 	submission_time = DateTimeField()
 	body = TextField()
-	phone_number = TextField()
+	phone_num = TextField()
 	#additional categories to associate	

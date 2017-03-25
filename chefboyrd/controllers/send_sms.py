@@ -1,9 +1,9 @@
-from chefboyrd.models.sms import Sms
 from twilio.rest import TwilioRestClient
 from datetime import datetime, date
 import twilio.twiml
 import configparser
 import os
+from chefboyrd.models.sms import Sms
 
 config = configparser.RawConfigParser()
 config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
@@ -25,6 +25,9 @@ def update_db(*date_from):
     updates the sms in the database starting from the date_from specified (at time midnight)
     no param = updates the sms feedback in database with all message entries
     TODO: this may create duplicate entries, should test this 
+
+    Args:
+        date_from (date object): a specified date, where we update db with sms sent after this date
     '''
     if date_from == ():
         messages = client.messages.list() # this may have a long random string first
@@ -37,9 +40,9 @@ def update_db(*date_from):
                 sid=message.sid,
                 submission_time=message.date_sent,
                 body=message.body, 
-                phone_number=message.from_
+                phone_num=message.from_
                 )
-            print(sms_tmp.body)
+            #print(sms_tmp.body)
             #print(sms_tmp.submission_time) 
             if not (sms_tmp.save()):
                 print("sms could not be saved in sb")

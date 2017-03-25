@@ -1,6 +1,8 @@
 requests
 flask
+flask_table
 peewee
 twilio
 flask-login
 werkzeug
+

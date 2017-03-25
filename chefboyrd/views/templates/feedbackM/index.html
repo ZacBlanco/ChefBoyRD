@@ -2,25 +2,10 @@
 {% block body %}
     <h2>Welcome</h2>
     <div>
-        This is the reservation page
-        Here are a list of reservations made
+        This is the page for displaying feedback
+        Here is a list of the feedback made
         <br>
         {{table}}
         <br>
-
-
-        <H1>Add a Reservation Here</H1>
-            {% from "_formhelpers.html" import render_field, render_field_date %}
-        <br>
-		<form action="" method=post>
-		  <dl>
-		  	{{ form.hidden_tag() }}
-		    {{ render_field(form.name) }}
-		    {{ render_field(form.num) }}
-		    {{ render_field(form.phone) }}
-		    {{ render_field_date(form.start) }}
-		  </dl>
-		  <p><input type=submit>
-		</form>
     </div>
 {% endblock %}

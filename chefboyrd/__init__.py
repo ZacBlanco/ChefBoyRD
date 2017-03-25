@@ -84,7 +84,7 @@ from chefboyrd.views import root, stat_dash, feedbackM
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
 APP.register_blueprint(auth_pages, url_prefix='/auth')
-APP.register_blueprint(feedbackM.page, url_prefix='feedbackM')
+APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 
 # Put all table creations after here
 # ==================================
