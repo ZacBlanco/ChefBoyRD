@@ -29,6 +29,8 @@ class ModelTest(unittest.TestCase):
         Orders.create_table(True)
         Quantities._meta.database = chefboyrd.DB
         Quantities.create_table(True)
+        Ingredients._meta.database = chefboyrd.DB
+        Ingredients.create_table(True)
 
     @classmethod
     def tearDown(self):
@@ -145,6 +147,12 @@ class ModelTest(unittest.TestCase):
             data_controller.get_dotw_orders(-1)
         with self.assertRaises(ValueError):
             data_controller.get_dotw_orders(8)
+
+    @patch('chefboyrd.models.Orders.create', return_value=None)
+    def test_generate_data(self, orders):
+        # print(Ingredients._meta.database.database)
+        data_controller.generate_data(num_days=1, num_tabs=5)
+        orders.asser_called_once()
             
 
 

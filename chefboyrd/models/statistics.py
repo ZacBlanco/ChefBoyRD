@@ -26,11 +26,11 @@ class Tabs(BaseModel):
 
 class Ingredients(BaseModel):
     '''A table which maps ingredient names to ingredient ID's'''
-    name = CharField()
+    name = CharField(unique=True)
 
 class Quantities(BaseModel):
     '''A table mapping quantities names to quantity Id's'''
-    name = CharField()
+    name = CharField(unique=True)
 
 class MealIngredients(BaseModel):
     '''A table mapping a meal to the ingredients used'''
