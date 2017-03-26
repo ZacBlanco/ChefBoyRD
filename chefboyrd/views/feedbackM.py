@@ -4,7 +4,11 @@ from jinja2 import TemplateNotFound
 from flask_wtf import FlaskForm
 from wtforms import DateTimeField, SubmitField
 from chefboyrd.auth import require_role
+<<<<<<< HEAD
 from chefboyrd.controllers import feedback_controller, send_sms
+=======
+from chefboyrd.controllers import feedback_controller
+>>>>>>> d0fbc3ff4433379e8f6ecad7885ca1e1a190becd
 from chefboyrd.models.sms import Sms
 from datetime import datetime
 import copy
@@ -15,6 +19,7 @@ class DateSpecifyForm(FlaskForm):
     '''
     The form that should be submitted to get feedback tables within the specified date range
      '''
+
     date_time_from = DateTimeField('Time From',format='%Y-%m-%d %H:%M:%S')
     date_time_to = DateTimeField('Time To',format='%Y-%m-%d %H:%M:%S')
     submit_field = SubmitField("search")
@@ -63,6 +68,9 @@ def feedback_table():
         
         if (pos_col ==1 or neg_col==1 or except_col==1 or food_col==1 or service_col==1):
             feedback_analyze=1
+        if (request.form.get('WordCloud') == 1):
+            pass
+            #feedback_controller.word_freq_counter()
         res = []
         all_string_bodies = ""
         for sms in smss:
@@ -99,17 +107,17 @@ def feedback_table():
                 #print(sms.body)
             else:
                 res.append(copy.deepcopy(tmp_dict))
-            all_string_bodies = all_string_bodies + sms.body + ","
-        if (request.form.get('WordCloud')):
-            word_freq = feedback_controller.word_freq_counter(all_string_bodies)
-        else:
-        	word_freq = []
-        #print(word_freq)
+
+        #     all_string_bodies = all_string_bodies + sms.body + ","
+        # if (request.form.get('WordCloud')):
+        #     word_freq = feedback_controller.word_freq_counter(all_string_bodies)
+        # else:
+        # 	word_freq = []
+        # #print(word_freq)
         table = TableCls(res)
     else:
         res = []
         table = TableCls(res)
-
     if not (res == []):
         return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=word_freq)
     else:

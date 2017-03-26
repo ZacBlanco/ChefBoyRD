@@ -52,7 +52,6 @@ def feedback_analysis(inStr):
 
     if not isinstance(inStr, str):
         raise TypeError("Input must be a string")
-
     
     posFlag = 0
     negFlag = 0
