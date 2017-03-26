@@ -23,7 +23,7 @@ Basically if you've got some code and it doesn't interact with the models or the
 then it should be a controller.
 
 '''
-from chefboyrd.models.customers import Customer
+from chefboyrd.models import Customer
 
 
 def new_customer(name):

@@ -17,6 +17,15 @@
             {% if message %}
                     <h3>{{ message }}</h3>
             {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="flashes bg-warning">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            {% endwith %}
             <section id="main">    
                 <br>
                 {% block body %}
