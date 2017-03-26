@@ -107,10 +107,10 @@ def index():
 #updates database whenever a text comes in, needed for demo eventually
 @APP.route('/',methods=['POST'])
 def test_sms():
-	'''When Twilio makes a POST request, db will be updated with new sms messages from today'''
-	#print(request.url)
-	send_sms.update_db(date.today())
-	return 'db updated'
+    '''When Twilio makes a POST request, db will be updated with new sms messages from today'''
+    #print(request.url)
+    send_sms.update_db(date.today())
+    return 'db updated'
 
 # =============================================================================================== #
 
