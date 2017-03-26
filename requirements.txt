@@ -7,4 +7,3 @@ flask-login
 werkzeug
 wtforms
 flask-wtf
-

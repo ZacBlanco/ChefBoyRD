@@ -17,6 +17,9 @@ restaurant_phone_number = config['test']['restaurant_phone_number']
 '''
 need the sms information in the database so we can create tables with multiple objects
 '''
+#updates database whenever a text comes in, needed for demo eventually
+#
+
 def update_db(*date_from):
     '''
     updates the sms in the database starting from the date_from specified (at time midnight)
@@ -27,11 +30,14 @@ def update_db(*date_from):
 
     Args:
         date_from (date object): a specified date, where we update db with sms sent after this date
+
+    Throws:
+        SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or auth_token
     '''
     try:
         client = TwilioRestClient(account_sid,auth_token)
     except:
-        print("Could not communicate with Twilio Rest client");
+        raise SystemError("Could not communicate with Twilio Rest client");
     if date_from == ():
         messages = client.messages.list() # this may have a long random string first
     else:
@@ -47,7 +53,12 @@ def update_db(*date_from):
                 sid=message.sid,
                 submission_time= date_tmp,
                 body=message.body, 
-                phone_num=message.from_
+                phone_num=message.from_,
+                pos_flag=-1,
+                neg_flag=-1,
+                exception_flag=-1,
+                food_flag=-1,
+                service_flag=-1
                 )
             #print(sms_tmp.body)
             #print(sms_tmp.submission_time) 
@@ -61,6 +72,7 @@ def update_db(*date_from):
         except IntegrityError:
             err = 0
             print("Duplicate Sms Entry " + sms_tmp.body)
+            #raise IntegrityError
     return 1 #this should be on success
 
 #only need to do this once before demo
@@ -68,6 +80,10 @@ def delete_feedback():
     '''
     wipe all message history on twilio
     '''
+    try:
+        client = TwilioRestClient(account_sid,auth_token)
+    except:
+        raise SystemError("Could not communicate with Twilio Rest client");
     messages = client.messages.list()
     for message in messages:
         try:

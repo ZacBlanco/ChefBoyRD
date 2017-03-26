@@ -61,7 +61,6 @@ APP.secret_key = 'ENG-</rutgers-chefboyrd?>-<oij!$9ui%^98A*FSD>@2018!'
 LM = flask_login.LoginManager()
 LM.init_app(APP)
 import chefboyrd.auth # register the login and authentication functions
-from chefboyrd.controllers import send_sms
 
 @APP.before_request
 def before_request():
@@ -103,14 +102,6 @@ def index():
                                logged_in=True)
     else:
         return render_template('default.html')
-
-#updates database whenever a text comes in, needed for demo eventually
-@APP.route('/',methods=['POST'])
-def test_sms():
-	'''When Twilio makes a POST request, db will be updated with new sms messages from today'''
-	#print(request.url)
-	send_sms.update_db(date.today())
-	return 'db updated'
 
 # =============================================================================================== #
 
