@@ -45,7 +45,7 @@ import flask_login
 from flask import Flask, render_template
 from peewee import SqliteDatabase, fn
 import datetime
-from datetime import date, datetime
+from datetime import timedelta
 
 
 def init_db(dbname):

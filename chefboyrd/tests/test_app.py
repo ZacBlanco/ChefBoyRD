@@ -26,6 +26,3 @@ class ChefBoyRDTest(unittest.TestCase):
         rv = self.app.get('/test/hello')
         rv.get_data(True)
         self.assertEqual('Hi', rv.get_data(True))
-
-if __name__ == '__main__':
-    unittest.main()
