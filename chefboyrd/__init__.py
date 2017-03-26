@@ -38,10 +38,12 @@ Other helpful sources of documentaiton and reading:
 
 
 '''
+import datetime
+from datetime import timedelta
 import configparser
 import flask_login
 from flask import Flask, render_template
-from peewee import SqliteDatabase
+from peewee import SqliteDatabase, fn
 
 
 def init_db(dbname):
@@ -130,3 +132,9 @@ try:
     User.create_user('caz', 'caz', 'caz', 'notanadmin')
 except:
     pass
+
+from chefboyrd.controllers import data_controller
+
+if Orders.select().count() < 1000:
+    start_date = datetime.datetime.now() - timedelta(days=15)
+    data_controller.generate_data(num_days=15, num_tabs=45, dt_start=start_date)

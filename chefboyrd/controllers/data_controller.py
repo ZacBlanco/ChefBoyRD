@@ -23,15 +23,15 @@ def get_meals(dt_min=None, dt_max=None):
     '''
     meals = None
     if dt_min is None and dt_max is None:
-        meals = Meals.select()
+        meals = Meals.select().join(Tabs)
     elif dt_min is None:
-        meals = Meals.select().join(Tabs).where(Meals.timestamp <= dt_max)
+        meals = Meals.select().join(Tabs).where(Tabs.timestamp <= dt_max)
     elif dt_max is None:
-        meals = Meals.select().join(Tabs).where(Meals.timestamp >= dt_min)
+        meals = Meals.select().join(Tabs).where(Tabs.timestamp >= dt_min)
     elif timedelta.total_seconds(dt_max - dt_min) < 0:
         raise ValueError("Max datetime must be greater than min datetime")
     else:
-        meals = Meals.select().join(Tabs).where(Meals.timestamp >= dt_min, Meals.timestamp <= dt_max)
+        meals = Meals.select().join(Tabs).where(Tabs.timestamp >= dt_min, Tabs.timestamp <= dt_max)
     return meals
 
 def get_orders_date_range(dt_min=None, dt_max=None):
@@ -153,8 +153,7 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
         num_days (int): default=10, The number of days to generate data for
         num_tabs (int): default=50, The average number of tabs per day
         order_per_tab (int): default=3, Number of orders which exist on each tab
-        dt_min (datetime): default=(today().day - numdays/2), The datetime to start creating orders
-        dt_max (datetime): default=(today().day + numdays/2), The datetime to stop creating orders
+        dt_start (datetime): default=(datetime.now()), The datetime to start creating orders
 
     Returns:
         int: The number of new orders created in the DB.
@@ -186,14 +185,14 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
         
         for tab in range(int(clamp_rng(random.gauss(num_tabs, 2), 1, 20000000))):
             # Create tab here
-            tab_time = time(hour=int(clamp_rng(random.gammavariate(39.25, .3057324840764), 6, 23)),
+            tab_time = time(hour=int(clamp_rng(random.gammavariate(60.25, .1991701244813278), 6, 21)),
                             minute=random.randint(0, 59))
             tab_dt = datetime(year=tab_date.year,
                               day=tab_date.day,
                               month=tab_date.month,
                               hour=tab_time.hour,
                               minute=tab_time.minute)
-            num_orders = clamp_rng(abs(round(random.gauss(order_per_tab, 1))), 1, 200) #rng w/ mean of order_per_tab
+            num_orders = int(clamp_rng(abs(random.gauss(order_per_tab, 1)), 1, 200)) #rng w/ mean of order_per_tab
             tab = Tabs.create(timestamp=tab_dt, had_reservation=randbool(), party_size=num_orders)
             for order in range(num_orders):
                 # Pick a random meal
@@ -204,7 +203,6 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
 
 def randbool():
     return random.gauss(0, 1) >= 0
-
 
 def clamp_rng(num, lo, hi):
     '''Forces a number to fall within min/max range by doing lo + (num % (hi-lo))

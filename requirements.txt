@@ -4,3 +4,5 @@ peewee
 flask-login
 werkzeug
 gunicorn
+matplotlib
+scikit-learn
