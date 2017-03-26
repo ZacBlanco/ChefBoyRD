@@ -44,6 +44,8 @@ import configparser
 import flask_login
 from flask import Flask, render_template
 from peewee import SqliteDatabase, fn
+import datetime
+from datetime import date, datetime
 
 
 def init_db(dbname):
@@ -84,16 +86,22 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash
+from chefboyrd.views import root, stat_dash, feedbackM
+from chefboyrd.views import root, stat_dash, reservationH, table_manager
+from chefboyrd.models import customers, user, reservation, tables
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
 APP.register_blueprint(auth_pages, url_prefix='/auth')
+APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
+APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
+APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 
 # Put all table creations after here
 # ==================================
 from chefboyrd.models import Customer, User
 from chefboyrd.models import Meals, Ingredients, MealIngredients, Quantities, Tabs, Orders
+from chefboyrd.models import customers, user, sms
 
 Customer.create_table(True)
 User.create_table(True)
@@ -104,6 +112,12 @@ MealIngredients.create_table(True)
 Quantities.create_table(True)
 Tabs.create_table(True)
 Orders.create_table(True)
+
+sms.Sms.create_table(True)
+reservation.Reservation.create_table(True)
+tables.Restaurant.create_table(True)
+tables.Table.create_table(True)
+tables.Booking.create_table(True)
 
 # ==================================== Universal Routes ======================================== #
 @APP.route('/')
@@ -127,14 +141,47 @@ try:
 except:
     pass
 
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',18,23)
+# except:
+#     pass
+
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     tables.Table.create_tables(1,4)
+# except:
+#     pass
+
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    user.User.create_user('bcs', 'bcs', 'bcs', 'admin')
+except:
+    pass
+
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     print("TESTING")
+#     reservation.Reservation.create_reservation('Brandon',6,'732-333-5555',datetime.datetime.now())
+# except:
+#     pass
+
 try:
     # email: caz, pw: caz
     User.create_user('caz', 'caz', 'caz', 'notanadmin')
 except:
     pass
 
-from chefboyrd.controllers import data_controller
 
+from chefboyrd.controllers import data_controller
 if Orders.select().count() < 1000:
     start_date = datetime.datetime.now() - timedelta(days=15)
     data_controller.generate_data(num_days=15, num_tabs=45, dt_start=start_date)
