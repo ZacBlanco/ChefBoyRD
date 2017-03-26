@@ -9,9 +9,11 @@ class Sms(Model):
     submission_time(datetime): is the date and time the feedback was submitted
     body(str): the message of the string
     phone_num(str): Phone number of person who sent in text
+
+    TODO: submission_time assumes we are in EST time zone
 	'''
 	sid = TextField(unique=True)
-	submission_time = DateTimeField()
+	submission_time = DateTimeField() 
 	body = TextField()
 	phone_num = TextField()
 	#additional categories to associate	

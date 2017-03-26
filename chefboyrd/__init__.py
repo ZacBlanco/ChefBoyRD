@@ -42,7 +42,7 @@ import configparser
 import flask_login
 from flask import Flask, render_template
 from peewee import SqliteDatabase
-import datetime
+from datetime import date, datetime
 
 
 
@@ -104,14 +104,13 @@ def index():
     else:
         return render_template('default.html')
 
-# #updates database whenever a text comes in, needed for demo eventually
-# import date
-# @APP.route('/',methods=['POST'])
-# def test_sms():
-# 	'''When Twilio makes a POST request, db will be updated with new sms messages from today'''
-# 	#print(request.url)
-# 	send_sms.update_db(datetime.date().today())
-# 	return 'db updated'
+#updates database whenever a text comes in, needed for demo eventually
+@APP.route('/',methods=['POST'])
+def test_sms():
+	'''When Twilio makes a POST request, db will be updated with new sms messages from today'''
+	#print(request.url)
+	send_sms.update_db(date.today())
+	return 'db updated'
 
 # =============================================================================================== #
 

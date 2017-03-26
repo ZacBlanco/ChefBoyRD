@@ -40,7 +40,6 @@ def feedback_table():
     Display a table of feedback sent in during a specified date-time range.
     By default all feedback in database will be displayed
     '''
-
     #get all of the feedback objects and insert it into table
     form = DateSpecifyForm()
     if (request.method== 'POST'):
@@ -52,7 +51,7 @@ def feedback_table():
         	).order_by(-Sms.submission_time)
         res = []
         for sms in smss:
-            print(sms.submission_time)
+            #print(sms.submission_time)
             res.append(dict(submission_time=sms.submission_time,body=sms.body))
         table = ItemTable(res)
     else:

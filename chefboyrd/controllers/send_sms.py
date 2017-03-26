@@ -1,5 +1,5 @@
 from twilio.rest import TwilioRestClient
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import twilio.twiml
 import configparser
 import os
@@ -13,11 +13,6 @@ auth_token = config['keys']['auth_token']
 cust_phone_number = config['test']['cust_phone_number']
 restaurant_phone_number = config['test']['restaurant_phone_number']
 
-try:
-    client = TwilioRestClient(account_sid,auth_token)
-except:
-    print("Could not communicate with Twilio Rest client");
-
 
 '''
 need the sms information in the database so we can create tables with multiple objects
@@ -27,35 +22,45 @@ def update_db(*date_from):
     updates the sms in the database starting from the date_from specified (at time midnight)
     no param = updates the sms feedback in database with all message entries
     TODO: this may create duplicate entries, should test this 
+    TODO: Fix error with twilio, where the most recent message does not have a submission timep
+    TODO: Fix possible error with DST. TImezone was hotfix
 
     Args:
         date_from (date object): a specified date, where we update db with sms sent after this date
     '''
+    try:
+        client = TwilioRestClient(account_sid,auth_token)
+    except:
+        print("Could not communicate with Twilio Rest client");
     if date_from == ():
         messages = client.messages.list() # this may have a long random string first
     else:
         date_from = date_from[0]
-        messages = client.messages.list(date_sent=date_from)
+        messages = client.messages.list(DateSent=date_from)
     for message in messages:
         try:
+            if (message.date_sent != None):
+                date_tmp = message.date_sent - timedelta(hours=4)
+            else:
+                date_tmp = None
             sms_tmp = Sms(
                 sid=message.sid,
-                submission_time=message.date_sent,
+                submission_time= date_tmp,
                 body=message.body, 
                 phone_num=message.from_
                 )
             #print(sms_tmp.body)
             #print(sms_tmp.submission_time) 
-            try:
-                err = sms_tmp.save()
-            except IntegrityError:
-                err = 0
-                print("Duplicate Sms Entry")
+            #print(sms_tmp.body)
+            err = sms_tmp.save()
             if not (err):
-                print("Sms could not be saved in db")
+                print("Sms could not be saved in db" + sms_tmp.body)
         except ValueError:
             print("End of messages reached.")
             return 0
+        except IntegrityError:
+            err = 0
+            print("Duplicate Sms Entry " + sms_tmp.body)
     return 1 #this should be on success
 
 #only need to do this once before demo
