@@ -38,14 +38,14 @@ Other helpful sources of documentaiton and reading:
 
 
 '''
+import datetime
+from datetime import timedelta
 import configparser
 import flask_login
 from flask import Flask, render_template
-from peewee import SqliteDatabase
+from peewee import SqliteDatabase, fn
 import datetime
-from datetime import date, datetime
-
-
+from datetime import timedelta
 
 
 def init_db(dbname):
@@ -67,13 +67,19 @@ import chefboyrd.auth # register the login and authentication functions
 @APP.before_request
 def before_request():
     """Connect to the database before each request."""
-    DB.get_conn()
+    try:
+        DB.connect()
+    except:
+        pass
 
 
 @APP.after_request
 def after_request(response):
     """Close the database connection after each request."""
-    DB.close()
+    try:
+        DB.close()
+    except:
+        pass
     return response
 
 
@@ -93,10 +99,21 @@ APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 
 # Put all table creations after here
 # ==================================
+from chefboyrd.models import Customer, User
+from chefboyrd.models import Meals, Ingredients, MealIngredients, Quantities, Tabs, Orders
 from chefboyrd.models import customers, user, sms
+
+Customer.create_table(True)
+User.create_table(True)
+
+Meals.create_table(True)
+Ingredients.create_table(True)
+MealIngredients.create_table(True)
+Quantities.create_table(True)
+Tabs.create_table(True)
+Orders.create_table(True)
+
 sms.Sms.create_table(True)
-customers.Customer.create_table(True)
-user.User.create_table(True)
 reservation.Reservation.create_table(True)
 tables.Restaurant.create_table(True)
 tables.Table.create_table(True)
@@ -119,8 +136,8 @@ def index():
 try:
     # Test User:
     # email: zac
-    # Password: zac 
-    user.User.create_user('zac', 'zac', 'zac', 'admin')
+    # Password: zac
+    User.create_user('zac', 'zac', 'zac', 'admin')
 except:
     pass
 
@@ -159,7 +176,12 @@ except:
 
 try:
     # email: caz, pw: caz
-    user.User.create_user('caz', 'caz', 'caz', 'notanadmin')
+    User.create_user('caz', 'caz', 'caz', 'notanadmin')
 except:
     pass
 
+
+from chefboyrd.controllers import data_controller
+if Orders.select().count() < 1000:
+    start_date = datetime.datetime.now() - timedelta(days=15)
+    data_controller.generate_data(num_days=15, num_tabs=45, dt_start=start_date)

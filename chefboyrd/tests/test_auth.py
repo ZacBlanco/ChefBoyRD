@@ -4,7 +4,7 @@ import os
 import tempfile
 from chefboyrd import auth
 import flask_login
-from chefboyrd.models import user
+from chefboyrd.models import User
 
 
 class AuthTest(unittest.TestCase):
@@ -22,7 +22,7 @@ class AuthTest(unittest.TestCase):
     def test_login(self):
         '''Test login/logout functionality'''
         try:
-            user.User.create_user('zac', 'zac', 'zac', 'manager')
+            User.create_user('zac', 'zac', 'zac', 'manager')
         except:
             pass
         rv = self.app.get('/protected')
@@ -42,8 +42,8 @@ class AuthTest(unittest.TestCase):
     def test_roles(self):
         '''Test the role requirement wrapper'''
         try:
-            user.User.create_user('man', 'man', 'man', 'manager')
-            user.User.create_user('nam', 'nam', 'nam', 'nomanager')
+            User.create_user('man', 'man', 'man', 'manager')
+            User.create_user('nam', 'nam', 'nam', 'nomanager')
         except:
             pass
         rv = self.app.get('/admintest')
@@ -74,8 +74,6 @@ class AuthTest(unittest.TestCase):
     def logout(self):
         '''Logs the user out'''
         return self.app.get('/auth/logout')
-        
-
 
 @chefboyrd.APP.route('/protected')
 @auth.require_login

@@ -5,6 +5,9 @@ peewee
 twilio
 flask-login
 werkzeug
+gunicorn
+matplotlib<2.0.0
+scikit-learn
 wtforms
 flask-wtf
 Flask-WTF

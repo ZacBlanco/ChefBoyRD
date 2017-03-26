@@ -1,7 +1,74 @@
 {% extends "default.html" %}
 {% block body %}
-    <h2>Welcome</h2>
-    <div>
-        This is the dashboard page
+    <div class="row">
+        <h3 class="col-xs-10 col-xs-push-2">Dashboard > {{ request.args.type }}</h3>
+    </div>
+    <div class="row well">
+        Please select an item <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Dashboards
+        <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="/dashboard/?type=Performance">Performance</a></li>
+            <li><a href="/dashboard/?type=Meals">Meals</a></li>
+            <li><a href="/dashboard/?type=Tabs">Tabs</a></li>
+            <li><a href="/dashboard/?type=Ingredients">Ingredients</a></li>
+            <li><a href="/dashboard/?type=Revenue">Revenue</a></li>
+        </ul>
+    </div>
+    </div>
+    <hr>
+    {% if request.args.type %}
+        <form action='/dashboard/?type={{ request.args.type }}' method="POST">
+        <div class="form-inline">
+            {% if request.args.type == "Meals" or request.args.type == "Ingredients" or request.args.type == "Tabs" %}
+                <label for="item-type">Item Type</label>
+                <select onchange="saveValue(this)" id='{{ request.args.type }}-type' class="form-control" name="selector"> 
+                {% if options %}
+                    {% for option in options %}
+                        <option>{{ option }}</option>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            </select>
+            <input text='View Graph' type='submit' class='form-control'/>
+        </div>
+            <br>
+            <label for="startdate">Start Date</label>
+            <input id="startdate" type="date" onchange="saveValue(this)" name="startdate">
+            <label for="enddate">End Date</label>
+            <input id="enddate" type="date" onchange="saveValue(this)" name="enddate">
+        </form>
+        <script type="text/javascript">
+        document.getElementById("{{ request.args.type }}-type").value = getSavedValue("{{ request.args.type }}-type"); 
+        document.getElementById("startdate").value = getSavedValue("startdate"); 
+        document.getElementById("enddate").value = getSavedValue("enddate"); 
+        //Save the value function - save it to localStorage as (ID, VALUE)
+        function saveValue(e){
+            var id = e.id;
+            var val = e.value;
+            localStorage.setItem(id, val);
+        }
+
+        //get the saved value function - return the value of "v" from localStorage. 
+        function getSavedValue  (v){
+            if (localStorage.getItem(v) === null) {
+                return "";
+            }
+            return localStorage.getItem(v);
+        }
+        </script>
+    {% endif %}
+    <br>
+    <div class="row">
+    {% if graphs %}
+        {% for graph in graphs %}
+            <div class="">
+                    <img width="{{ graph.width }}" height="{{ graph.height }}" src="{{ graph.img }}"/>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
     </div>
 {% endblock %}
