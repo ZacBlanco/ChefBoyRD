@@ -59,9 +59,10 @@ class Table(BaseModel):
             ValueError: 
         '''
         try:
-            cls.create(
+            tb = cls.create(
                 restaurant=restaurant,
                 size=size, occupied=occupied, posX=posX,posY=posY)
+            return [tb.posX,tb.posY,tb.occupied,tb.id]
         except IntegrityError:
             raise ValueError("This should not happen(Table)")
 

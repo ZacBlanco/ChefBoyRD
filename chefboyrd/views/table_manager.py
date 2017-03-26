@@ -102,3 +102,10 @@ def update_table():
         coords.append([table.posX,table.posY, table.occupied,table.id])
     return json.dumps(coords)
 
+@page.route("/add_table",methods=['GET', 'POST'])
+@require_role('admin') # Example of requireing a role(and authentication)
+def add_table():
+    '''Renders the index page of the dashboards
+    '''
+    id = tables.Table.create_tables(1,5, 0,0.5, 0.5)
+    return json.dumps(id)
