@@ -115,7 +115,7 @@ def feedback_table():
         res = []
         table = TableCls(res)
     if not (res == []):
-        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=word_freq)
+        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form)
     else:
         return render_template('feedbackM/index.html', logged_in=True, form=form)
 
