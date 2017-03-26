@@ -4,11 +4,7 @@ from jinja2 import TemplateNotFound
 from flask_wtf import FlaskForm
 from wtforms import DateTimeField, SubmitField
 from chefboyrd.auth import require_role
-<<<<<<< HEAD
 from chefboyrd.controllers import feedback_controller, send_sms
-=======
-from chefboyrd.controllers import feedback_controller
->>>>>>> d0fbc3ff4433379e8f6ecad7885ca1e1a190becd
 from chefboyrd.models.sms import Sms
 from datetime import datetime
 import copy
