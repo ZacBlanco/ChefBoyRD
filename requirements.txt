@@ -1,8 +1,12 @@
 requests
 flask
+flask_table
 peewee
+twilio
 flask-login
 werkzeug
+wtforms
+flask-wtf
 Flask-WTF
 WTForms-Alchemy
 Flask-Table
