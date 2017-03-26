@@ -64,10 +64,11 @@ def confirm():
     '''Renders the index page of the dashboards
     '''
     id = int(request.args.get('id'))
+    id2 = 0
     for ids in tables.Booking.select().where(tables.Booking.id == id):
-        id = int(ids.table.id)
+        id2 = int(ids.table.id)
         break
-    query = tables.Table.update(occupied=1).where(tables.Table.id==id)
+    query = tables.Table.update(occupied=1).where(tables.Table.id==id2)
     query.execute()
     tables.Booking.cancel_reservation(id)
     # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
