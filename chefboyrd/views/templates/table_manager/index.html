@@ -1,0 +1,149 @@
+{% extends "default.html" %}
+{% block body %}
+    <h2>Welcome</h2>
+    <div>
+        This is the Table Management page
+        Here are a list of reservations made
+<!--                  <div id="buttons">
+    <button id="addTable">
+      Add Table
+    </button>
+    </div> -->
+            <br>
+        {{table}}
+        <br>
+        <div id="container"></div>
+
+
+  <script>
+    document.getElementById("container").style.border = "solid #000000";
+    var width = document.getElementById("container").clientWidth;
+    var height = window.innerHeight;
+    radius = width / 15
+    function addCircle(layer, posX, posY, occupied,id) {
+        var group = new Konva.Group({
+            draggable: true,
+            id: 'group'+id,
+            x: posX,
+            y: posY,
+        });
+        var tableNo = new Konva.Text({
+              id: id,
+              x: 0-radius / 2,
+              y: 0 - radius / 2,
+              text: id,
+              fontSize: 30,
+              fontFamily: 'Calibri',
+            });
+        var circle = new Konva.Circle({
+            id: id,
+            x: 0,
+            y: 0,
+            radius: radius,
+            fill: (occupied == 'True') ? 'red' : 'green'
+        });
+        tableNo.setListening(false);
+        group.add(circle)
+        group.add(tableNo)
+        layer.add(group);
+    }
+   var text = new Konva.Text({
+      x: width / 4,
+      y: 10,
+      fontFamily: 'Calibri',
+      fontSize: 24,
+      text: '',
+      fill: 'black'
+    });
+    function writeMessage(message) {
+      text.setText(message);
+      layer.draw();
+    }
+    var stage = new Konva.Stage({
+        container: 'container',
+        width: width,
+        height: height
+    });
+    var dragLayer = new Konva.Layer();
+    var layersArr = [];
+    /*
+    * create 10 layers each containing 1000 shapes to create
+    * 10,000 shapes.  This greatly improves performance because
+    * only 1,000 shapes will have to be drawn at a time when a
+    * circle is removed from a layer rather than all 10,000 shapes.
+    * Keep in mind that having too many layers can also slow down performance.
+    * I found that using 10 layers each made up of 1,000 shapes performs better
+    * than 20 layers with 500 shapes or 5 layers with 2,000 shapes
+    */
+    var layer = new Konva.Layer();
+    {% for tb in tables.Table.select() %}
+        addCircle(layer,width * {{tb.posX}},height * {{tb.posY}},'{{tb.occupied}}',{{tb.id}});
+    {% endfor %}
+    layer.add(text);
+    stage.add(layer);
+    stage.add(dragLayer);
+
+   stage.on('dblclick dbltap', function(evt) {
+        var circle = evt.target;
+        var id = circle.id();
+        var circle = stage.findOne('#'+id)
+        occupied =  (circle.fill() == 'red') ? 0 : 1
+        $.post( "/table_manager/change_table", {
+            occupied: occupied,
+            type: 1,
+            id: id
+        });
+        circle.setFill((circle.fill() == 'red') ? 'green' : 'red')
+        var layer = circle.getLayer();
+        layer.draw();
+    });
+    // stage.on('mousedown touchstart', function(evt) {
+    //     var circle = evt.target;
+    //     // circle.setFill('red')
+    //     var layer = circle.getLayer();
+    //     // circle.moveTo(dragLayer);
+    //     // layer.draw();
+    //     // circle.startDrag();
+    // });
+
+    stage.on('dragend', function(evt) {
+        var circle = evt.target;
+        // circle.setFill('red')
+        var x = circle.x() / width;
+        var y = circle.y() / height;
+        var id = circle.id().replace( /^\D+/g, '');;
+        $.post( "/table_manager/change_table", {
+            type: 0,
+            posX: x,
+            posY: y,
+            id: id
+        });
+        writeMessage('Table: ' + id + ' at ' + 'x: ' +Math.floor(x*width) + ', y: ' + Math.floor(height*y));
+        layer.draw();
+    });
+    function updateShapes(new_x, new_y, new_occupied, id){
+        var group = stage.findOne('#group'+id)
+        var circle = stage.findOne('#'+id)
+        occupied =  (new_occupied) ? 'red' : 'green'
+        circle.setFill(occupied)
+        group.x(new_x * width)
+        group.y(new_y * height)
+        var layer = group.getLayer();
+        layer.draw();
+    }
+
+    // document.getElementById('addTable').addEventListener('click', function() {
+    //   addCircle(layer);
+    //   layer.draw();
+    // }, false);
+    window.setInterval(function(){
+         $.get( "/table_manager/update_table", function( data ) {
+        table_data = JSON.parse(data)
+        for(table in table_data){
+            updateShapes(table_data[table][0],table_data[table][1],table_data[table][2],table_data[table][3])
+        }
+        });
+}, 1000);
+  </script>
+    </div>
+{% endblock %}
