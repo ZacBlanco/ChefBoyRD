@@ -40,21 +40,25 @@ def feedback_table():
     Display a table of feedback sent in during a specified date-time range.
     By default all feedback in database will be displayed
     '''
+
     #get all of the feedback objects and insert it into table
     form = DateSpecifyForm()
-    if form.validate_on_submit():
+    if (request.method== 'POST'):
+        dtf = datetime.strptime(request.form['datetimefrom'], "%m/%d/%Y %H:%M %p")
+        dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %H:%M %p")
         smss = Sms.select().where(
-        	(Sms.submission_time > form.date_time_from)
-        	and (Sms.submission_time <= form.date_time_to)
-        	).orderby(Sms.submission_time)
+        	(Sms.submission_time  > dtf)
+        	& (Sms.submission_time <= dtt)
+        	).order_by(-Sms.submission_time)
+        res = []
+        for sms in smss:
+            print(sms.submission_time)
+            res.append(dict(submission_time=sms.submission_time,body=sms.body))
+        table = ItemTable(res)
     else:
-        smss = Sms.select()
-
-    res = []
-    for sms in smss:
-        res.append(dict(submission_time=sms.submission_time,body=sms.body))
-    table = ItemTable(res)
+        res = []
+        table = ItemTable(res)
     if not (res == []):
         return render_template('feedbackM/index.html', logged_in=True, table=table, form=form)
     else:
-    	return render_template('feedbackM/index.html', logged_in=True, form=form)
+        return render_template('feedbackM/index.html', logged_in=True, form=form)
