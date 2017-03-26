@@ -2,5 +2,4 @@
 *.pyc
 __pycache__/**
 *.db
-sms.cfg
 run.sh
