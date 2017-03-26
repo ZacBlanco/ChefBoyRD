@@ -3,3 +3,8 @@ flask
 peewee
 flask-login
 werkzeug
+Flask-WTF
+WTForms-Alchemy
+Flask-Table
+python-dateutil
+phonenumbers
