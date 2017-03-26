@@ -9,10 +9,11 @@
       Add Table
     </button>
     </div> -->
-        <div id="container"></div>
-        <br>
+            <br>
         {{table}}
         <br>
+        <div id="container"></div>
+
 
   <script>
     document.getElementById("container").style.border = "solid #000000";
@@ -117,16 +118,16 @@
             posY: y,
             id: id
         });
-        writeMessage('Table: ' + circle.id() + ' at ' + 'x: ' +Math.floor(x*width) + ', y: ' + Math.floor(height*y));
+        writeMessage('Table: ' + id + ' at ' + 'x: ' +Math.floor(x*width) + ', y: ' + Math.floor(height*y));
         layer.draw();
     });
     function updateShapes(new_x, new_y, new_occupied, id){
-        console.log(new_x + " " + new_y)
         var group = stage.findOne('#group'+id)
-        // occupied =  (circle.fill() == 'red') ? 0 : 1
-        // circle.setFill(occupied)
-        group.x(new_x)
-        group.y(new_y)
+        var circle = stage.findOne('#'+id)
+        occupied =  (new_occupied) ? 'red' : 'green'
+        circle.setFill(occupied)
+        group.x(new_x * width)
+        group.y(new_y * height)
         var layer = group.getLayer();
         layer.draw();
     }
@@ -135,6 +136,14 @@
     //   addCircle(layer);
     //   layer.draw();
     // }, false);
+    window.setInterval(function(){
+         $.get( "/table_manager/update_table", function( data ) {
+        table_data = JSON.parse(data)
+        for(table in table_data){
+            updateShapes(table_data[table][0],table_data[table][1],table_data[table][2],table_data[table][3])
+        }
+        });
+}, 1000);
   </script>
     </div>
 {% endblock %}

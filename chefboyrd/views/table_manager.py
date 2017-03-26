@@ -17,6 +17,7 @@ from wtforms_alchemy import PhoneNumberField
 from datetime import datetime
 from flask_table import Table, Col, ButtonCol
 from flask import request
+import json
 
 page = Blueprint('table_manager', __name__, template_folder='./templates')
 
@@ -89,3 +90,14 @@ def change_table():
         query = tables.Table.update(occupied=occupied).where(tables.Table.id==id)
         query.execute()
     return redirect(url_for('table_manager.table_manager_index'))
+
+@page.route("/update_table",methods=['GET', 'POST'])
+@require_role('admin') # Example of requireing a role(and authentication)
+def update_table():
+    '''Renders the index page of the dashboards
+    '''
+    coords = []
+    for table in tables.Table.select():
+        coords.append([table.posX,table.posY, table.occupied,table.id])
+    return json.dumps(coords)
+
