@@ -32,18 +32,18 @@ def get_first_table_available(restaurant, booking_date_time, people, minutes_slo
 
     tables_booked_ids = []
     # Exclude tables which start and end booking date includes requested initial booking date_time
-    for book in Booking.select().where(Booking.booking_date_time_start < l_bound_time,Booking.booking_date_time_end > l_bound_time):
+    for book in Booking.select().where(Booking.booking_date_time_start <= l_bound_time,Booking.booking_date_time_end >= l_bound_time):
     	tables_booked_ids.append(book.table.id)
     # Exclude tables which start and end booking date includes requested ending booking date_time
-    for book in Booking.select().where(Booking.booking_date_time_start < u_bound_time,Booking.booking_date_time_end > u_bound_time):
+    for book in Booking.select().where(Booking.booking_date_time_start <= u_bound_time,Booking.booking_date_time_end >= u_bound_time):
     	tables_booked_ids.append(book.table.id)
     # Exclude tables which booking slots is inside requested booking slot
-    for book in Booking.select().where(Booking.booking_date_time_start > l_bound_time,Booking.booking_date_time_end < u_bound_time):
+    for book in Booking.select().where(Booking.booking_date_time_start >= l_bound_time,Booking.booking_date_time_end <= u_bound_time):
     	tables_booked_ids.append(book.table.id)
 
 
     # Exclude tables which include requested booking slot
-    for book in Booking.select().where(Booking.booking_date_time_start < l_bound_time,Booking.booking_date_time_end > u_bound_time):
+    for book in Booking.select().where(Booking.booking_date_time_start <= l_bound_time,Booking.booking_date_time_end >= u_bound_time):
     	tables_booked_ids.append(book.table.id)
     # Then I get a list of all the tables, of the needed size, available in that restaurant and
     # I exclude the previous list of unavailable tables. I order the list from the smaller table
