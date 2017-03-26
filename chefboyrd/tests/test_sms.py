@@ -3,6 +3,7 @@
 import unittest
 from unittest.mock import patch
 from chefboyrd.controllers import send_sms
+from datetime import datetime
 
 class MyModuleTestt(unittest.TestCase):
     '''Example Test Module'''
