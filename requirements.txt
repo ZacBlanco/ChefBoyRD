@@ -6,5 +6,5 @@ werkzeug
 Flask-WTF
 WTForms-Alchemy
 Flask-Table
-python3-dateutil
+python-dateutil
 phonenumbers
