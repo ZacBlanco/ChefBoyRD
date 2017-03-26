@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, url_for, redirect
+from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_table import Table, Col
 from jinja2 import TemplateNotFound
 from flask_wtf import FlaskForm
@@ -10,16 +10,24 @@ from datetime import datetime
 page = Blueprint('feedbackM', __name__, template_folder='./templates')
 
 class ItemTable(Table):
+    '''
+    Table to be displayed as the list of all feedback received in a time range.
+    The following fields are the columns to be displayed
+    '''
     html_attrs = {'class': 'table table-striped'}
-    sid = Col('Sid')
+    #sid = Col('Sid')
     submission_time = Col('Submission Time')
     body = Col('Body')
-    phone_num = Col('Phone Number')
-    #cancel = ButtonCol('Cancel','reservationH.cancel',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-danger'})
+    #phone_num = Col('Phone Number')
+    
 
 class DateSpecifyForm(FlaskForm):
-    date_time_from = DateTimeField(datetime.today(),format='%Y-%m-%d %H:%M:%S')
-    date_time_to = DateTimeField(datetime.now(),format='%Y-%m-%d %H:%M:%S')
+    '''
+    The form that should be submitted to get feedback tables within the specified date range
+     '''
+    #,datetime.today() ,datetime.now()
+    date_time_from = DateTimeField('Date&Time From',format='%Y-%m-%d %H:%M:%S')
+    date_time_to = DateTimeField('Date&Time To',format='%Y-%m-%d %H:%M:%S')
     submit_field = SubmitField("search")
     #phone = StringField('Phone Number', [validators.Length(min=10, max=10)])
     #phone = PhoneNumberField('Phone Number')
@@ -28,6 +36,10 @@ class DateSpecifyForm(FlaskForm):
 @page.route("/",methods=['GET', 'POST'])
 @require_role('admin')
 def feedback_table():
+    '''
+    Display a table of feedback sent in during a specified date-time range.
+    By default all feedback in database will be displayed
+    '''
     #get all of the feedback objects and insert it into table
     form = DateSpecifyForm()
     if form.validate_on_submit():
@@ -36,10 +48,13 @@ def feedback_table():
         	and (Sms.submission_time <= form.date_time_to)
         	).orderby(Sms.submission_time)
     else:
-    	smss = Sms.select()
+        smss = Sms.select()
+
     res = []
     for sms in smss:
-        res.append(dict(sid=sms.sid,submission_time=sms.submission_time,body=sms.body,phone_num=sms.phone_num))
+        res.append(dict(submission_time=sms.submission_time,body=sms.body))
     table = ItemTable(res)
     if not (res == []):
-        return render_template('feedbackM/index.html', logged_in=True, table=table)
+        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form)
+    else:
+    	return render_template('feedbackM/index.html', logged_in=True, form=form)

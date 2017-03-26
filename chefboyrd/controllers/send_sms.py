@@ -4,6 +4,7 @@ import twilio.twiml
 import configparser
 import os
 from chefboyrd.models.sms import Sms
+from peewee import IntegrityError
 
 config = configparser.RawConfigParser()
 config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
@@ -15,7 +16,8 @@ restaurant_phone_number = config['test']['restaurant_phone_number']
 try:
     client = TwilioRestClient(account_sid,auth_token)
 except:
-    print("Could not communicate with rest client");
+    print("Could not communicate with Twilio Rest client");
+
 
 '''
 need the sms information in the database so we can create tables with multiple objects
@@ -44,23 +46,28 @@ def update_db(*date_from):
                 )
             #print(sms_tmp.body)
             #print(sms_tmp.submission_time) 
-            if not (sms_tmp.save()):
-                print("sms could not be saved in sb")
+            try:
+                err = sms_tmp.save()
+            except IntegrityError:
+                err = 0
+                print("Duplicate Sms Entry")
+            if not (err):
+                print("Sms could not be saved in db")
         except ValueError:
             print("End of messages reached.")
             return 0
     return 1 #this should be on success
 
-#only need to do this before demo
-# def delete_feedback():
-#     '''
-#     wipe all message history on twilio
-#     '''
-#     messages = client.messages.list()
-#     for message in messages:
-#         try:
-#             client.messages.delete(message.sid)
-#         except ValueError:
-#             print("End of messages list reached.")
-#             return 0
-#     return 1
+#only need to do this once before demo
+def delete_feedback():
+    '''
+    wipe all message history on twilio
+    '''
+    messages = client.messages.list()
+    for message in messages:
+        try:
+            client.messages.delete(message.sid)
+        except ValueError:
+            print("End of messages list reached.")
+            return 0
+    return 1

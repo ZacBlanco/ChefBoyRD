@@ -2,6 +2,17 @@
 {% block body %}
     <h2>Welcome</h2>
     <div>
+        <H3>Specify feedback range here:</H3>
+            {% from "_formhelpers.html" import render_field_date %}
+        <br>
+        <form action="" method=post>
+          <dl>
+            {{ render_field_date(form.date_time_from) }}
+            {{ render_field_date(form.date_time_to) }}
+          </dl>
+          <p><input type=submit>
+        </form>
+
         This is the page for displaying feedback
         Here is a list of the feedback made
         <br>
