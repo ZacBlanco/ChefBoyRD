@@ -1,4 +1,4 @@
-from peewee import Model, CharField, IntegerField, IntegerField, ForeignKeyField, DateTimeField, BooleanField
+from peewee import Model, CharField, IntegerField, IntegerField, ForeignKeyField, DateTimeField, BooleanField, FloatField
 from chefboyrd.models import BaseModel
 
 
@@ -38,8 +38,8 @@ class Table(BaseModel):
     restaurant = ForeignKeyField(Restaurant)
     size = IntegerField()
     occupied = BooleanField()
-    posX = IntegerField()
-    posY = IntegerField()
+    posX = FloatField()
+    posY = FloatField()
 
     @classmethod
     def create_tables(cls,restaurant,size, occupied, posX, posY):

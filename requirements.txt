@@ -7,3 +7,4 @@ Flask-WTF
 WTForms-Alchemy
 Flask-Table
 python3-dateutil
+phonenumbers

@@ -28,7 +28,9 @@ class ItemTable(Table):
     phone = Col('Phone')
     time = Col('Starting Time')
     table = Col('Table')
+    confirm = ButtonCol('Confirm','table_manager.confirm',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-success'})
     cancel = ButtonCol('Cancel','table_manager.cancel',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-danger'})
+
 
 @page.route("/",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
@@ -50,7 +52,22 @@ def table_manager_index():
 def cancel():
     '''Renders the index page of the dashboards
     '''
-    id = request.args.get('id')
+    id = int(request.args.get('id'))
+    tables.Booking.cancel_reservation(id)
+    # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+    return redirect(url_for('table_manager.table_manager_index'))
+
+@page.route("/confirm",methods=['GET', 'POST'])
+@require_role('admin') # Example of requireing a role(and authentication)
+def confirm():
+    '''Renders the index page of the dashboards
+    '''
+    id = int(request.args.get('id'))
+    for ids in tables.Booking.select().where(tables.Booking.id == id):
+        id = int(ids.table.id)
+        break
+    query = tables.Table.update(occupied=1).where(tables.Table.id==id)
+    query.execute()
     tables.Booking.cancel_reservation(id)
     # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
     return redirect(url_for('table_manager.table_manager_index'))
@@ -63,8 +80,8 @@ def change_table():
     id = int(request.form['id'])
     type = int(request.form['type'])
     if type == 0:
-        posX = int(request.form['posX'])
-        posY = int(request.form['posY'])
+        posX = float(request.form['posX'])
+        posY = float(request.form['posY'])
         query = tables.Table.update(posX=posX,posY=posY).where(tables.Table.id==id)
         query.execute() 
     else:

@@ -4,33 +4,50 @@
     <div>
         This is the Table Management page
         Here are a list of reservations made
-                 <div id="buttons">
+<!--                  <div id="buttons">
     <button id="addTable">
       Add Table
     </button>
-    </div>
+    </div> -->
         <div id="container"></div>
         <br>
         {{table}}
         <br>
 
   <script>
-    var width = window.innerWidth / 1.5;
+    document.getElementById("container").style.border = "solid #000000";
+    var width = document.getElementById("container").clientWidth;
     var height = window.innerHeight;
+    radius = width / 15
     function addCircle(layer, posX, posY, occupied,id) {
-        var randX = Math.random() * stage.getWidth();
-        var randY = Math.random() * stage.getHeight();
-        var circle = new Konva.Circle({
-            id: id,
+        var group = new Konva.Group({
+            draggable: true,
+            id: 'group'+id,
             x: posX,
             y: posY,
-            radius: 50,
+        });
+        var tableNo = new Konva.Text({
+              id: id,
+              x: 0-radius / 2,
+              y: 0 - radius / 2,
+              text: id,
+              fontSize: 30,
+              fontFamily: 'Calibri',
+            });
+        var circle = new Konva.Circle({
+            id: id,
+            x: 0,
+            y: 0,
+            radius: radius,
             fill: (occupied == 'True') ? 'red' : 'green'
         });
-        layer.add(circle);
+        tableNo.setListening(false);
+        group.add(circle)
+        group.add(tableNo)
+        layer.add(group);
     }
    var text = new Konva.Text({
-      x: 200,
+      x: width / 4,
       y: 10,
       fontFamily: 'Calibri',
       fontSize: 24,
@@ -59,7 +76,7 @@
     */
     var layer = new Konva.Layer();
     {% for tb in tables.Table.select() %}
-        addCircle(layer,{{tb.posX}},{{tb.posY}},'{{tb.occupied}}',{{tb.id}});
+        addCircle(layer,width * {{tb.posX}},height * {{tb.posY}},'{{tb.occupied}}',{{tb.id}});
     {% endfor %}
     layer.add(text);
     stage.add(layer);
@@ -67,9 +84,8 @@
 
    stage.on('dblclick dbltap', function(evt) {
         var circle = evt.target;
-        var x = circle.x();
-        var y = circle.y();
         var id = circle.id();
+        var circle = stage.findOne('#'+id)
         occupied =  (circle.fill() == 'red') ? 0 : 1
         $.post( "/table_manager/change_table", {
             occupied: occupied,
@@ -78,38 +94,47 @@
         });
         circle.setFill((circle.fill() == 'red') ? 'green' : 'red')
         var layer = circle.getLayer();
-        circle.moveTo(dragLayer);
         layer.draw();
     });
-    stage.on('mousedown touchstart', function(evt) {
-        var circle = evt.target;
-        // circle.setFill('red')
-        var layer = circle.getLayer();
-        circle.moveTo(dragLayer);
-        layer.draw();
-        circle.startDrag();
-    });
+    // stage.on('mousedown touchstart', function(evt) {
+    //     var circle = evt.target;
+    //     // circle.setFill('red')
+    //     var layer = circle.getLayer();
+    //     // circle.moveTo(dragLayer);
+    //     // layer.draw();
+    //     // circle.startDrag();
+    // });
 
-    stage.on('mouseup touchend', function(evt) {
+    stage.on('dragend', function(evt) {
         var circle = evt.target;
         // circle.setFill('red')
-        var x = Math.floor(circle.x());
-        var y = Math.floor(circle.y());
-        var id = circle.id();
+        var x = circle.x() / width;
+        var y = circle.y() / height;
+        var id = circle.id().replace( /^\D+/g, '');;
         $.post( "/table_manager/change_table", {
             type: 0,
             posX: x,
             posY: y,
             id: id
         });
-        writeMessage('Table: ' + circle.id() + ' at ' + 'x: ' + x + ', y: ' + y);
+        writeMessage('Table: ' + circle.id() + ' at ' + 'x: ' +Math.floor(x*width) + ', y: ' + Math.floor(height*y));
         layer.draw();
     });
+    function updateShapes(new_x, new_y, new_occupied, id){
+        console.log(new_x + " " + new_y)
+        var group = stage.findOne('#group'+id)
+        // occupied =  (circle.fill() == 'red') ? 0 : 1
+        // circle.setFill(occupied)
+        group.x(new_x)
+        group.y(new_y)
+        var layer = group.getLayer();
+        layer.draw();
+    }
 
-    document.getElementById('addTable').addEventListener('click', function() {
-      addCircle(layer);
-      layer.draw();
-    }, false);
+    // document.getElementById('addTable').addEventListener('click', function() {
+    //   addCircle(layer);
+    //   layer.draw();
+    // }, false);
   </script>
     </div>
 {% endblock %}
