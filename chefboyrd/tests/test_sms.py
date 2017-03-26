@@ -10,7 +10,4 @@ class MyModuleTestt(unittest.TestCase):
     def test_sms(self):
         '''test the send_sms function
         '''
-        self.assertEqual(send_sms.update_db(datetime(2017,3,21),1)
-    
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual(send_sms.update_db(datetime(2017,3,21)),1)
