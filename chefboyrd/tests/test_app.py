@@ -11,8 +11,7 @@ import tempfile
 import chefboyrd
 
 class ChefBoyRDTest(unittest.TestCase):
-    '''Test the flask application
-    '''
+    '''Test the flask application'''
 
     def setUp(self):
         self.db_fd, self.db_name = tempfile.mkstemp()
@@ -27,6 +26,3 @@ class ChefBoyRDTest(unittest.TestCase):
         rv = self.app.get('/test/hello')
         rv.get_data(True)
         self.assertEqual('Hi', rv.get_data(True))
-
-if __name__ == '__main__':
-    unittest.main()

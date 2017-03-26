@@ -41,9 +41,8 @@ Other helpful sources of documentaiton and reading:
 import configparser
 import flask_login
 from flask import Flask, render_template
-from peewee import SqliteDatabase
-from datetime import datetime
-
+from peewee import SqliteDatabase, fn
+from datetime import datetime, timedelta
 
 
 def init_db(dbname):
@@ -65,33 +64,53 @@ import chefboyrd.auth # register the login and authentication functions
 @APP.before_request
 def before_request():
     """Connect to the database before each request."""
-    DB.connect()
+    try:
+        DB.connect()
+    except:
+        pass
 
 
 @APP.after_request
 def after_request(response):
     """Close the database connection after each request."""
-    DB.close()
+    try:
+        DB.close()
+    except:
+        pass
     return response
 
 
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
+from chefboyrd.views import root, stat_dash, feedbackM
 from chefboyrd.views import root, stat_dash, reservationH, table_manager
+from chefboyrd.models import customers, user, reservation, tables
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
 APP.register_blueprint(auth_pages, url_prefix='/auth')
 APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
+APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 
 # Put all table creations after here
 # ==================================
-from chefboyrd.models import customers, user, reservation, tables
+from chefboyrd.models import Customer, User
+from chefboyrd.models import Meals, Ingredients, MealIngredients, Quantities, Tabs, Orders
+from chefboyrd.models import customers, user, sms
 
-customers.Customer.create_table(True)
-user.User.create_table(True)
+Customer.create_table(True)
+User.create_table(True)
+
+Meals.create_table(True)
+Ingredients.create_table(True)
+MealIngredients.create_table(True)
+Quantities.create_table(True)
+Tabs.create_table(True)
+Orders.create_table(True)
+
+sms.Sms.create_table(True)
 reservation.Reservation.create_table(True)
 tables.Restaurant.create_table(True)
 tables.Table.create_table(True)
@@ -114,8 +133,8 @@ def index():
 try:
     # Test User:
     # email: zac
-    # Password: zac 
-    user.User.create_user('zac', 'zac', 'zac', 'admin')
+    # Password: zac
+    User.create_user('zac', 'zac', 'zac', 'admin')
 except:
     pass
 
@@ -155,6 +174,12 @@ except:
 
 try:
     # email: caz, pw: caz
-    user.User.create_user('caz', 'caz', 'caz', 'notanadmin')
+    User.create_user('caz', 'caz', 'caz', 'notanadmin')
 except:
     pass
+
+
+from chefboyrd.controllers import data_controller
+if Orders.select().count() < 1000:
+    start_date = datetime.now() - timedelta(days=15)
+    data_controller.generate_data(num_days=15, num_tabs=45, dt_start=start_date)

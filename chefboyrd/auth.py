@@ -5,7 +5,7 @@ import flask
 from flask import Blueprint, render_template, url_for, redirect
 import flask_login
 from chefboyrd import LM as login_manager
-from chefboyrd.models.user import User
+from chefboyrd.models import User
 from werkzeug.security import check_password_hash
 
 auth_pages = Blueprint('auth_pages', __name__, template_folder="./views/templates")

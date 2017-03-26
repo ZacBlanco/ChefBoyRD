@@ -1,17 +1,9 @@
 <div class="col-md-3">
     <header>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul class=flashes>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        {% endwith %}
         <ul class="nav nav-pills nav-stacked">
-            <li role="presentation" class="active"><a href="/">Home</a></li>
+            <li role="presentation" class=""><a href="/">Home</a></li>
             <li role="presentation" class=""><a href="/dashboard">Dashboard</a></li>
+            <li role="presentation" class=""><a href="/feedbackM">Feedback Management</a></li>
             <li role="presentation" class=""><a href="/reservationH">Reservation Host</a></li>
             <li role="presentation" class=""><a href="/table_manager">Table Management</a></li>
         </ul>
