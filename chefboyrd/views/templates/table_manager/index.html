@@ -4,14 +4,15 @@
     <div>
         This is the Table Management page
         Here are a list of reservations made
-<!--                  <div id="buttons">
-    <button id="addTable">
-      Add Table
-    </button>
-    </div> -->
+
             <br>
         {{table}}
         <br>
+        <div id="buttons">
+    <button id="addTable">
+      Add Table
+    </button>
+    </div>
         <div id="container"></div>
 
 
@@ -97,14 +98,6 @@
         var layer = circle.getLayer();
         layer.draw();
     });
-    // stage.on('mousedown touchstart', function(evt) {
-    //     var circle = evt.target;
-    //     // circle.setFill('red')
-    //     var layer = circle.getLayer();
-    //     // circle.moveTo(dragLayer);
-    //     // layer.draw();
-    //     // circle.startDrag();
-    // });
 
     stage.on('dragend', function(evt) {
         var circle = evt.target;
@@ -123,19 +116,25 @@
     });
     function updateShapes(new_x, new_y, new_occupied, id){
         var group = stage.findOne('#group'+id)
+        if(group == null){
+            addCircle(layer, new_x, new_y, new_occupied,id)
+            group = stage.findOne('#group'+id)
+        }
         var circle = stage.findOne('#'+id)
         occupied =  (new_occupied) ? 'red' : 'green'
         circle.setFill(occupied)
         group.x(new_x * width)
         group.y(new_y * height)
-        var layer = group.getLayer();
         layer.draw();
     }
 
-    // document.getElementById('addTable').addEventListener('click', function() {
-    //   addCircle(layer);
-    //   layer.draw();
-    // }, false);
+    document.getElementById('addTable').addEventListener('click', function() {
+        $.get( "/table_manager/add_table", function( data ) {
+            table_data = JSON.parse(data)
+            addCircle(layer,width * table_data[0],height * table_data[1],table_data[2],table_data[3]);
+            layer.draw();
+        }); 
+    }, false);
     window.setInterval(function(){
          $.get( "/table_manager/update_table", function( data ) {
         table_data = JSON.parse(data)

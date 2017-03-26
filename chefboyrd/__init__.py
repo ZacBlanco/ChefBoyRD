@@ -38,14 +38,11 @@ Other helpful sources of documentaiton and reading:
 
 
 '''
-import datetime
-from datetime import timedelta
 import configparser
 import flask_login
 from flask import Flask, render_template
 from peewee import SqliteDatabase, fn
-import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 def init_db(dbname):
@@ -141,21 +138,22 @@ try:
 except:
     pass
 
-# try:
-#     # Test User:
-#     # email: zac
-#     # Password: zac 
-#     tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',18,23)
-# except:
-#     pass
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',18,23)
+except:
+    pass
 
-# try:
-#     # Test User:
-#     # email: zac
-#     # Password: zac 
-#     tables.Table.create_tables(1,4)
-# except:
-#     pass
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    if tables.Table.select().count() < 1:
+        tables.Table.create_tables(1,5, 0,0.5, 0.5)
+except:
+    pass
 
 try:
     # Test User:
@@ -165,14 +163,14 @@ try:
 except:
     pass
 
-# try:
-#     # Test User:
-#     # email: zac
-#     # Password: zac 
-#     print("TESTING")
-#     reservation.Reservation.create_reservation('Brandon',6,'732-333-5555',datetime.datetime.now())
-# except:
-#     pass
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    if tables.Booking.select().count() < 1:
+        tables.Booking.create_booking(1,6,datetime(2017, 2, 14, 19, 0),datetime(2015, 2, 14, 19, 1),'Brandon','732-333-5555')
+except:
+    pass
 
 try:
     # email: caz, pw: caz
@@ -183,5 +181,5 @@ except:
 
 from chefboyrd.controllers import data_controller
 if Orders.select().count() < 1000:
-    start_date = datetime.datetime.now() - timedelta(days=15)
+    start_date = datetime.now() - timedelta(days=15)
     data_controller.generate_data(num_days=15, num_tabs=45, dt_start=start_date)
