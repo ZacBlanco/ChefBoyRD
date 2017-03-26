@@ -142,7 +142,7 @@ try:
     # Test User:
     # email: zac
     # Password: zac 
-    tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',18,23)
+    tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
 except:
     pass
 
