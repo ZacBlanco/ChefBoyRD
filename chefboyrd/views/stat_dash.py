@@ -4,7 +4,7 @@
 Will be able to render dashboards which include statistics from the database
 of the Point of sale system and other data systems for the business.
 '''
-import urllib, base64
+import base64
 from datetime import datetime, timedelta
 import logging
 from io import BytesIO
@@ -17,6 +17,7 @@ import matplotlib
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from chefboyrd.controllers import data_controller
+from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
 
