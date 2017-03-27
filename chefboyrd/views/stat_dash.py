@@ -4,6 +4,7 @@
 Will be able to render dashboards which include statistics from the database
 of the Point of sale system and other data systems for the business.
 '''
+import sys
 import base64
 from datetime import datetime, timedelta
 import logging
@@ -31,7 +32,7 @@ def get_datauri(fig):
     canvas.print_png(imgdata)
     imgdata.seek(0)
     data = base64.b64encode(imgdata.getvalue())
-    data_url = 'data:image/png;base64,{}'.format(urllib.quote(data.rstrip('\n')))
+    data_url = 'data:image/png;base64,{}'.format(quote(data))
     return data_url
 
 def create_jinja_object(fig):

@@ -38,11 +38,12 @@ Other helpful sources of documentaiton and reading:
 
 
 '''
-from datetime import timedelta, datetime
+
 import configparser
 import flask_login
 from flask import Flask, render_template
 from peewee import SqliteDatabase, fn
+from datetime import datetime, timedelta
 
 
 def init_db(dbname):
@@ -83,7 +84,7 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM
+from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
@@ -91,6 +92,7 @@ APP.register_blueprint(auth_pages, url_prefix='/auth')
 APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
+APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
 
 # Put all table creations after here
 # ==================================
@@ -135,21 +137,22 @@ try:
 except:
     pass
 
-# try:
-#     # Test User:
-#     # email: zac
-#     # Password: zac 
-#     tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',18,23)
-# except:
-#     pass
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
+except:
+    pass
 
-# try:
-#     # Test User:
-#     # email: zac
-#     # Password: zac 
-#     tables.Table.create_tables(1,4)
-# except:
-#     pass
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    if tables.Table.select().count() < 1:
+        tables.Table.create_tables(1,5, 0,0.5, 0.5)
+except:
+    pass
 
 try:
     # Test User:
@@ -159,14 +162,14 @@ try:
 except:
     pass
 
-# try:
-#     # Test User:
-#     # email: zac
-#     # Password: zac 
-#     print("TESTING")
-#     reservation.Reservation.create_reservation('Brandon',6,'732-333-5555',datetime.datetime.now())
-# except:
-#     pass
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    if tables.Booking.select().count() < 1:
+        tables.Booking.create_booking(1,6,datetime(2017, 2, 14, 19, 0),datetime(2015, 2, 14, 19, 1),'Brandon','732-333-5555')
+except:
+    pass
 
 try:
     # email: caz, pw: caz
