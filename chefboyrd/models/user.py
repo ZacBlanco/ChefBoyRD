@@ -11,7 +11,7 @@ class User(UserMixin, BaseModel):
     '''A sample customer model
     Please modify this to fit our needs
     '''
-    email = CharField(unique=True, primary_key=True)
+    email = CharField(unique=True)
     password = CharField()
     name = CharField()
     role = CharField()
