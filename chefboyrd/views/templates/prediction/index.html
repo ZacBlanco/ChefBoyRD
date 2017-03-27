@@ -1,0 +1,59 @@
+{% extends "default.html" %}
+{% block body %}
+	<div class="row">
+		<h3 class="col-xs-10 col-xs-push-2">Predict your Meal Usage</h3>
+	</div>
+	<hr>
+	<form action='/prediction/' method="POST">
+	<div class="row form-inline">
+		<label for="beginning-date">From: </label>
+		<input id="beginning-date" type="datetime-local" onchange="saveValue(this)" name="beginningDate"/>
+		<br>
+		<label for="ending-date">To: </label>
+		<input id="ending-date" type="datetime-local" onchange="saveValue(this)" name="endingDate"/>
+		<br>
+		<br>
+		<input class="btn btn-default centered col-sm-2 col-sm-offset-5" type="submit" text="Submit"/>
+	</div>
+	<script type="text/javascript">
+        document.getElementById("beginning-date").value = getSavedValue("beginning-date"); 
+        document.getElementById("ending-date").value = getSavedValue("ending-date"); 
+        //Save the value function - save it to localStorage as (ID, VALUE)
+        function saveValue(e){
+            var id = e.id;
+            var val = e.value;
+            localStorage.setItem(id, val);
+        }
+
+        //get the saved value function - return the value of "v" from localStorage. 
+        function getSavedValue  (v){
+            if (localStorage.getItem(v) === null) {
+                return "";
+            }
+            return localStorage.getItem(v);
+        }
+    </script>
+	<br>
+	</form>
+	{% if meals %}
+	<div class="row well">
+		<table class="table table-bordered table-hover" style="width:100%; height:600px">
+			<tr>
+				<td style="font-weight: bold">Meal</td>
+				<td style="font-weight: bold">Amount</td>
+			</tr>
+		{% for meal_key in meals %}
+			<tr>
+				<td>{{ meal_key }}</td>
+				<td>{{ meals[meal_key] }}</td>
+			</tr>	
+		{% endfor %}
+		</table>
+	</div>
+	{% else %}
+	<div class="row well">
+		<span class="centered col-sm-2 col-sm-offset-5" style="width:100%">Select your dates</span>
+	</div>
+	{% endif %}
+
+{% endblock %}

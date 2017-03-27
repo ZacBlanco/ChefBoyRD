@@ -86,6 +86,7 @@ from chefboyrd.auth import auth_pages
 from chefboyrd.views import root, stat_dash, feedbackM
 from chefboyrd.views import root, stat_dash, reservationH, table_manager
 from chefboyrd.models import customers, user, reservation, tables
+from chefboyrd.views import prediction_dash
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
@@ -93,6 +94,7 @@ APP.register_blueprint(auth_pages, url_prefix='/auth')
 APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
+APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
 
 # Put all table creations after here
 # ==================================

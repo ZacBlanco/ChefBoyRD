@@ -6,34 +6,6 @@ from datetime import datetime, timedelta, date, time
 from chefboyrd.models import Orders, Tabs, Meals, Ingredients, MealIngredients, Quantities
 
 
-
-def get_meals(dt_min=None, dt_max=None):
-    ''' Gets a range of meals from one datetime to another datetime joined on Tabs
-    
-    If dt_min is None then all orders less than max will be returned.
-    If dt_max is None then all orders greater than dt_min is None
-    If both are none then all orders are returned.
-
-    Args:
-        dt_min (datetime): A datetime object for the range to begin at. (Inclusive)
-        dt_max (datetime): A datetime object for the range end begin at. (Inclusive)
-
-    Returns:
-        iterable: An iterable of order models (peewee set).
-    '''
-    meals = None
-    if dt_min is None and dt_max is None:
-        meals = Meals.select().join(Tabs)
-    elif dt_min is None:
-        meals = Meals.select().join(Tabs).where(Tabs.timestamp <= dt_max)
-    elif dt_max is None:
-        meals = Meals.select().join(Tabs).where(Tabs.timestamp >= dt_min)
-    elif timedelta.total_seconds(dt_max - dt_min) < 0:
-        raise ValueError("Max datetime must be greater than min datetime")
-    else:
-        meals = Meals.select().join(Tabs).where(Tabs.timestamp >= dt_min, Tabs.timestamp <= dt_max)
-    return meals
-
 def get_orders_date_range(dt_min=None, dt_max=None):
     '''Gets a range of orders from one datetime to another datetime joined on Tabs.
 
