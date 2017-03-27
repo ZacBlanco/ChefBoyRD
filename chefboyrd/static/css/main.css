@@ -5,3 +5,7 @@
 bg-gray-lighter {
     background-color: #555;
 }
+
+prediction-table {
+	border: 1px solid black;
+}
