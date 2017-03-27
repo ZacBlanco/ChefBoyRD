@@ -49,7 +49,6 @@ def update_db(*date_from):
         try:
             if (message.date_sent != None):
                 date_tmp = message.date_sent - timedelta(hours=4)
-                print('time adjusted')
             else:
                 date_tmp = None
             sms_tmp = Sms(
@@ -81,7 +80,7 @@ def update_db(*date_from):
             return 0
         except IntegrityError:
             err = 0
-            print("Duplicate Sms Entry " + sms_tmp.body)
+            #print("Duplicate Sms Entry " + sms_tmp.body)
             #raise IntegrityError
     return 1 #this should be on success
 
