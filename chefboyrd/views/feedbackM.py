@@ -39,7 +39,7 @@ def feedback_table():
         dtf = datetime.strptime(request.form['datetimefrom'], "%m/%d/%Y %I:%M %p")
         dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %I:%M %p")
         if (request.form.get('dropdown') =='Good'):
-            print('Form Good')
+            #print('Form Good')
             pos_col, neg_col = (1,0)
             smss = Sms.select().where(
                 (Sms.submission_time  > dtf)& 
@@ -99,7 +99,7 @@ def feedback_table():
         all_string_bodies = ""
         #print(len(smss))
         for sms in smss:
-            print('pos:{} neg:{} except:{} food:{} service:{}'.format(sms.pos_flag,sms.neg_flag, sms.exception_flag, sms.food_flag, sms.service_flag))
+            #print('pos:{} neg:{} except:{} food:{} service:{}'.format(sms.pos_flag,sms.neg_flag, sms.exception_flag, sms.food_flag, sms.service_flag))
             res.append(dict(time=sms.submission_time.strftime("%Y-%m-%d %H:%M"),body=sms.body))
 
         #     all_string_bodies = all_string_bodies + sms.body + ","

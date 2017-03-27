@@ -62,17 +62,16 @@ def update_db(*date_from):
                 food_flag=-1,
                 service_flag=-1
                 )
-            #print(sms_tmp.body)
-            #print(sms_tmp.submission_time) 
-            #print(sms_tmp.body)
-            err = sms_tmp.save()
             res2 = feedback_analysis(sms_tmp.body)
             sms_tmp.pos_flag = res2[0]
             sms_tmp.neg_flag = res2[1]
             sms_tmp.exception_flag = res2[2]
             sms_tmp.food_flag = res2[3]
             sms_tmp.service_flag = res2[4]
-            sms_tmp.update()
+            #print(sms_tmp.body)
+            #print(sms_tmp.submission_time) 
+            #print(sms_tmp.body)
+            err = sms_tmp.save()
             if not (err):
                 print("Sms could not be saved in db" + sms_tmp.body)
         except ValueError:
