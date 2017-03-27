@@ -178,7 +178,9 @@ except:
     pass
 
 
-from chefboyrd.controllers import data_controller
+from chefboyrd.controllers import data_controller, feedback_controller
 if Orders.select().count() < 1000:
     start_date = datetime.now() - timedelta(days=15)
     data_controller.generate_data(num_days=15, num_tabs=45, dt_start=start_date)
+
+feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
