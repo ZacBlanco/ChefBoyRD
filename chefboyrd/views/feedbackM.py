@@ -1,3 +1,8 @@
+"""
+feedbackM
+This view is specifically for the administrative staff's management of the feedback
+"""
+
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_table import Table, Col, create_table
 from jinja2 import TemplateNotFound
@@ -12,13 +17,15 @@ import copy
 page = Blueprint('feedbackM', __name__, template_folder='./templates')
 
 class ItemTable(Table):
+    """
+    FlaskTable object for organizing feedback info into a table
+
+    """
     time = Col('Time', column_html_attrs={'class': 'spaced-table-col'})
     body = Col('Body')
 
 class DateSpecifyForm(FlaskForm):
-    '''
-    The form that should be submitted to get feedback tables within the specified date range
-     '''
+    """WTforms object for the date-time form submission for the DB query"""
 
     date_time_from = DateTimeField('Time From')
     date_time_to = DateTimeField('Time To')
@@ -27,15 +34,20 @@ class DateSpecifyForm(FlaskForm):
 @page.route("/",methods=['GET', 'POST'])
 @require_role('admin')
 def feedback_table():
-    '''
+    """
+    By default displays a webpage for user to make feedback DB query.
     Display a table of feedback sent in during a specified date-time range.
-    By default all feedback in database will be displayed
-    -1 is don't care term
-    '''
+    Also, depending on whether category flags are specified, this page will only display
+
+    Returns:
+        The template to display with the appropriate parameters
+	table: table of feedback to display
+	form: form that specifies the query instructions.
+    """
     #get all of the feedback objects and insert it into table
     form = DateSpecifyForm()
     if (request.method== 'POST'):
-        pos_col, neg_col, except_col, food_col, service_col= (-1,-1,-1,-1,-1)
+        pos_col, neg_col, except_col, food_col, service_col= (-1,-1,-1,-1,-1) # -1 is a don't care term
         dtf = datetime.strptime(request.form['datetimefrom'], "%m/%d/%Y %I:%M %p")
         dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %I:%M %p")
         if (request.form.get('dropdown') =='Good'):
@@ -85,7 +97,6 @@ def feedback_table():
                 (Sms.exception_flag==except_col)
                 ).order_by(-Sms.submission_time)
         else:
-            print("No form")
             pos_col, neg_col, except_col,food_col, service_col = (-1,-1,-1,-1,-1)
             smss = Sms.select().where(
                 (Sms.submission_time  > dtf)& 
@@ -121,35 +132,46 @@ def feedback_table():
 @page.route("/deleteallfeedbackhistory",methods=['GET', 'POST'])
 @require_role('admin')
 def delete_feedback():
-    '''
-    calls the delete_feedback function, returns # of entries deleted
-    '''
+    """
+    Calls the delete_feedback function, returns a message confirming # of feedback entries deleted
+
+    Returns:
+        Confirmation string
+    """
     res = feedback_controller.delete_feedback()
     return String.format("%03d amount of sms entries deleted", res) 
 
 @page.route("/deletealltwiliofeedbackhistory",methods=['GET', 'POST'])
 @require_role('admin')
 def delete_twilio_feedback():
-    '''
-    wipe all message history on twilio
-    '''
+    """
+    wipe all message history on twilio. Only needs to be called once to clear data.
+
+    Returns:
+        Confirmation string
+    """
     feedback_controller.delete_twilio_feedback()
     return "Twilio Feedback deleted"
 
 @page.route("/updateallsms",methods=['GET','POST'])
 @require_role('admin')
 def update_all_sms():
-    '''
-    update all sms
-    '''
+    """
+    Update sms data from external Twilio database
+
+    Returns:
+        Confirmation string
+    """
     feedback_controller.update_db()
     return "db updates with all sms: Success"
 
 @page.route('/twiliosms',methods=['POST'])
 def send_sms_route():
-    '''
+    """
     This is the directory we need to configure twilio for.
     When Twilio makes a POST request, db will be updated with new sms messages from today
-    '''
+    Returns:
+        Confirmation string
+    """
     feedback_controller.update_db(date.today())
     return 'db updated'
