@@ -22,14 +22,6 @@ chefboyrd.auth module
     :undoc-members:
     :show-inheritance:
 
-chefboyrd.example_module module
--------------------------------
-
-.. automodule:: chefboyrd.example_module
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

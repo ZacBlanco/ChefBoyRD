@@ -43,10 +43,10 @@ def require_role(role):
     By decorating a function with @require_role you are implicity forcing @login_required as well.
     Example:
 
-            @APP.route('/admin-dashboard')
-            @require_role('admin')
-            def view_dash():
-                ...
+        @APP.route('/admin-dashboard')
+        @require_role('admin')
+        def view_dash():
+        # Something here
 
     If a user is not authorized then the flask_login.unauthorized handler is called.
     '''
