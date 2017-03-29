@@ -8,3 +8,6 @@ run.sh
 *.DS_Store
 */.DS_Store
 **/.DS_Store
+
+*.html
+docs/_build/**
