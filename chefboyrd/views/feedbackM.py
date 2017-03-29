@@ -4,20 +4,24 @@ from jinja2 import TemplateNotFound
 from flask_wtf import FlaskForm
 from wtforms import DateTimeField, SubmitField
 from chefboyrd.auth import require_role
-from chefboyrd.controllers import feedback_controller, send_sms
+from chefboyrd.controllers import feedback_controller
 from chefboyrd.models.sms import Sms
-from datetime import datetime
+from datetime import datetime, date
 import copy
 
 page = Blueprint('feedbackM', __name__, template_folder='./templates')
+
+class ItemTable(Table):
+    time = Col('Time', column_html_attrs={'class': 'spaced-table-col'})
+    body = Col('Body')
 
 class DateSpecifyForm(FlaskForm):
     '''
     The form that should be submitted to get feedback tables within the specified date range
      '''
 
-    date_time_from = DateTimeField('Time From',format='%Y-%m-%d %H:%M:%S')
-    date_time_to = DateTimeField('Time To',format='%Y-%m-%d %H:%M:%S')
+    date_time_from = DateTimeField('Time From')
+    date_time_to = DateTimeField('Time To')
     submit_field = SubmitField("search")
 
 @page.route("/",methods=['GET', 'POST'])
@@ -26,83 +30,77 @@ def feedback_table():
     '''
     Display a table of feedback sent in during a specified date-time range.
     By default all feedback in database will be displayed
+    -1 is don't care term
     '''
-    TableCls = create_table('TableCls')
     #get all of the feedback objects and insert it into table
     form = DateSpecifyForm()
     if (request.method== 'POST'):
-        time_col, body_col, pos_col, neg_col, except_col, food_col, service_col, feedback_analyze = (0,0,0,0,0,0,0,0)
-        dtf = datetime.strptime(request.form['datetimefrom'], "%m/%d/%Y %H:%M %p")
-        dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %H:%M %p")
-        
-        if (request.form.get('Time')):
-            TableCls.add_column('Time', Col('Time'))
-            time_col = 1
-        if (request.form.get('Body')):
-            TableCls.add_column('Body', Col('Body'))
-            body_col = 1
-        if (request.form.get('Positive')):
-            TableCls.add_column('Positive', Col('Positive'))
-            pos_col = 1
-        if (request.form.get('Negative')):
-            TableCls.add_column('Negative', Col('Negative'))
-            neg_col = 1
-        if (request.form.get('Exception')):
-            TableCls.add_column('Exception', Col('Exception'))
-            except_col = 1
-        if (request.form.get('Food')):
-            TableCls.add_column('Food', Col('Food'))
+        pos_col, neg_col, except_col, food_col, service_col= (-1,-1,-1,-1,-1)
+        dtf = datetime.strptime(request.form['datetimefrom'], "%m/%d/%Y %I:%M %p")
+        dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %I:%M %p")
+        if (request.form.get('dropdown') =='Good'):
+            #print('Form Good')
+            pos_col, neg_col = (1,0)
+            smss = Sms.select().where(
+                (Sms.submission_time  > dtf)& 
+                (Sms.submission_time <= dtt)&
+                (Sms.pos_flag==pos_col)&
+                (Sms.neg_flag==neg_col)
+                ).order_by(-Sms.submission_time)
+        elif (request.form.get('dropdown') =='Bad'):
+            pos_col, neg_col = (0,1)
+            smss = Sms.select().where(
+                (Sms.submission_time  > dtf)& 
+                (Sms.submission_time <= dtt)&
+                (Sms.pos_flag==pos_col)&
+                (Sms.neg_flag==neg_col)
+                ).order_by(-Sms.submission_time)
+        elif (request.form.get('dropdown') =='Mixed'):
+            pos_col, neg_col = (1,1)
+            smss = Sms.select().where(
+                (Sms.submission_time  > dtf)& 
+                (Sms.submission_time <= dtt)&
+                (Sms.pos_flag==pos_col)&
+                (Sms.neg_flag==neg_col)
+                ).order_by(-Sms.submission_time)
+        elif (request.form.get('dropdown') == 'Food'):
             food_col = 1
-        if (request.form.get('Service')):
-            TableCls.add_column('Service', Col('Service'))
+            smss = Sms.select().where(
+                (Sms.submission_time  > dtf)& 
+                (Sms.submission_time <= dtt)&
+                (Sms.food_flag == food_col)
+                ).order_by(-Sms.submission_time)
+        elif (request.form.get('dropdown') == 'Service'):
             service_col = 1
-        
-        smss = Sms.select().where(
-        	(Sms.submission_time  > dtf)
-        	& (Sms.submission_time <= dtt)
-        	).order_by(-Sms.submission_time)
-        
-        if (pos_col ==1 or neg_col==1 or except_col==1 or food_col==1 or service_col==1):
-            feedback_analyze=1
-        if (request.form.get('WordCloud') == 1):
-            pass
+            smss = Sms.select().where(
+                (Sms.submission_time  > dtf)& 
+                (Sms.submission_time <= dtt)&
+                (Sms.service_flag == service_col)
+                ).order_by(-Sms.submission_time)
+        elif (request.form.get('dropdown') =='Exception'):
+            except_col = 1
+            smss = Sms.select().where(
+                (Sms.submission_time  > dtf)& 
+                (Sms.submission_time <= dtt)&
+                (Sms.exception_flag==except_col)
+                ).order_by(-Sms.submission_time)
+        else:
+            print("No form")
+            pos_col, neg_col, except_col,food_col, service_col = (-1,-1,-1,-1,-1)
+            smss = Sms.select().where(
+                (Sms.submission_time  > dtf)& 
+                (Sms.submission_time <= dtt)
+                ).order_by(-Sms.submission_time)
+
+        #if (request.form.get('WordCloud') == 1):
+        #    pass
             #feedback_controller.word_freq_counter()
         res = []
         all_string_bodies = ""
+        #print(len(smss))
         for sms in smss:
-            tmp_dict = dict()
-            #print(sms.submission_time)
-            #res.append(dict(submission_time=sms.submission_time,body=sms.body))
-            if time_col==1:
-                tmp_dict['Time']=sms.submission_time
-            if body_col==1:
-                tmp_dict['Body']=sms.body
-            if feedback_analyze==1:
-                if (sms.pos_flag > -1): #if feedback analysis exists
-                    pass
-                else:
-                    res2 = feedback_controller.feedback_analysis(sms.body)
-                    sms.pos_flag = res2[0]
-                    sms.neg_flag = res2[1]
-                    sms.exception_flag = res2[2]
-                    sms.food_flag = res2[3]
-                    sms.service_flag = res2[4]
-                    sms.update()
-            if pos_col==1:
-                tmp_dict['Positive']=sms.pos_flag
-            if neg_col==1:
-                tmp_dict['Negative']=sms.neg_flag
-            if except_col==1:
-                tmp_dict['Exception']=sms.exception_flag
-            if food_col==1:
-                tmp_dict['Food']=sms.food_flag
-            if service_col==1:
-                tmp_dict['Service']=sms.service_flag
-            if res == []:
-                res = [copy.deepcopy(tmp_dict)]
-                #print(sms.body)
-            else:
-                res.append(copy.deepcopy(tmp_dict))
+            #print('pos:{} neg:{} except:{} food:{} service:{}'.format(sms.pos_flag,sms.neg_flag, sms.exception_flag, sms.food_flag, sms.service_flag))
+            res.append(dict(time=sms.submission_time.strftime("%Y-%m-%d %H:%M"),body=sms.body))
 
         #     all_string_bodies = all_string_bodies + sms.body + ","
         # if (request.form.get('WordCloud')):
@@ -110,12 +108,13 @@ def feedback_table():
         # else:
         # 	word_freq = []
         # #print(word_freq)
-        table = TableCls(res)
+        table = ItemTable(res)
     else:
         res = []
-        table = TableCls(res)
+        table = ItemTable(res)
     if not (res == []):
-        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=word_freq)
+        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form)
+        #return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=word_freq)
     else:
         return render_template('feedbackM/index.html', logged_in=True, form=form)
 
@@ -123,10 +122,34 @@ def feedback_table():
 @require_role('admin')
 def delete_feedback():
     '''
-    Deletes all feedback history on twilio and in database.
-    Should only be done once before demo.
+    calls the delete_feedback function, returns # of entries deleted
     '''
-    send_sms.delete_feedback()
-    query = Sms.delete() # deletes all SMS objects
-    res = query.execute()
-    return String.format("%03d amount of sms entries deleted", res)
+    res = feedback_controller.delete_feedback()
+    return String.format("%03d amount of sms entries deleted", res) 
+
+@page.route("/deletealltwiliofeedbackhistory",methods=['GET', 'POST'])
+@require_role('admin')
+def delete_twilio_feedback():
+    '''
+    wipe all message history on twilio
+    '''
+    feedback_controller.delete_twilio_feedback()
+    return "Twilio Feedback deleted"
+
+@page.route("/updateallsms",methods=['GET','POST'])
+@require_role('admin')
+def update_all_sms():
+    '''
+    update all sms
+    '''
+    feedback_controller.update_db()
+    return "db updates with all sms: Success"
+
+@page.route('/twiliosms',methods=['POST'])
+def send_sms_route():
+    '''
+    This is the directory we need to configure twilio for.
+    When Twilio makes a POST request, db will be updated with new sms messages from today
+    '''
+    feedback_controller.update_db(date.today())
+    return 'db updated'

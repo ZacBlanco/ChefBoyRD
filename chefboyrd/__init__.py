@@ -38,6 +38,7 @@ Other helpful sources of documentaiton and reading:
 
 
 '''
+
 import configparser
 import flask_login
 from flask import Flask, render_template
@@ -83,9 +84,7 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash, feedbackM
-from chefboyrd.views import root, stat_dash, reservationH, table_manager
-from chefboyrd.models import customers, user, reservation, tables
+from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
@@ -93,12 +92,12 @@ APP.register_blueprint(auth_pages, url_prefix='/auth')
 APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
+APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
 
 # Put all table creations after here
 # ==================================
-from chefboyrd.models import Customer, User
 from chefboyrd.models import Meals, Ingredients, MealIngredients, Quantities, Tabs, Orders
-from chefboyrd.models import customers, user, sms
+from chefboyrd.models import customers, user, reservation, tables, sms, Customer, User
 
 Customer.create_table(True)
 User.create_table(True)
@@ -138,22 +137,22 @@ try:
 except:
     pass
 
-try:
-    # Test User:
-    # email: zac
-    # Password: zac 
-    tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
-except:
-    pass
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
+# except:
+#     pass
 
-try:
-    # Test User:
-    # email: zac
-    # Password: zac 
-    if tables.Table.select().count() < 1:
-        tables.Table.create_tables(1,5, 0,0.5, 0.5)
-except:
-    pass
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     if tables.Table.select().count() < 1:
+#         tables.Table.create_tables(1,5, 0,0.5, 0.5)
+# except:
+#     pass
 
 try:
     # Test User:
@@ -163,14 +162,14 @@ try:
 except:
     pass
 
-try:
-    # Test User:
-    # email: zac
-    # Password: zac 
-    if tables.Booking.select().count() < 1:
-        tables.Booking.create_booking(1,6,datetime(2017, 2, 14, 19, 0),datetime(2015, 2, 14, 19, 1),'Brandon','732-333-5555')
-except:
-    pass
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     if tables.Booking.select().count() < 1:
+#         tables.Booking.create_booking(1,6,datetime(2017, 2, 14, 19, 0),datetime(2015, 2, 14, 19, 1),'Brandon','732-333-5555')
+# except:
+#     pass
 
 try:
     # email: caz, pw: caz
@@ -179,7 +178,9 @@ except:
     pass
 
 
-from chefboyrd.controllers import data_controller
+from chefboyrd.controllers import data_controller, feedback_controller
 if Orders.select().count() < 1000:
     start_date = datetime.now() - timedelta(days=15)
     data_controller.generate_data(num_days=15, num_tabs=45, dt_start=start_date)
+
+feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
