@@ -12,6 +12,14 @@ from chefboyrd.models import Orders, Tabs, Meals, Ingredients, MealIngredients, 
 from peewee import fn
 
 def polynomialModel(x, *params):
+    '''
+    This is the polynomial model that will be fit by our algorithm. 
+
+    Args: x = input matrix where the features are rows and each predictor(data point) is a column
+          params = the parameters for the model
+
+    Returns: sum = the output vector where each indice is a predictor
+    '''
     complexity = 1
     sum = params[0]
     for i in range(len(x)):
@@ -20,13 +28,25 @@ def polynomialModel(x, *params):
     return sum
 
 def sinusoidalModel(x, *params):
+    '''
+    This is the sinusoidal model that will be fit by our algorithm. 
+
+    Args: x = input matrix where the features are rows and each predictor(data point) is a column
+          params = the parameters for the model
+
+    Returns: sum = the output vector where each indice is a predictor
+    '''
     sum = params[9]
     for i in range(len(x)):
         sum += params[3*i]*np.sin(params[3*i+1]*x[i]+params[3*i+2])
     return sum
 
 def orders_to_list(orders):
-    '''Converts peewee query result set to a list of dictionary of lists'''
+    '''
+    Converts peewee query result set to a list of dictionary of lists
+
+    Args: accepts a list of orders made from a query for peewee
+    '''
     orders = orders.switch(Orders).join(Meals).order_by(Meals.name)
     currentMeal = ""
     previousMeal = ""
@@ -65,6 +85,16 @@ def orders_to_list(orders):
     return mealDict
 
 def train_regression(mealDict, modelType):
+    '''
+    This trains all of the meals and fits their data to their own set of parameters
+
+    Args:
+    mealDict = The meal dictionary containing order data created by orders_to_list
+    modelType = the type of model to use(sinusoidal, polynomial)
+
+    Returns:
+    mealsParams = a dictionary that contains the parameters for each corresponding meal
+    '''
     mealsParams = {}
     for meal_key in mealDict:
         x = np.transpose(mealDict[meal_key][:, 0:3])
@@ -74,7 +104,17 @@ def train_regression(mealDict, modelType):
     return mealsParams
 
 def train_regression_single(x, y, modelType):
-    '''Train regression model with parameters'''
+    '''
+    Trains a single meal and fits it to a model to find its parameters
+
+    Args:
+    x = The input vector(which is composed of rows 0 to 3 in the vector)
+    y = The expected output vector(the last row)
+    modelType = the type of model to use
+
+    Returns:
+    params = a list of parameters
+    '''
     # Train the model
     initial_params = []
 
@@ -88,12 +128,12 @@ def train_regression_single(x, y, modelType):
         return params
 
 def get_earliest_datetime():
-    '''Finds the minimum datetime'''
+    '''Finds the minimum datetime in the orders database'''
     earliestDatetime = Tabs.select(fn.MIN(Tabs.timestamp)).scalar(convert=True)
     return earliestDatetime
 
 def get_last_datetime():
-    '''Finds the maximum datetime in a list'''
+    '''Finds the maximum datetime in the orders database'''
     lastDatetime = Tabs.select(fn.MAX(Tabs.timestamp)).scalar(convert=True)
     return lastDatetime
 

@@ -14,8 +14,9 @@ def predict_regression(regression_params, modelType, dt_min=None, dt_max=None):
 	Args: 
 		regression_params - the parameters for oyur model
 		modelType - the type of model you're using
-		date range - the 
-	Returns: a dictionary of meals with associated usage amounts
+		date range - the two dates that you want to predict the regression for
+	Returns: 
+		mealUsage - a dictionary of meals with associated usage amounts
 	'''
 	if dt_min is None and dt_max is None:
 		dt_min = get_earliest_datetime()
