@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.controllers.booking_controller &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.controllers.booking_controller</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;This module and its functions handle the logic for table reservations for the restaurant.</span>
+<span class="sd">It also handles moving data in and out of our database via the via our application models.&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models.tables</span> <span class="k">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Booking</span><span class="p">,</span> <span class="n">Restaurant</span>
+
+<div class="viewcode-block" id="book_restaurant_table"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.booking_controller.book_restaurant_table">[docs]</a><span class="k">def</span> <span class="nf">book_restaurant_table</span><span class="p">(</span><span class="n">restaurant</span><span class="p">,</span> <span class="n">booking_date_time</span><span class="p">,</span> <span class="n">people</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">phone</span><span class="p">,</span> <span class="n">minutes_slot</span><span class="o">=</span><span class="mi">90</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method uses get_first_table_available to get the first table available, then it</span>
+<span class="sd">    creates a Booking on the database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    restaurant: The id of the restaurant we want to make the booking for</span>
+<span class="sd">    booking_time_date: The starting time of the booking we want to make</span>
+<span class="sd">    people: The number of people that the booking is requesting</span>
+<span class="sd">    name: The name of the guest making the reservation</span>
+<span class="sd">    phone: The phone number of the guest making the reservation</span>
+<span class="sd">    minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</span>
+
+<span class="sd">    Returns: A dictionary with the booking id, and the table id. If there is no table available at the requested time None is returned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">get_first_table_available</span><span class="p">(</span><span class="n">restaurant</span><span class="p">,</span> <span class="n">booking_date_time</span><span class="p">,</span> <span class="n">people</span><span class="p">,</span> <span class="n">minutes_slot</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">table</span><span class="p">:</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="n">minutes_slot</span><span class="p">)</span>
+        <span class="n">booking</span> <span class="o">=</span> <span class="n">Booking</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="p">,</span> <span class="n">people</span><span class="o">=</span><span class="n">people</span><span class="p">,</span>
+            <span class="n">booking_date_time_start</span><span class="o">=</span><span class="n">booking_date_time</span><span class="p">,</span> <span class="n">booking_date_time_end</span><span class="o">=</span><span class="n">booking_date_time</span> <span class="o">+</span> <span class="n">delta</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">phone</span><span class="o">=</span><span class="n">phone</span><span class="p">)</span>
+        <span class="n">booking</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;booking&#39;</span><span class="p">:</span> <span class="n">booking</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="n">table</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="get_first_table_available"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.booking_controller.get_first_table_available">[docs]</a><span class="k">def</span> <span class="nf">get_first_table_available</span><span class="p">(</span><span class="n">restaurant</span><span class="p">,</span> <span class="n">booking_date_time</span><span class="p">,</span> <span class="n">people</span><span class="p">,</span> <span class="n">minutes_slot</span><span class="o">=</span><span class="mi">90</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method returns the first available table of a restaurant, given a specific number of</span>
+<span class="sd">    people and a booking date/time.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    restaurant: The id of the restaurant we want to make the booking for</span>
+<span class="sd">    booking_time_date: The starting time of the booking we want to make</span>
+<span class="sd">    people: The number of people that the booking is requesting</span>
+<span class="sd">    minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</span>
+
+<span class="sd">    Returns: The first table available. If there are no tables available we return None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># I make sure to check if the tables are not already booked within the time slot required</span>
+    <span class="c1"># by the new booking</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="n">minutes_slot</span><span class="p">)</span>
+    <span class="n">l_bound_time</span> <span class="o">=</span> <span class="n">booking_date_time</span>
+    <span class="n">u_bound_time</span> <span class="o">=</span> <span class="n">booking_date_time</span> <span class="o">+</span> <span class="n">delta</span>
+
+    <span class="n">tables_booked_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Exclude tables which start and end booking date includes requested initial booking date_time</span>
+    <span class="k">for</span> <span class="n">book</span> <span class="ow">in</span> <span class="n">Booking</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_start</span> <span class="o">&lt;=</span> <span class="n">l_bound_time</span><span class="p">,</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_end</span> <span class="o">&gt;=</span> <span class="n">l_bound_time</span><span class="p">):</span>
+    	<span class="n">tables_booked_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">book</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="c1"># Exclude tables which start and end booking date includes requested ending booking date_time</span>
+    <span class="k">for</span> <span class="n">book</span> <span class="ow">in</span> <span class="n">Booking</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_start</span> <span class="o">&lt;=</span> <span class="n">u_bound_time</span><span class="p">,</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_end</span> <span class="o">&gt;=</span> <span class="n">u_bound_time</span><span class="p">):</span>
+    	<span class="n">tables_booked_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">book</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="c1"># Exclude tables which booking slots is inside requested booking slot</span>
+    <span class="k">for</span> <span class="n">book</span> <span class="ow">in</span> <span class="n">Booking</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_start</span> <span class="o">&gt;=</span> <span class="n">l_bound_time</span><span class="p">,</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_end</span> <span class="o">&lt;=</span> <span class="n">u_bound_time</span><span class="p">):</span>
+    	<span class="n">tables_booked_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">book</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+
+    <span class="c1"># Exclude tables which include requested booking slot</span>
+    <span class="k">for</span> <span class="n">book</span> <span class="ow">in</span> <span class="n">Booking</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_start</span> <span class="o">&lt;=</span> <span class="n">l_bound_time</span><span class="p">,</span><span class="n">Booking</span><span class="o">.</span><span class="n">booking_date_time_end</span> <span class="o">&gt;=</span> <span class="n">u_bound_time</span><span class="p">):</span>
+    	<span class="n">tables_booked_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">book</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="c1"># Then I get a list of all the tables, of the needed size, available in that restaurant and</span>
+    <span class="c1"># I exclude the previous list of unavailable tables. I order the list from the smaller table</span>
+    <span class="c1"># to the bigger one and I return the first, smaller one, available.</span>
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">Table</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Table</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="n">people</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Table</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+    	<span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">restaurant</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">&lt;=</span> <span class="n">booking_date_time</span><span class="o">.</span><span class="n">hour</span> <span class="ow">and</span> <span class="n">table</span><span class="o">.</span><span class="n">restaurant</span><span class="o">.</span><span class="n">closing_time</span> <span class="o">&gt;=</span> <span class="n">booking_date_time</span><span class="o">.</span><span class="n">hour</span><span class="o">+</span><span class="p">(</span><span class="n">minutes_slot</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="mi">60</span><span class="p">)):</span>
+	    	<span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tables_booked_ids</span><span class="p">:</span>
+	    		<span class="k">return</span> <span class="n">table</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

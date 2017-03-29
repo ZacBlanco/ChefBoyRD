@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.models.tables &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.models.tables</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">CharField</span><span class="p">,</span> <span class="n">IntegerField</span><span class="p">,</span> <span class="n">IntegerField</span><span class="p">,</span> <span class="n">ForeignKeyField</span><span class="p">,</span> <span class="n">DateTimeField</span><span class="p">,</span> <span class="n">BooleanField</span><span class="p">,</span> <span class="n">FloatField</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="n">BaseModel</span>
+
+
+<div class="viewcode-block" id="Restaurant"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.tables.Restaurant">[docs]</a><span class="k">class</span> <span class="nc">Restaurant</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
+    <span class="n">opening_time</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">closing_time</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Restaurant.create_restaurant"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.tables.Restaurant.create_restaurant">[docs]</a>    <span class="k">def</span> <span class="nf">create_restaurant</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">description</span><span class="p">,</span><span class="n">opening_time</span><span class="p">,</span><span class="n">closing_time</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Creates a new reservation</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            id(int): Unique Identifier for reservation. This should be auto added by peewee for us.</span>
+<span class="sd">            name(str): Name of person who made the reservation</span>
+<span class="sd">            description(str): A description of the restaurant</span>
+<span class="sd">            opening_time(int): The opening time of the restaurant in hours</span>
+<span class="sd">            closing_time(int): The closing time of the restaurant in hours</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            N/A</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">opening_time</span><span class="o">=</span><span class="n">opening_time</span><span class="p">,</span>
+                <span class="n">closing_time</span><span class="o">=</span><span class="n">closing_time</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This should not happen(Restaurant)&quot;</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Table"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.tables.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">restaurant</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">Restaurant</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">occupied</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">()</span>
+    <span class="n">posX</span> <span class="o">=</span> <span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">posY</span> <span class="o">=</span> <span class="n">FloatField</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Table.create_tables"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.tables.Table.create_tables">[docs]</a>    <span class="k">def</span> <span class="nf">create_tables</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">restaurant</span><span class="p">,</span><span class="n">size</span><span class="p">,</span> <span class="n">occupied</span><span class="p">,</span> <span class="n">posX</span><span class="p">,</span> <span class="n">posY</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Creates a new reservation</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            id(int): A unique identifier for the table</span>
+<span class="sd">            restaurant(int): The foreign key of the restaurant</span>
+<span class="sd">            size(int): The max number of guests a table can seat</span>
+<span class="sd">            occupied(bool): Determines if a table is occupied. 0 is not occupied, and 1 is occupied</span>
+<span class="sd">            posX(float): The relative x position of the table</span>
+<span class="sd">            posY(float): The relative y position of the table</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            N/A</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tb</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">restaurant</span><span class="o">=</span><span class="n">restaurant</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">occupied</span><span class="o">=</span><span class="n">occupied</span><span class="p">,</span> <span class="n">posX</span><span class="o">=</span><span class="n">posX</span><span class="p">,</span><span class="n">posY</span><span class="o">=</span><span class="n">posY</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">tb</span><span class="o">.</span><span class="n">posX</span><span class="p">,</span><span class="n">tb</span><span class="o">.</span><span class="n">posY</span><span class="p">,</span><span class="n">tb</span><span class="o">.</span><span class="n">occupied</span><span class="p">,</span><span class="n">tb</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This should not happen(Table)&quot;</span><span class="p">)</span></div></div>
+
+
+
+<div class="viewcode-block" id="Booking"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.tables.Booking">[docs]</a><span class="k">class</span> <span class="nc">Booking</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">ForeignKeyField</span><span class="p">(</span><span class="n">Table</span><span class="p">)</span>
+    <span class="n">people</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">phone</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span> <span class="c1"># Phone number </span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span> <span class="c1"># Name of person who made the reservation</span>
+    <span class="n">booking_date_time_start</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">booking_date_time_end</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Booking.cancel_reservation"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.tables.Booking.cancel_reservation">[docs]</a>    <span class="k">def</span> <span class="nf">cancel_reservation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Attemps to cancel a reservation given an ID</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        cls(Booking(: an object representing a booking</span>
+<span class="sd">        id(int): the id of the booking we want to cancel</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">delete_instance</span><span class="p">()</span>
+        <span class="k">return</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Booking.create_booking"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.tables.Booking.create_booking">[docs]</a>    <span class="k">def</span> <span class="nf">create_booking</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span><span class="n">table</span><span class="p">,</span><span class="n">people</span><span class="p">,</span><span class="n">booking_date_time_start</span><span class="p">,</span><span class="n">booking_date_time_end</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">phone</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Creates a new reservation</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            id(int): Unique Identifier for the booking. This should be auto added by peewee for us.</span>
+<span class="sd">            people(int): The number of guests requested for the booking</span>
+<span class="sd">            phone(char): A phone number of the guest making the reservation</span>
+<span class="sd">            name(char): The name of the guest requesting the reservation</span>
+<span class="sd">            booking_date_time_start(date): The starting time of the reservation</span>
+<span class="sd">            booking_date_time_end(date): The ending time of the reservation</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            N/A</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="p">,</span>
+                <span class="n">people</span><span class="o">=</span><span class="n">people</span><span class="p">,</span>
+                <span class="n">booking_date_time_start</span><span class="o">=</span><span class="n">booking_date_time_start</span><span class="p">,</span>
+                <span class="n">booking_date_time_end</span><span class="o">=</span><span class="n">booking_date_time_end</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">phone</span><span class="o">=</span><span class="n">phone</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This should not happen(Booking)&quot;</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

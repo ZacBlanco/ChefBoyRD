@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.controllers.prediction_controller &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.controllers.prediction_controller</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;PredictionController</span>
+
+<span class="sd">This controller performs our machine learning algorithms using non-linear regression fits on the data.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">floor</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">curve_fit</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.controllers.model_controller</span> <span class="k">import</span> <span class="n">polynomialModel</span><span class="p">,</span> <span class="n">sinusoidalModel</span><span class="p">,</span> <span class="n">get_earliest_datetime</span><span class="p">,</span> <span class="n">get_last_datetime</span>
+
+<div class="viewcode-block" id="predict_regression"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.prediction_controller.predict_regression">[docs]</a><span class="k">def</span> <span class="nf">predict_regression</span><span class="p">(</span><span class="n">regression_params</span><span class="p">,</span> <span class="n">modelType</span><span class="p">,</span> <span class="n">dt_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;Predicts the usage of ingredients according to our regression model</span>
+<span class="sd">	Args: </span>
+<span class="sd">		regression_params - the parameters for oyur model</span>
+<span class="sd">		modelType - the type of model you&#39;re using</span>
+<span class="sd">		date range - the two dates that you want to predict the regression for</span>
+<span class="sd">	Returns: </span>
+<span class="sd">		mealUsage - a dictionary of meals with associated usage amounts</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="k">if</span> <span class="n">dt_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dt_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="n">dt_min</span> <span class="o">=</span> <span class="n">get_earliest_datetime</span><span class="p">()</span>
+		<span class="n">dt_max</span> <span class="o">=</span> <span class="n">get_last_datetime</span><span class="p">()</span>
+	<span class="k">elif</span> <span class="n">dt_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="n">dt_min</span> <span class="o">=</span> <span class="n">get_earliest_datetime</span><span class="p">()</span>
+	<span class="k">elif</span> <span class="n">dt_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="n">dt_max</span> <span class="o">=</span> <span class="n">get_last_datetime</span><span class="p">()</span>
+	<span class="k">elif</span> <span class="n">timedelta</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(</span><span class="n">dt_max</span> <span class="o">-</span> <span class="n">dt_min</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Max datetime must be greater than min datetime&quot;</span><span class="p">)</span>
+	
+	<span class="n">dt_delta</span> <span class="o">=</span> <span class="n">dt_max</span> <span class="o">-</span> <span class="n">dt_min</span>
+	<span class="n">total_hours</span> <span class="o">=</span> <span class="n">dt_delta</span><span class="o">.</span><span class="n">days</span><span class="o">*</span><span class="mi">24</span> <span class="o">+</span> <span class="n">floor</span><span class="p">(</span><span class="n">dt_delta</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mi">3600</span><span class="p">)</span>
+	<span class="n">mealUsage</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="n">mealsParams</span> <span class="o">=</span> <span class="n">regression_params</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_hours</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">meal_key</span> <span class="ow">in</span> <span class="n">mealsParams</span><span class="p">:</span>
+			<span class="n">current_dt</span> <span class="o">=</span> <span class="n">dt_min</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+			<span class="n">dt_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">current_dt</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">current_dt</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">current_dt</span><span class="o">.</span><span class="n">month</span><span class="p">])</span>
+			<span class="n">params</span> <span class="o">=</span> <span class="n">mealsParams</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]</span>
+			<span class="k">if</span> <span class="n">meal_key</span> <span class="ow">in</span> <span class="n">mealUsage</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">modelType</span> <span class="o">==</span> <span class="s1">&#39;Polynomial&#39;</span><span class="p">:</span>
+					<span class="n">mealUsage</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">polynomialModel</span><span class="p">(</span><span class="n">dt_array</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">modelType</span> <span class="o">==</span> <span class="s1">&#39;Sinusoidal&#39;</span><span class="p">:</span>
+					<span class="n">mealUsage</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sinusoidalModel</span><span class="p">(</span><span class="n">dt_array</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">modelType</span> <span class="o">==</span> <span class="s1">&#39;Polynomial&#39;</span><span class="p">:</span>
+					<span class="n">mealUsage</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">polynomialModel</span><span class="p">(</span><span class="n">dt_array</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">modelType</span> <span class="o">==</span> <span class="s1">&#39;Sinusoidal&#39;</span><span class="p">:</span>
+					<span class="n">mealUsage</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sinusoidalModel</span><span class="p">(</span><span class="n">dt_array</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">meal_key</span> <span class="ow">in</span> <span class="n">mealUsage</span><span class="p">:</span>
+		<span class="n">mealUsage</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">mealUsage</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]))</span>
+
+	<span class="k">return</span> <span class="n">mealUsage</span></div>
+
+	
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

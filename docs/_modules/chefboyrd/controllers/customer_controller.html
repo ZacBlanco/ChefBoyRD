@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.controllers.customer_controller &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.controllers.customer_controller</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;Customer Controller</span>
+
+<span class="sd">A controller houses all functions that has to do with taking arguments</span>
+<span class="sd">and moifying the underlying data store. The controllers also perform all</span>
+<span class="sd">of the data analysis that might be taking place.abs</span>
+
+<span class="sd">Essentially controllers are for the &#39;business logic&#39; of the application.</span>
+<span class="sd">Everything that goes here will somehow manipulate, calculate, store, modify</span>
+<span class="sd">or learn everything that we need.</span>
+
+<span class="sd">All of the data and objects that we are working with will come from the ``models``</span>
+<span class="sd">folder. Typically each Model will have a corresponding controller which will do</span>
+<span class="sd">all of the CRUD (create, read, update, deletion) from the database. It&#39;s really</span>
+<span class="sd">a middle man from the flask functions to the database which contains all of the</span>
+<span class="sd">logic.</span>
+
+<span class="sd">Other controllers which aren&#39;t directly mapped to updating, reading, or writing</span>
+<span class="sd">models might perform actions like model training (machine learning) or scheduling</span>
+<span class="sd">jobs which may be run at specified times that aren&#39;t necessarily completely dictated</span>
+<span class="sd">by user interaction.</span>
+
+<span class="sd">Basically if you&#39;ve got some code and it doesn&#39;t interact with the models or the views,</span>
+<span class="sd">then it should be a controller.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="n">Customer</span>
+
+
+<div class="viewcode-block" id="new_customer"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.customer_controller.new_customer">[docs]</a><span class="k">def</span> <span class="nf">new_customer</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Create a new customer</span>
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): the customer name</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">cust</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">cust</span><span class="o">.</span><span class="n">save</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="get_customers"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.customer_controller.get_customers">[docs]</a><span class="k">def</span> <span class="nf">get_customers</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Return a list with all customer names&#39;&#39;&#39;</span>
+    <span class="n">custs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">cust</span> <span class="ow">in</span> <span class="n">Customer</span><span class="o">.</span><span class="n">select</span><span class="p">():</span>
+            <span class="n">custs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cust</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">custs</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

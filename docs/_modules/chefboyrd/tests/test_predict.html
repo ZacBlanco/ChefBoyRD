@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.tests.test_predict &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.tests.test_predict</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;Test some model creation and methods&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">unittest.mock</span> <span class="k">import</span> <span class="n">patch</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">chefboyrd</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">SqliteDatabase</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.controllers</span> <span class="k">import</span> <span class="n">data_controller</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.controllers</span> <span class="k">import</span> <span class="n">model_controller</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.controllers</span> <span class="k">import</span> <span class="n">prediction_controller</span>
+
+<div class="viewcode-block" id="ModelTest"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest">[docs]</a><span class="k">class</span> <span class="nc">ModelTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ModelTest.setUp"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_name</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">()</span>
+        <span class="n">chefboyrd</span><span class="o">.</span><span class="n">init_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">APP</span><span class="o">.</span><span class="n">test_client</span><span class="p">()</span>
+        <span class="c1"># This bit of code sets the db to a tempfile for each model</span>
+        <span class="c1"># Ensures testing on fresh DB every run.</span>
+        <span class="n">chefboyrd</span><span class="o">.</span><span class="n">DB</span> <span class="o">=</span> <span class="n">SqliteDatabase</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+        <span class="n">Tabs</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">DB</span>
+        <span class="n">Tabs</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Meals</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">DB</span>
+        <span class="n">Meals</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">MealIngredients</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">DB</span>
+        <span class="n">MealIngredients</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Orders</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">DB</span>
+        <span class="n">Orders</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Quantities</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">DB</span>
+        <span class="n">Quantities</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Ingredients</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">DB</span>
+        <span class="n">Ingredients</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ModelTest.tearDown"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_fd</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_polynomialModel"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_polynomialModel">[docs]</a>    <span class="k">def</span> <span class="nf">test_polynomialModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">iv</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># Input vector</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># Input parameters</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="n">model_controller</span><span class="o">.</span><span class="n">polynomialModel</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="o">*</span><span class="n">ip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="c1"># Expected output is 7</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_sinusoidalModel"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_sinusoidalModel">[docs]</a>    <span class="k">def</span> <span class="nf">test_sinusoidalModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">iv</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="n">model_controller</span><span class="o">.</span><span class="n">sinusoidalModel</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="o">*</span><span class="n">ip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="mf">1.2936149395776206</span><span class="p">)</span> <span class="c1"># Expected output</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_get_earliest_datetime"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_get_earliest_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_earliest_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data_controller</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">expected_earliest_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">earliest_datetime</span> <span class="o">=</span> <span class="n">model_controller</span><span class="o">.</span><span class="n">get_earliest_datetime</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">earliest_datetime</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">expected_earliest_datetime</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">earliest_datetime</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">expected_earliest_datetime</span><span class="o">.</span><span class="n">month</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">earliest_datetime</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">expected_earliest_datetime</span><span class="o">.</span><span class="n">day</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_create_meal"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_create_meal">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_meal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Meals</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="mf">12.99</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Cheeseburger&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">meals</span> <span class="o">=</span> <span class="n">Meals</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Meals</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Cheeseburger&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">meals</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">meals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">price</span><span class="p">,</span> <span class="mf">12.99</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_create_tab"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_create_tab">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Tabs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">had_reservation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">party_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">party_size</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tabs</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">party_size</span> <span class="o">==</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tabs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">tabs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">had_reservation</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_create_foreign_key_obj"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_create_foreign_key_obj">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_foreign_key_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">MealIngredients</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">quantity_amt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">meal_id</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">ingredient_id</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+                                   <span class="n">quantity_meas_id</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">mis</span> <span class="o">=</span> <span class="n">MealIngredients</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">MealIngredients</span><span class="o">.</span><span class="n">quantity_amt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mis</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_get_order_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_get_order_range">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_order_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">Meals</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Burger&quot;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">8.99</span><span class="p">)</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+            <span class="n">tm</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">tm</span><span class="p">,</span> <span class="n">had_reservation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">party_size</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">ords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Orders</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">tab</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">meal</span><span class="o">=</span><span class="n">m1</span><span class="o">.</span><span class="n">get_id</span><span class="p">()))</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dcords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">19</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">18</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">dt_max</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="mi">15</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dcords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">dt_max</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">19</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dcords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">17</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ModelTest.test_get_tab_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_get_tab_range">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_tab_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+            <span class="n">tm</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">tm</span><span class="p">,</span> <span class="n">had_reservation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">party_size</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dcords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">19</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">18</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">dt_max</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="mi">15</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dcords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">dt_max</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">19</span><span class="p">)</span>
+        <span class="n">dcords</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dcords</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">times</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dcords</span><span class="p">),</span> <span class="mi">17</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span></div>
+        
+<div class="viewcode-block" id="ModelTest.test_get_dotw"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_get_dotw">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_dotw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">Meals</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Burger&quot;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">8.99</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+            <span class="n">tm</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
+                <span class="n">td</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="p">(</span><span class="n">tm</span><span class="o">.</span><span class="n">day</span><span class="o">-</span><span class="n">y</span><span class="p">))</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">td</span><span class="p">,</span> <span class="n">had_reservation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">party_size</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">Orders</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">tab</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">meal</span><span class="o">=</span><span class="n">m1</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_controller</span><span class="o">.</span><span class="n">get_dotw_orders</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">data_controller</span><span class="o">.</span><span class="n">get_dotw_orders</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">data_controller</span><span class="o">.</span><span class="n">get_dotw_orders</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span></div>
+
+    <span class="nd">@patch</span><span class="p">(</span><span class="s1">&#39;chefboyrd.models.Orders.create&#39;</span><span class="p">,</span> <span class="n">return_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="viewcode-block" id="ModelTest.test_generate_data"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_generate_data">[docs]</a>    <span class="k">def</span> <span class="nf">test_generate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orders</span><span class="p">):</span>
+        <span class="c1"># print(Ingredients._meta.database.database)</span>
+        <span class="n">data_controller</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">num_days</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_tabs</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">orders</span><span class="o">.</span><span class="n">asser_called_once</span><span class="p">()</span></div></div>
+            
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

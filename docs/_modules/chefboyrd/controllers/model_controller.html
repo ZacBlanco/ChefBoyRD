@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.controllers.model_controller &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.controllers.model_controller</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;ModelController</span>
+<span class="sd">This is a preprocessor for the prediction_controller. Given data in the form of</span>
+<span class="sd">our local models, it converts it into numbers usable by the prediction controller.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">Model</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">curve_fit</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="n">Orders</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">,</span> <span class="n">Meals</span><span class="p">,</span> <span class="n">Ingredients</span><span class="p">,</span> <span class="n">MealIngredients</span><span class="p">,</span> <span class="n">Quantities</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">fn</span>
+
+<div class="viewcode-block" id="polynomialModel"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.model_controller.polynomialModel">[docs]</a><span class="k">def</span> <span class="nf">polynomialModel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the polynomial model that will be fit by our algorithm. </span>
+
+<span class="sd">    Args: x = input matrix where the features are rows and each predictor(data point) is a column</span>
+<span class="sd">          params = the parameters for the model</span>
+
+<span class="sd">    Returns: sum = the output vector where each indice is a predictor</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">complexity</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">complexity</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="nb">sum</span> <span class="o">+=</span> <span class="n">params</span><span class="p">[</span><span class="n">complexity</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="n">j</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span></div>
+
+<div class="viewcode-block" id="sinusoidalModel"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.model_controller.sinusoidalModel">[docs]</a><span class="k">def</span> <span class="nf">sinusoidalModel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the sinusoidal model that will be fit by our algorithm. </span>
+
+<span class="sd">    Args: x = input matrix where the features are rows and each predictor(data point) is a column</span>
+<span class="sd">          params = the parameters for the model</span>
+
+<span class="sd">    Returns: sum = the output vector where each indice is a predictor</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">params</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">params</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">sum</span></div>
+
+<div class="viewcode-block" id="orders_to_list"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.model_controller.orders_to_list">[docs]</a><span class="k">def</span> <span class="nf">orders_to_list</span><span class="p">(</span><span class="n">orders</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Converts peewee query result set to a list of dictionary of lists</span>
+
+<span class="sd">    Args: accepts a list of orders made from a query for peewee</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="o">.</span><span class="n">switch</span><span class="p">(</span><span class="n">Orders</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Meals</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Meals</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">currentMeal</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">previousMeal</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">currentHour</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">previousHour</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">mealCounter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mealDict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+        <span class="n">currentMeal</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">meal</span><span class="o">.</span><span class="n">name</span>
+        <span class="c1"># Check if you&#39;re on a new meal</span>
+        <span class="k">if</span> <span class="n">currentMeal</span> <span class="o">!=</span> <span class="n">previousMeal</span><span class="p">:</span>
+            <span class="c1"># Add the rest of the mealCounter to the previous meal</span>
+            <span class="k">if</span> <span class="n">previousMeal</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">mealCounter</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ts</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ts</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">ts</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">ts</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">mealCounter</span><span class="p">]])</span>
+                <span class="k">if</span> <span class="n">previousMeal</span> <span class="ow">in</span> <span class="n">mealDict</span><span class="p">:</span>
+                    <span class="n">mealDict</span><span class="p">[</span><span class="n">previousMeal</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mealDict</span><span class="p">[</span><span class="n">previousMeal</span><span class="p">],</span> <span class="n">row</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mealDict</span><span class="p">[</span><span class="n">previousMeal</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+                <span class="n">mealCounter</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">mealCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Check if the hour bucket is the same</span>
+        <span class="n">currentHour</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">hour</span> 
+        <span class="k">if</span> <span class="n">currentHour</span> <span class="o">!=</span> <span class="n">previousHour</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">previousHour</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">ts</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ts</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">ts</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">ts</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">mealCounter</span><span class="p">]])</span>
+                <span class="k">if</span> <span class="n">currentMeal</span> <span class="ow">in</span> <span class="n">mealDict</span><span class="p">:</span>
+                    <span class="n">mealDict</span><span class="p">[</span><span class="n">currentMeal</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mealDict</span><span class="p">[</span><span class="n">currentMeal</span><span class="p">],</span> <span class="n">row</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mealDict</span><span class="p">[</span><span class="n">currentMeal</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+                <span class="n">mealCounter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">previousHour</span> <span class="o">=</span> <span class="n">currentHour</span>
+        <span class="n">previousMeal</span> <span class="o">=</span> <span class="n">currentMeal</span>
+    <span class="k">return</span> <span class="n">mealDict</span></div>
+
+<div class="viewcode-block" id="train_regression"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.model_controller.train_regression">[docs]</a><span class="k">def</span> <span class="nf">train_regression</span><span class="p">(</span><span class="n">mealDict</span><span class="p">,</span> <span class="n">modelType</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This trains all of the meals and fits their data to their own set of parameters</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    mealDict = The meal dictionary containing order data created by orders_to_list</span>
+<span class="sd">    modelType = the type of model to use(sinusoidal, polynomial)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    mealsParams = a dictionary that contains the parameters for each corresponding meal</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">mealsParams</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">meal_key</span> <span class="ow">in</span> <span class="n">mealDict</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">mealDict</span><span class="p">[</span><span class="n">meal_key</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">mealDict</span><span class="p">[</span><span class="n">meal_key</span><span class="p">][:,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="n">mealParams</span> <span class="o">=</span> <span class="n">train_regression_single</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">modelType</span><span class="p">)</span>
+        <span class="n">mealsParams</span><span class="p">[</span><span class="n">meal_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mealParams</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">mealsParams</span></div>
+
+<div class="viewcode-block" id="train_regression_single"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.model_controller.train_regression_single">[docs]</a><span class="k">def</span> <span class="nf">train_regression_single</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">modelType</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Trains a single meal and fits it to a model to find its parameters</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    x = The input vector(which is composed of rows 0 to 3 in the vector)</span>
+<span class="sd">    y = The expected output vector(the last row)</span>
+<span class="sd">    modelType = the type of model to use</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    params = a list of parameters</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Train the model</span>
+    <span class="n">initial_params</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">modelType</span> <span class="o">==</span> <span class="s1">&#39;Polynomial&#39;</span><span class="p">:</span>
+        <span class="n">initial_params</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="n">params</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">polynomialModel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">initial_params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params</span>
+    <span class="k">elif</span> <span class="n">modelType</span> <span class="o">==</span> <span class="s1">&#39;Sinusoidal&#39;</span><span class="p">:</span>
+        <span class="n">initial_params</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="n">params</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">sinusoidalModel</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">initial_params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">params</span></div>
+
+<div class="viewcode-block" id="get_earliest_datetime"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.model_controller.get_earliest_datetime">[docs]</a><span class="k">def</span> <span class="nf">get_earliest_datetime</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Finds the minimum datetime in the orders database&#39;&#39;&#39;</span>
+    <span class="n">earliestDatetime</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">MIN</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span><span class="p">))</span><span class="o">.</span><span class="n">scalar</span><span class="p">(</span><span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">earliestDatetime</span></div>
+
+<div class="viewcode-block" id="get_last_datetime"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.model_controller.get_last_datetime">[docs]</a><span class="k">def</span> <span class="nf">get_last_datetime</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Finds the maximum datetime in the orders database&#39;&#39;&#39;</span>
+    <span class="n">lastDatetime</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">MAX</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span><span class="p">))</span><span class="o">.</span><span class="n">scalar</span><span class="p">(</span><span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lastDatetime</span></div>
+
+
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

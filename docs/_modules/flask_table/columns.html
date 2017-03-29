@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>flask_table.columns &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for flask_table.columns</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Markup</span><span class="p">,</span> <span class="n">url_for</span>
+<span class="kn">from</span> <span class="nn">babel.dates</span> <span class="k">import</span> <span class="n">format_date</span><span class="p">,</span> <span class="n">format_datetime</span>
+<span class="kn">from</span> <span class="nn">flask_babel</span> <span class="k">import</span> <span class="n">gettext</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span> <span class="nn">.html</span> <span class="k">import</span> <span class="n">element</span>
+
+
+<span class="k">def</span> <span class="nf">_single_get</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="c1"># First, try to lookup the key as if the item were a dict. If</span>
+    <span class="c1"># that fails, lookup the key as an atrribute of an item.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+    <span class="c1"># once we have the value, try calling it as a function. If</span>
+    <span class="c1"># that fails, the just return it.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">val</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+
+<span class="k">def</span> <span class="nf">_recursive_getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+    <span class="c1"># See if keys is as string, if so, we need to split on the dots.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_single_get</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_recursive_getattr</span><span class="p">(</span><span class="n">_single_get</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+
+<span class="k">class</span> <span class="nc">Col</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The subclass for all Columns, and the class that just gets some</span>
+<span class="sd">    data from each item an outputs it.</span>
+
+<span class="sd">    We use this hack with _counter to make sure that the columns end</span>
+<span class="sd">    up in the same order as when declared. Each column must set a</span>
+<span class="sd">    name, which is used in as the heading for that column, and can</span>
+<span class="sd">    optionally set an attr or an attr_list. attr=&#39;foo&#39; is equivalent</span>
+<span class="sd">    to attr_list=[&#39;foo&#39;] and attr_list=[&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;] will</span>
+<span class="sd">    attempt to get item.foo.bar.baz for each item in the iterable</span>
+<span class="sd">    given to the table. If item.foo.bar is None, then this process</span>
+<span class="sd">    will terminate and will not error. However, if item.foo.bar is an</span>
+<span class="sd">    object without an attribute &#39;baz&#39;, then this will currently error.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attr_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">allow_sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">th_html_attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">td_html_attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">column_html_attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_sort</span> <span class="o">=</span> <span class="n">allow_sort</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_counter_val</span> <span class="o">=</span> <span class="n">Col</span><span class="o">.</span><span class="n">_counter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">=</span> <span class="n">attr_list</span>
+        <span class="k">if</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show</span> <span class="o">=</span> <span class="n">show</span>
+
+        <span class="n">column_html_attrs</span> <span class="o">=</span> <span class="n">column_html_attrs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">td_html_attrs</span> <span class="o">=</span> <span class="n">column_html_attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">td_html_attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">td_html_attrs</span> <span class="ow">or</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">th_html_attrs</span> <span class="o">=</span> <span class="n">column_html_attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">th_html_attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">th_html_attrs</span> <span class="ow">or</span> <span class="p">{})</span>
+
+        <span class="n">Col</span><span class="o">.</span><span class="n">_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">get_attr_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span>
+        <span class="k">elif</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">attr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">from_attr_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">_recursive_getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">td</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">td_contents</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_attr_list</span><span class="p">(</span><span class="n">attr</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">element</span><span class="p">(</span>
+            <span class="s1">&#39;td&#39;</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span>
+            <span class="n">escape_content</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">td_html_attrs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">td_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given an item and an attr, return the contents of the td.</span>
+
+<span class="sd">        This method is a likely candidate to override when extending</span>
+<span class="sd">        the Col class, which is done in LinkCol and</span>
+<span class="sd">        ButtonCol. Override this method if you need to get some extra</span>
+<span class="sd">        data from the item.</span>
+
+<span class="sd">        Note that the output of this function is NOT escaped.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">td_format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">from_attr_list</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">td_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given just the value extracted from the item, return what should</span>
+<span class="sd">        appear within the td.</span>
+
+<span class="sd">        This method is also a good choice to override when extending,</span>
+<span class="sd">        which is done in the BoolCol, DateCol and DatetimeCol</span>
+<span class="sd">        classes. Override this method when you just need the standard</span>
+<span class="sd">        data that attr_list gets from the item, but need to adjust how</span>
+<span class="sd">        it is represented.</span>
+
+<span class="sd">        Note that the output of this function is escaped.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Markup</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">OptCol</span><span class="p">(</span><span class="n">Col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Translate the contents according to a dictionary of choices.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">coerce_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OptCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">choices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="n">choices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">default_key</span><span class="p">,</span> <span class="n">default_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coerce_fn</span> <span class="o">=</span> <span class="n">coerce_fn</span>
+
+    <span class="k">def</span> <span class="nf">from_attr_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>
+        <span class="c1"># Don&#39;t convert None to empty string here.</span>
+        <span class="k">return</span> <span class="n">_recursive_getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">coerce_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coerce_fn</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coerce_fn</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">content</span>
+
+    <span class="k">def</span> <span class="nf">td_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coerce_content</span><span class="p">(</span><span class="n">content</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">BoolCol</span><span class="p">(</span><span class="n">OptCol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Output Yes/No values for truthy or falsey values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">yes_display</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Yes&#39;</span><span class="p">)</span>
+    <span class="n">no_display</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">yes_display</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_display</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">yes_display</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">yes_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yes_display</span>
+        <span class="k">if</span> <span class="n">no_display</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">no_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_display</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BoolCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="n">yes_display</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="n">no_display</span><span class="p">},</span>
+            <span class="n">coerce_fn</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">BoolNaCol</span><span class="p">(</span><span class="n">OptCol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Output Yes/No values for truthy or falsey values, or N/A for None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">yes_display</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Yes&#39;</span><span class="p">)</span>
+    <span class="n">no_display</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;No&#39;</span><span class="p">)</span>
+    <span class="n">na_display</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;N/A&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">yes_display</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_display</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">na_display</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">yes_display</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">yes_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yes_display</span>
+        <span class="k">if</span> <span class="n">no_display</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">no_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_display</span>
+        <span class="k">if</span> <span class="n">na_display</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">na_display</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">na_display</span>
+
+        <span class="k">def</span> <span class="nf">bool_or_none</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">BoolNaCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="n">yes_display</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="n">no_display</span><span class="p">,</span> <span class="kc">None</span><span class="p">:</span> <span class="n">na_display</span><span class="p">},</span>
+            <span class="n">coerce_fn</span><span class="o">=</span><span class="n">bool_or_none</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">DateCol</span><span class="p">(</span><span class="n">Col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format the content as a date, unless it is None, in which case,</span>
+<span class="sd">    output empty.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DateCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date_format</span> <span class="o">=</span> <span class="n">date_format</span>
+
+    <span class="k">def</span> <span class="nf">td_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">format_date</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_format</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">DatetimeCol</span><span class="p">(</span><span class="n">Col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format the content as a datetime, unless it is None, in which case,</span>
+<span class="sd">    output empty.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">datetime_format</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DatetimeCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datetime_format</span> <span class="o">=</span> <span class="n">datetime_format</span>
+
+    <span class="k">def</span> <span class="nf">td_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">format_datetime</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datetime_format</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">LinkCol</span><span class="p">(</span><span class="n">Col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format the content as a link. Requires a endpoint to use to find</span>
+<span class="sd">    the url and can also take a dict of url_kwargs which is expected</span>
+<span class="sd">    to have values that are strings which are used to get data from</span>
+<span class="sd">    the item.</span>
+
+<span class="sd">    Eg:</span>
+
+<span class="sd">    view = LinkCol(&#39;View&#39;, &#39;view_fn&#39;, url_kwargs=dict(id=&#39;id&#39;))</span>
+
+<span class="sd">    This will create a link to the address given by url_for(&#39;view_fn&#39;,</span>
+<span class="sd">    id=item.id) for each item in the iterable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attr_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">url_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">url_kwargs_extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">anchor_attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LinkCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span>
+            <span class="n">attr_list</span><span class="o">=</span><span class="n">attr_list</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url_kwargs</span> <span class="o">=</span> <span class="n">url_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url_kwargs_extra</span> <span class="o">=</span> <span class="n">url_kwargs_extra</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anchor_attrs</span> <span class="o">=</span> <span class="n">anchor_attrs</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">url_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># We give preference to the item kwargs, rather than the extra</span>
+        <span class="c1"># kwargs.</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_kwargs_extra</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">item_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_recursive_getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                       <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">item_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">get_attr_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">LinkCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_attr_list</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attr_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_attr_list</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">url_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">url_kwargs</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">td_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">href</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+        <span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anchor_attrs</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">td_format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">element</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">escape_content</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ButtonCol</span><span class="p">(</span><span class="n">LinkCol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Just the same a LinkCol, but creates an empty form which gets</span>
+<span class="sd">    posted to the specified url.</span>
+
+<span class="sd">    Eg:</span>
+
+<span class="sd">    delete = ButtonCol(&#39;Delete&#39;, &#39;delete_fn&#39;, url_kwargs=dict(id=&#39;id&#39;))</span>
+
+<span class="sd">    When clicked, this will post to url_for(&#39;delete_fn&#39;, id=item.id).</span>
+
+<span class="sd">    Can pass button_attrs to pass extra attributes to the button</span>
+<span class="sd">    element.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attr_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">url_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">button_attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ButtonCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">endpoint</span><span class="p">,</span>
+            <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span>
+            <span class="n">attr_list</span><span class="o">=</span><span class="n">attr_list</span><span class="p">,</span>
+            <span class="n">url_kwargs</span><span class="o">=</span><span class="n">url_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button_attrs</span> <span class="o">=</span> <span class="n">button_attrs</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">td_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>
+        <span class="n">button_attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button_attrs</span><span class="p">)</span>
+        <span class="n">button_attrs</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;submit&#39;</span>
+        <span class="n">button</span> <span class="o">=</span> <span class="n">element</span><span class="p">(</span>
+            <span class="s1">&#39;button&#39;</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="n">button_attrs</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">element</span><span class="p">(</span>
+            <span class="s1">&#39;form&#39;</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span>
+                <span class="n">action</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">item</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">button</span><span class="p">,</span>
+            <span class="n">escape_content</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">NestedTableCol</span><span class="p">(</span><span class="n">Col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This column type allows for nesting tables into a column.  The</span>
+<span class="sd">    nested table is defined as a sub-class of Table as usual. Then in</span>
+<span class="sd">    the main table, a column is defined using NestedTableCol with the</span>
+<span class="sd">    second argument being the name of the Table sub-class object</span>
+<span class="sd">    defined for the nested table.</span>
+
+<span class="sd">    Eg:</span>
+
+<span class="sd">    class MySubTable(Table):</span>
+<span class="sd">        a = Col(&#39;1st nested table col&#39;)</span>
+<span class="sd">        b = Col(&#39;2nd nested table col&#39;)</span>
+
+<span class="sd">    class MainTable(Table):</span>
+<span class="sd">        id = Col(&#39;id&#39;)</span>
+<span class="sd">        objects = NestedTableCol(&#39;objects&#39;, MySubTable)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">table_class</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NestedTableCol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_class</span> <span class="o">=</span> <span class="n">table_class</span>
+
+    <span class="k">def</span> <span class="nf">td_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_class</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">__html__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">t</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

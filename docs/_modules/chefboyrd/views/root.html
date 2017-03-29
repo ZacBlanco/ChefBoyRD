@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.views.root &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.views.root</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;This is a sample blueprint for a homepage</span>
+
+<span class="sd">Because we&#39;re going to have multiple views for the project we need a way to break them up easily</span>
+<span class="sd">within our application. Flask provides us with this neat tool called blueprints where we&#39;re able</span>
+<span class="sd">to define, essentially, chunks of our APIs or programs as blueprints with functions, then map</span>
+<span class="sd">the predefined functions to specific routes in our application. (See the __init__.py file)</span>
+<span class="sd">for blueprint registering.</span>
+
+<span class="sd">To create a new routable location as part of the view you need to first create the blueprint for</span>
+<span class="sd">the module. This is done with the following code</span>
+
+<span class="sd">    page = Blueprint(&#39;main&#39;, __name__, template_folder=&#39;templates&#39;)</span>
+
+<span class="sd">Then you can use the function decorator @page.route(...) to decorate methods in order to create</span>
+<span class="sd">the views. See the example below. I think the code is relatively straightforward.</span>
+
+<span class="sd">Read the flask documentation if you have issues. Particularly the following pages:</span>
+
+<span class="sd">- http://flask.pocoo.org/docs/0.12/blueprints/</span>
+<span class="sd">- http://flask.pocoo.org/docs/0.12/quickstart/</span>
+
+<span class="sd">Dive deeper into the documentation for a better understanding of how this all works.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">abort</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">TemplateNotFound</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.controllers</span> <span class="k">import</span> <span class="n">customer_controller</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">date</span>
+
+<span class="n">page</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">,</span> <span class="n">template_folder</span><span class="o">=</span><span class="s1">&#39;templates&#39;</span><span class="p">)</span>
+
+<span class="nd">@page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="show"><a class="viewcode-back" href="../../../autodoc/chefboyrd.views.html#chefboyrd.views.root.show">[docs]</a><span class="k">def</span> <span class="nf">show</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Render Homepage&#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;default.html&#39;</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">customer_controller</span><span class="o">.</span><span class="n">get_customers</span><span class="p">())</span>
+    <span class="k">except</span> <span class="n">TemplateNotFound</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
+
+<span class="nd">@page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/hello&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="showhello"><a class="viewcode-back" href="../../../autodoc/chefboyrd.views.html#chefboyrd.views.root.showhello">[docs]</a><span class="k">def</span> <span class="nf">showhello</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Super basic function. Always shows &quot;Hi&quot;&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="s2">&quot;Hi&quot;</span></div>
+
+<span class="nd">@page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/customer/&lt;name&gt;&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="new_cust"><a class="viewcode-back" href="../../../autodoc/chefboyrd.views.html#chefboyrd.views.root.new_cust">[docs]</a><span class="k">def</span> <span class="nf">new_cust</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Creates a new customer</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): String representing the name</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">customer_controller</span><span class="o">.</span><span class="n">new_customer</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;default.html&#39;</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;default.html&#39;</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Failed&#39;</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

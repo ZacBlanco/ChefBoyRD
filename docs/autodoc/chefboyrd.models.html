@@ -1,0 +1,929 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.models package &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="chefboyrd.tests package" href="chefboyrd.tests.html" />
+    <link rel="prev" title="chefboyrd.controllers package" href="chefboyrd.controllers.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="chefboyrd-models-package">
+<h1>chefboyrd.models package<a class="headerlink" href="#chefboyrd-models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-chefboyrd.models.base_model">
+<span id="chefboyrd-models-base-model-module"></span><h2>chefboyrd.models.base_model module<a class="headerlink" href="#module-chefboyrd.models.base_model" title="Permalink to this headline">¶</a></h2>
+<p>Base model that all new models should inherit from</p>
+<p>A data model is an object which helps us define mappings between our data in our databases
+and the objects that we interact with inside of the program and in our code.</p>
+<p>For this project we use an ORM (Object-Relational Mapping) library called peewee.
+If you look at the code below peewee makes defining these models incredibly simple and the
+documentation for the library is quite good. There are lots of examples and it is incredibly
+powerful. Plus it peewee is ridiculously easy to use with SQLite. However if we do choose to
+use another database the migration is very simple as well. This way our options are left open.</p>
+<p>Otherwise there&#8217;s not much else to talk about with the models. I highly recommend reading the
+peewee Quickstart and documentation</p>
+<p>See <a class="reference external" href="http://docs.peewee-orm.com/en/latest/peewee/quickstart.html">http://docs.peewee-orm.com/en/latest/peewee/quickstart.html</a></p>
+<dl class="class">
+<dt id="chefboyrd.models.base_model.BaseModel">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.base_model.</code><code class="descname">BaseModel</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/base_model.html#BaseModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.base_model.BaseModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">peewee.Model</span></code></p>
+<p>A base model which sets up the database connection for all inherited classes</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.base_model.BaseModel.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.base_model.BaseModel.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">BaseModelDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.base_model.BaseModel.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.base_model.BaseModel.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.models.customers">
+<span id="chefboyrd-models-customers-module"></span><h2>chefboyrd.models.customers module<a class="headerlink" href="#module-chefboyrd.models.customers" title="Permalink to this headline">¶</a></h2>
+<p>A data model for our customer</p>
+<p>A data model is an object which helps us define mappings between our data in our databases
+and the objects that we interact with inside of the program and in our code.</p>
+<dl class="class">
+<dt id="chefboyrd.models.customers.Customer">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.customers.</code><code class="descname">Customer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/customers.html#Customer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.customers.Customer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A sample customer model
+Please modify this to fit our needs</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.customers.Customer.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.customers.Customer.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">CustomerDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.customers.Customer.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.customers.Customer.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.customers.Customer.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.customers.Customer.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.models.reservation">
+<span id="chefboyrd-models-reservation-module"></span><h2>chefboyrd.models.reservation module<a class="headerlink" href="#module-chefboyrd.models.reservation" title="Permalink to this headline">¶</a></h2>
+<p>The basic reservation model</p>
+<dl class="class">
+<dt id="chefboyrd.models.reservation.Reservation">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.reservation.</code><code class="descname">Reservation</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/reservation.html#Reservation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.reservation.Reservation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">flask_login.mixins.UserMixin</span></code>, <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<dl class="attribute">
+<dt id="chefboyrd.models.reservation.Reservation.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">ReservationDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chefboyrd.models.reservation.Reservation.cancel_reservation">
+<em class="property">classmethod </em><code class="descname">cancel_reservation</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/reservation.html#Reservation.cancel_reservation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.cancel_reservation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="chefboyrd.models.reservation.Reservation.create_reservation">
+<em class="property">classmethod </em><code class="descname">create_reservation</code><span class="sig-paren">(</span><em>name</em>, <em>num</em>, <em>phone</em>, <em>start</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/reservation.html#Reservation.create_reservation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.create_reservation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new reservation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>id</strong> (<em>int</em>) &#8211; Unique Identifier for reservation. This should be auto added by peewee for us.</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; Name of person who made the reservation</li>
+<li><strong>num</strong> (<em>int</em>) &#8211; Number of people in the reservation</li>
+<li><strong>phone</strong> (<em>str</em>) &#8211; Phone number of person who made the reservation</li>
+<li><strong>start</strong> (<a class="reference internal" href="chefboyrd.views.html#chefboyrd.views.reservationH.ItemTable.time" title="chefboyrd.views.reservationH.ItemTable.time"><em>time</em></a>) &#8211; Starting time of reservation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">N/A</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.reservation.Reservation.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.reservation.Reservation.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.reservation.Reservation.num">
+<code class="descname">num</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.num" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.reservation.Reservation.phone">
+<code class="descname">phone</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.phone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.reservation.Reservation.start">
+<code class="descname">start</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em><a class="headerlink" href="#chefboyrd.models.reservation.Reservation.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.models.sms">
+<span id="chefboyrd-models-sms-module"></span><h2>chefboyrd.models.sms module<a class="headerlink" href="#module-chefboyrd.models.sms" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="chefboyrd.models.sms.Sms">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.sms.</code><code class="descname">Sms</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/sms.html#Sms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.sms.Sms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">peewee.Model</span></code></p>
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.sid">
+<code class="descname">sid</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.sid" title="Permalink to this definition">¶</a></dt>
+<dd><p>is an unique id assigned by twilio. it will help us keep track of sms that is in, or not in db</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.submission_time">
+<code class="descname">submission_time</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.submission_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>is the date and time the feedback was submitted</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.body">
+<code class="descname">body</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.body" title="Permalink to this definition">¶</a></dt>
+<dd><p>the message of the Sms</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.phone_num">
+<code class="descname">phone_num</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.phone_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>Phone number of person who sent in text</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.pos_flag">
+<code class="descname">pos_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.pos_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 if body includes positive feedback. 0 if not. -1 default value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.neg_flag">
+<code class="descname">neg_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.neg_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 if body includes negative feedback. 0 if not. -1 default value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.exception_flag">
+<code class="descname">exception_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.exception_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 if body includes an exception to a present clause. 0 if not. -1 default value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.food_flag">
+<code class="descname">food_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.food_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 if body includes feedback about food. 0 if not. -1 default value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.service_flag">
+<code class="descname">service_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.service_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>1 if indicating body includes feedback about service. 0 if not. -1 default value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">SmsDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">body</code><em class="property"> = &lt;peewee.TextField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">exception_flag</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">food_flag</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.sms.Sms.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.sms.Sms.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">neg_flag</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">phone_num</code><em class="property"> = &lt;peewee.TextField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">pos_flag</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">service_flag</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">sid</code><em class="property"> = &lt;peewee.TextField object&gt;</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">submission_time</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.models.statistics">
+<span id="chefboyrd-models-statistics-module"></span><h2>chefboyrd.models.statistics module<a class="headerlink" href="#module-chefboyrd.models.statistics" title="Permalink to this headline">¶</a></h2>
+<p>This module contains all of the peewee model classes which correspond to order statistics. They
+will be used to make predictions and display data about business revenue and growth.</p>
+<dl class="class">
+<dt id="chefboyrd.models.statistics.Ingredients">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.statistics.</code><code class="descname">Ingredients</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/statistics.html#Ingredients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.statistics.Ingredients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A table which maps ingredient names to ingredient ID&#8217;s</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Ingredients.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.statistics.Ingredients.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">IngredientsDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Ingredients.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Ingredients.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Ingredients.mealingredients_set">
+<code class="descname">mealingredients_set</code><a class="headerlink" href="#chefboyrd.models.statistics.Ingredients.mealingredients_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back-reference to expose related objects as a <cite>SelectQuery</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Ingredients.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Ingredients.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chefboyrd.models.statistics.MealIngredients">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.statistics.</code><code class="descname">MealIngredients</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/statistics.html#MealIngredients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A table mapping a meal to the ingredients used</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">MealIngredientsDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.ingredient_id">
+<code class="descname">ingredient_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.ingredient_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.ingredient_id_id">
+<code class="descname">ingredient_id_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.ingredient_id_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.meal_id">
+<code class="descname">meal_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.meal_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.meal_id_id">
+<code class="descname">meal_id_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.meal_id_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.quantity_amt">
+<code class="descname">quantity_amt</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.quantity_amt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.quantity_meas_id">
+<code class="descname">quantity_meas_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.quantity_meas_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.MealIngredients.quantity_meas_id_id">
+<code class="descname">quantity_meas_id_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.MealIngredients.quantity_meas_id_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chefboyrd.models.statistics.Meals">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.statistics.</code><code class="descname">Meals</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/statistics.html#Meals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.statistics.Meals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A model for restaurant meals</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Meals.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.statistics.Meals.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">MealsDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Meals.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Meals.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Meals.mealingredients_set">
+<code class="descname">mealingredients_set</code><a class="headerlink" href="#chefboyrd.models.statistics.Meals.mealingredients_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back-reference to expose related objects as a <cite>SelectQuery</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Meals.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Meals.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Meals.orders_set">
+<code class="descname">orders_set</code><a class="headerlink" href="#chefboyrd.models.statistics.Meals.orders_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back-reference to expose related objects as a <cite>SelectQuery</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Meals.price">
+<code class="descname">price</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Meals.price" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chefboyrd.models.statistics.Orders">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.statistics.</code><code class="descname">Orders</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/statistics.html#Orders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.statistics.Orders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A model for storing every meal ordered and providing mappings to the tabs to meals</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Orders.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.statistics.Orders.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">OrdersDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Orders.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Orders.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Orders.meal">
+<code class="descname">meal</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Orders.meal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Orders.meal_id">
+<code class="descname">meal_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Orders.meal_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Orders.tab">
+<code class="descname">tab</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Orders.tab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Orders.tab_id">
+<code class="descname">tab_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Orders.tab_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chefboyrd.models.statistics.Quantities">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.statistics.</code><code class="descname">Quantities</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/statistics.html#Quantities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.statistics.Quantities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A table mapping quantities names to quantity Id&#8217;s</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Quantities.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.statistics.Quantities.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">QuantitiesDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Quantities.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Quantities.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Quantities.mealingredients_set">
+<code class="descname">mealingredients_set</code><a class="headerlink" href="#chefboyrd.models.statistics.Quantities.mealingredients_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back-reference to expose related objects as a <cite>SelectQuery</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Quantities.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Quantities.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chefboyrd.models.statistics.Tabs">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.statistics.</code><code class="descname">Tabs</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/statistics.html#Tabs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.statistics.Tabs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A model for a tab - i.e. a list of meals or items ordered at a given table.</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Tabs.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.statistics.Tabs.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">TabsDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Tabs.had_reservation">
+<code class="descname">had_reservation</code><em class="property"> = &lt;peewee.BooleanField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Tabs.had_reservation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Tabs.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Tabs.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Tabs.orders_set">
+<code class="descname">orders_set</code><a class="headerlink" href="#chefboyrd.models.statistics.Tabs.orders_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back-reference to expose related objects as a <cite>SelectQuery</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Tabs.party_size">
+<code class="descname">party_size</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Tabs.party_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.statistics.Tabs.timestamp">
+<code class="descname">timestamp</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em><a class="headerlink" href="#chefboyrd.models.statistics.Tabs.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.models.tables">
+<span id="chefboyrd-models-tables-module"></span><h2>chefboyrd.models.tables module<a class="headerlink" href="#module-chefboyrd.models.tables" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="chefboyrd.models.tables.Booking">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.tables.</code><code class="descname">Booking</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/tables.html#Booking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.tables.Booking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.tables.Booking.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">BookingDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.booking_date_time_end">
+<code class="descname">booking_date_time_end</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.booking_date_time_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.booking_date_time_start">
+<code class="descname">booking_date_time_start</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.booking_date_time_start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="chefboyrd.models.tables.Booking.cancel_reservation">
+<em class="property">classmethod </em><code class="descname">cancel_reservation</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/tables.html#Booking.cancel_reservation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.tables.Booking.cancel_reservation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attemps to cancel a reservation given an ID</p>
+<p>Args:
+cls(Booking(: an object representing a booking
+id(int): the id of the booking we want to cancel</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chefboyrd.models.tables.Booking.create_booking">
+<em class="property">classmethod </em><code class="descname">create_booking</code><span class="sig-paren">(</span><em>table</em>, <em>people</em>, <em>booking_date_time_start</em>, <em>booking_date_time_end</em>, <em>name</em>, <em>phone</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/tables.html#Booking.create_booking"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.tables.Booking.create_booking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new reservation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>id</strong> (<em>int</em>) &#8211; Unique Identifier for the booking. This should be auto added by peewee for us.</li>
+<li><strong>people</strong> (<em>int</em>) &#8211; The number of guests requested for the booking</li>
+<li><strong>phone</strong> (<em>char</em>) &#8211; A phone number of the guest making the reservation</li>
+<li><strong>name</strong> (<em>char</em>) &#8211; The name of the guest requesting the reservation</li>
+<li><strong>booking_date_time_start</strong> (<em>date</em>) &#8211; The starting time of the reservation</li>
+<li><strong>booking_date_time_end</strong> (<em>date</em>) &#8211; The ending time of the reservation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">N/A</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.people">
+<code class="descname">people</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.people" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.phone">
+<code class="descname">phone</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.phone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.table">
+<code class="descname">table</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Booking.table_id">
+<code class="descname">table_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Booking.table_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chefboyrd.models.tables.Restaurant">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.tables.</code><code class="descname">Restaurant</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/tables.html#Restaurant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.tables.Restaurant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Restaurant.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">RestaurantDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Restaurant.closing_time">
+<code class="descname">closing_time</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.closing_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="chefboyrd.models.tables.Restaurant.create_restaurant">
+<em class="property">classmethod </em><code class="descname">create_restaurant</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>opening_time</em>, <em>closing_time</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/tables.html#Restaurant.create_restaurant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.create_restaurant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new reservation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>id</strong> (<em>int</em>) &#8211; Unique Identifier for reservation. This should be auto added by peewee for us.</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; Name of person who made the reservation</li>
+<li><strong>description</strong> (<em>str</em>) &#8211; A description of the restaurant</li>
+<li><strong>opening_time</strong> (<em>int</em>) &#8211; The opening time of the restaurant in hours</li>
+<li><strong>closing_time</strong> (<em>int</em>) &#8211; The closing time of the restaurant in hours</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">N/A</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Restaurant.description">
+<code class="descname">description</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Restaurant.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Restaurant.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Restaurant.opening_time">
+<code class="descname">opening_time</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.opening_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Restaurant.table_set">
+<code class="descname">table_set</code><a class="headerlink" href="#chefboyrd.models.tables.Restaurant.table_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back-reference to expose related objects as a <cite>SelectQuery</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="chefboyrd.models.tables.Table">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.tables.</code><code class="descname">Table</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/tables.html#Table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.tables.Table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.tables.Table.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">TableDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.booking_set">
+<code class="descname">booking_set</code><a class="headerlink" href="#chefboyrd.models.tables.Table.booking_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back-reference to expose related objects as a <cite>SelectQuery</cite>.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chefboyrd.models.tables.Table.create_tables">
+<em class="property">classmethod </em><code class="descname">create_tables</code><span class="sig-paren">(</span><em>restaurant</em>, <em>size</em>, <em>occupied</em>, <em>posX</em>, <em>posY</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/tables.html#Table.create_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.tables.Table.create_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new reservation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>id</strong> (<em>int</em>) &#8211; A unique identifier for the table</li>
+<li><strong>restaurant</strong> (<em>int</em>) &#8211; The foreign key of the restaurant</li>
+<li><strong>size</strong> (<em>int</em>) &#8211; The max number of guests a table can seat</li>
+<li><strong>occupied</strong> (<em>bool</em>) &#8211; Determines if a table is occupied. 0 is not occupied, and 1 is occupied</li>
+<li><strong>posX</strong> (<em>float</em>) &#8211; The relative x position of the table</li>
+<li><strong>posY</strong> (<em>float</em>) &#8211; The relative y position of the table</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">N/A</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Table.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.occupied">
+<code class="descname">occupied</code><em class="property"> = &lt;peewee.BooleanField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Table.occupied" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.posX">
+<code class="descname">posX</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Table.posX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.posY">
+<code class="descname">posY</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Table.posY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.restaurant">
+<code class="descname">restaurant</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Table.restaurant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.restaurant_id">
+<code class="descname">restaurant_id</code><em class="property"> = &lt;peewee.ForeignKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Table.restaurant_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.tables.Table.size">
+<code class="descname">size</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#chefboyrd.models.tables.Table.size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.models.user">
+<span id="chefboyrd-models-user-module"></span><h2>chefboyrd.models.user module<a class="headerlink" href="#module-chefboyrd.models.user" title="Permalink to this headline">¶</a></h2>
+<p>The basic user model</p>
+<p>The users will have roles i.e. chef, manager, host, waitress, etc..</p>
+<dl class="class">
+<dt id="chefboyrd.models.user.User">
+<em class="property">class </em><code class="descclassname">chefboyrd.models.user.</code><code class="descname">User</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/user.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.user.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">flask_login.mixins.UserMixin</span></code>, <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A sample customer model
+Please modify this to fit our needs</p>
+<dl class="attribute">
+<dt id="chefboyrd.models.user.User.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.user.User.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">UserDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="chefboyrd.models.user.User.create_user">
+<em class="property">classmethod </em><code class="descname">create_user</code><span class="sig-paren">(</span><em>email</em>, <em>password</em>, <em>name</em>, <em>role</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/user.html#User.create_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.user.User.create_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>email</strong> (<em>str</em>) &#8211; The user email</li>
+<li><strong>password</strong> (<em>str</em>) &#8211; The password string - no need to hash beforehand</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; name, doesn&#8217;t have to be unique</li>
+<li><strong>role</strong> (<em>str</em>) &#8211; The user role. admin, manager, chef, host, etc..</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">N/A</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; When user email already exists</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.user.User.email">
+<code class="descname">email</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.user.User.email" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.user.User.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#chefboyrd.models.user.User.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.user.User.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.user.User.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.user.User.password">
+<code class="descname">password</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.user.User.password" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="chefboyrd.models.user.User.role">
+<code class="descname">role</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#chefboyrd.models.user.User.role" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chefboyrd.models" title="Permalink to this headline">¶</a></h2>
+<p>Reimports all class models within the module to make them more easily accessible</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">chefboyrd.models package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models.base_model">chefboyrd.models.base_model module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models.customers">chefboyrd.models.customers module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models.reservation">chefboyrd.models.reservation module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models.sms">chefboyrd.models.sms module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models.statistics">chefboyrd.models.statistics module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models.tables">chefboyrd.models.tables module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models.user">chefboyrd.models.user module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.models">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">chefboyrd</a><ul>
+  <li><a href="chefboyrd.html">chefboyrd package</a><ul>
+      <li>Previous: <a href="chefboyrd.controllers.html" title="previous chapter">chefboyrd.controllers package</a></li>
+      <li>Next: <a href="chefboyrd.tests.html" title="next chapter">chefboyrd.tests package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/autodoc/chefboyrd.models.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/autodoc/chefboyrd.models.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

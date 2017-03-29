@@ -1,0 +1,539 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.controllers package &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="chefboyrd.models package" href="chefboyrd.models.html" />
+    <link rel="prev" title="chefboyrd package" href="chefboyrd.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="chefboyrd-controllers-package">
+<h1>chefboyrd.controllers package<a class="headerlink" href="#chefboyrd-controllers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-chefboyrd.controllers.booking_controller">
+<span id="chefboyrd-controllers-booking-controller-module"></span><h2>chefboyrd.controllers.booking_controller module<a class="headerlink" href="#module-chefboyrd.controllers.booking_controller" title="Permalink to this headline">¶</a></h2>
+<p>This module and its functions handle the logic for table reservations for the restaurant.
+It also handles moving data in and out of our database via the via our application models.</p>
+<dl class="function">
+<dt id="chefboyrd.controllers.booking_controller.book_restaurant_table">
+<code class="descclassname">chefboyrd.controllers.booking_controller.</code><code class="descname">book_restaurant_table</code><span class="sig-paren">(</span><em>restaurant</em>, <em>booking_date_time</em>, <em>people</em>, <em>name</em>, <em>phone</em>, <em>minutes_slot=90</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/booking_controller.html#book_restaurant_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.booking_controller.book_restaurant_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method uses get_first_table_available to get the first table available, then it
+creates a Booking on the database.</p>
+<p>Args:
+restaurant: The id of the restaurant we want to make the booking for
+booking_time_date: The starting time of the booking we want to make
+people: The number of people that the booking is requesting
+name: The name of the guest making the reservation
+phone: The phone number of the guest making the reservation
+minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</p>
+<p>Returns: A dictionary with the booking id, and the table id. If there is no table available at the requested time None is returned.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.booking_controller.get_first_table_available">
+<code class="descclassname">chefboyrd.controllers.booking_controller.</code><code class="descname">get_first_table_available</code><span class="sig-paren">(</span><em>restaurant</em>, <em>booking_date_time</em>, <em>people</em>, <em>minutes_slot=90</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/booking_controller.html#get_first_table_available"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.booking_controller.get_first_table_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the first available table of a restaurant, given a specific number of
+people and a booking date/time.</p>
+<p>Args:
+restaurant: The id of the restaurant we want to make the booking for
+booking_time_date: The starting time of the booking we want to make
+people: The number of people that the booking is requesting
+minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</p>
+<p>Returns: The first table available. If there are no tables available we return None</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.controllers.customer_controller">
+<span id="chefboyrd-controllers-customer-controller-module"></span><h2>chefboyrd.controllers.customer_controller module<a class="headerlink" href="#module-chefboyrd.controllers.customer_controller" title="Permalink to this headline">¶</a></h2>
+<p>Customer Controller</p>
+<p>A controller houses all functions that has to do with taking arguments
+and moifying the underlying data store. The controllers also perform all
+of the data analysis that might be taking place.abs</p>
+<p>Essentially controllers are for the &#8216;business logic&#8217; of the application.
+Everything that goes here will somehow manipulate, calculate, store, modify
+or learn everything that we need.</p>
+<p>All of the data and objects that we are working with will come from the <code class="docutils literal"><span class="pre">models</span></code>
+folder. Typically each Model will have a corresponding controller which will do
+all of the CRUD (create, read, update, deletion) from the database. It&#8217;s really
+a middle man from the flask functions to the database which contains all of the
+logic.</p>
+<p>Other controllers which aren&#8217;t directly mapped to updating, reading, or writing
+models might perform actions like model training (machine learning) or scheduling
+jobs which may be run at specified times that aren&#8217;t necessarily completely dictated
+by user interaction.</p>
+<p>Basically if you&#8217;ve got some code and it doesn&#8217;t interact with the models or the views,
+then it should be a controller.</p>
+<dl class="function">
+<dt id="chefboyrd.controllers.customer_controller.get_customers">
+<code class="descclassname">chefboyrd.controllers.customer_controller.</code><code class="descname">get_customers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/customer_controller.html#get_customers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.customer_controller.get_customers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list with all customer names</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.customer_controller.new_customer">
+<code class="descclassname">chefboyrd.controllers.customer_controller.</code><code class="descname">new_customer</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/customer_controller.html#new_customer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.customer_controller.new_customer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new customer
+:param name: the customer name
+:type name: str</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.controllers.data_controller">
+<span id="chefboyrd-controllers-data-controller-module"></span><h2>chefboyrd.controllers.data_controller module<a class="headerlink" href="#module-chefboyrd.controllers.data_controller" title="Permalink to this headline">¶</a></h2>
+<p>DataController - This is used to get relevant data for the model controller.</p>
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.clamp_rng">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">clamp_rng</code><span class="sig-paren">(</span><em>num</em>, <em>lo</em>, <em>hi</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#clamp_rng"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.clamp_rng" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forces a number to fall within min/max range by doing lo + (num % (hi-lo))</p>
+<p>Hi and lo should always be positive.
+If num is &lt; 0 then we take its absolute value and clamp that.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.generate_data">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">generate_data</code><span class="sig-paren">(</span><em>num_days=10</em>, <em>num_tabs=50</em>, <em>order_per_tab=3</em>, <em>dt_start=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#generate_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.generate_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates and stores data for the models in chefboyrd.models.statistics</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>Opening time is 7AM</li>
+<li>Closing time is 10PM</li>
+<li>Tabs are generated throughout the day UNEVENLY. Orders increase during the evening</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>num_days</strong> (<em>int</em>) &#8211; default=10, The number of days to generate data for</li>
+<li><strong>num_tabs</strong> (<em>int</em>) &#8211; default=50, The average number of tabs per day</li>
+<li><strong>order_per_tab</strong> (<em>int</em>) &#8211; default=3, Number of orders which exist on each tab</li>
+<li><strong>dt_start</strong> (<em>datetime</em>) &#8211; default=(datetime.now()), The datetime to start creating orders</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The number of new orders created in the DB.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.get_dollars_in_range">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">get_dollars_in_range</code><span class="sig-paren">(</span><em>dt_min=None</em>, <em>dt_max=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#get_dollars_in_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.get_dollars_in_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total sum of revenue from a range of dates</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.get_dotw_orders">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">get_dotw_orders</code><span class="sig-paren">(</span><em>dotw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#get_dotw_orders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.get_dotw_orders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all orders on a given day of the week</p>
+<p>Interesting challenge because we only have a datetime value.
+:param dotw: An integer representing the day of the week. 0 for Monday, 6 for Sunday.
+:type dotw: int</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of all order models on a given day of the week.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.get_orders_date_range">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">get_orders_date_range</code><span class="sig-paren">(</span><em>dt_min=None</em>, <em>dt_max=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#get_orders_date_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.get_orders_date_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a range of orders from one datetime to another datetime joined on Tabs.</p>
+<p>If dt_min is None then all orders less than max will be returned.
+If dt_max is None then all orders greater than dt_min is returned
+If both are none then all orders are returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt_min</strong> (<em>datetime</em>) &#8211; A datetime object for the range to begin at. (Inclusive)</li>
+<li><strong>dt_max</strong> (<em>datetime</em>) &#8211; A datetime object for the range end begin at. (Inclusive)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An iterable of order models (peewee set).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">iterable</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.get_reservations_on_dotw">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">get_reservations_on_dotw</code><span class="sig-paren">(</span><em>dotw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#get_reservations_on_dotw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.get_reservations_on_dotw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the number of reservations on a given day of the week.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.get_tabs_range">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">get_tabs_range</code><span class="sig-paren">(</span><em>dt_min=None</em>, <em>dt_max=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#get_tabs_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.get_tabs_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a range of tabs from one datetime to another datetime</p>
+<p>If dt_min is None then all tabs less than max will be returned.
+If dt_max is None then all tabs greater than dt_min is None
+If both are none then all tabs are returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt_min</strong> (<em>datetime</em>) &#8211; A datetime object for the range to begin at. (Inclusive)</li>
+<li><strong>dt_max</strong> (<em>datetime</em>) &#8211; A datetime object for the range end begin at. (Inclusive)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An iterable of order models (peewee set).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">iterable</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.people_in_range">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">people_in_range</code><span class="sig-paren">(</span><em>dt_min=None</em>, <em>dt_max=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#people_in_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.people_in_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total number of people served in a range of dates</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.data_controller.randbool">
+<code class="descclassname">chefboyrd.controllers.data_controller.</code><code class="descname">randbool</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/data_controller.html#randbool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.data_controller.randbool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.controllers.feedback_controller">
+<span id="chefboyrd-controllers-feedback-controller-module"></span><h2>chefboyrd.controllers.feedback_controller module<a class="headerlink" href="#module-chefboyrd.controllers.feedback_controller" title="Permalink to this headline">¶</a></h2>
+<p>This houses all the functions to add or delete sms objects into the database
+Also includes the feedback analysis functions</p>
+<dl class="function">
+<dt id="chefboyrd.controllers.feedback_controller.delete_feedback">
+<code class="descclassname">chefboyrd.controllers.feedback_controller.</code><code class="descname">delete_feedback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/feedback_controller.html#delete_feedback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.feedback_controller.delete_feedback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all feedback history in database.
+Should only be done once before demo.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.feedback_controller.delete_twilio_feedback">
+<code class="descclassname">chefboyrd.controllers.feedback_controller.</code><code class="descname">delete_twilio_feedback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/feedback_controller.html#delete_twilio_feedback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.feedback_controller.delete_twilio_feedback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wipe all message history on twilio</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">SystemError</span></code> &#8211; Could not communicate with Twilio Rest client</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; invalid reference to a stored sms object from the twilio client</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.feedback_controller.feedback_analysis">
+<code class="descclassname">chefboyrd.controllers.feedback_controller.</code><code class="descname">feedback_analysis</code><span class="sig-paren">(</span><em>inStr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/feedback_controller.html#feedback_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.feedback_controller.feedback_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines aspects of input string based on word content.</p>
+<p>Extended description:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inStr</strong> (<em>string</em>) &#8211; String containing words separated by spaces or
+non-apostrophe punctuation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of integers representing whether the input string
+meets the necessary criteria to be flagged as positive,
+negative, food-related, service-related or contains an exception.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(posFlag,negFlag,exceptionFlag,foodFlag,serviceFlag)</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Throws:</dt>
+<dd>TypeError: When argument is not a string.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.feedback_controller.update_db">
+<code class="descclassname">chefboyrd.controllers.feedback_controller.</code><code class="descname">update_db</code><span class="sig-paren">(</span><em>*date_from</em>, <em>**update_from</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/feedback_controller.html#update_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.feedback_controller.update_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>updates the sms in the database starting from the date_from specified (at time midnight)
+no param = updates the sms feedback in database with all message entries
+analyze feedback when sms is sent
+TODO: Fix error with twilio, where the most recent message does not have a submission timep</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>date_from</strong> (<em>date object</em>) &#8211; a specified date, where we update db with sms sent after this date</li>
+<li><strong>update_from</strong> &#8211; an optional argument. This should be &#8220;test&#8221; if messages are not coming from twilio, but from the test_fb_data file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">1 on success. 0 on error</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Throws:</dt>
+<dd>SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or auth_token</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.feedback_controller.word_freq_counter">
+<code class="descclassname">chefboyrd.controllers.feedback_controller.</code><code class="descname">word_freq_counter</code><span class="sig-paren">(</span><em>inStr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/feedback_controller.html#word_freq_counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.feedback_controller.word_freq_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines frequency of each word in input string.</p>
+<p>Extended description:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>inStr</strong> (<em>string</em>) &#8211; String containing words separated by spaces or
+non-apostrophe punctuation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A list of dictionary elements mapping the each distinct word within inStr</dt>
+<dd>to its number of occurrences in the input.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">resultDict</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Throws:</dt>
+<dd>TypeError: When argument is not a string.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.controllers.model_controller">
+<span id="chefboyrd-controllers-model-controller-module"></span><h2>chefboyrd.controllers.model_controller module<a class="headerlink" href="#module-chefboyrd.controllers.model_controller" title="Permalink to this headline">¶</a></h2>
+<p>ModelController
+This is a preprocessor for the prediction_controller. Given data in the form of
+our local models, it converts it into numbers usable by the prediction controller.</p>
+<dl class="function">
+<dt id="chefboyrd.controllers.model_controller.get_earliest_datetime">
+<code class="descclassname">chefboyrd.controllers.model_controller.</code><code class="descname">get_earliest_datetime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/model_controller.html#get_earliest_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.model_controller.get_earliest_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the minimum datetime in the orders database</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.model_controller.get_last_datetime">
+<code class="descclassname">chefboyrd.controllers.model_controller.</code><code class="descname">get_last_datetime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/model_controller.html#get_last_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.model_controller.get_last_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the maximum datetime in the orders database</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.model_controller.orders_to_list">
+<code class="descclassname">chefboyrd.controllers.model_controller.</code><code class="descname">orders_to_list</code><span class="sig-paren">(</span><em>orders</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/model_controller.html#orders_to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.model_controller.orders_to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts peewee query result set to a list of dictionary of lists</p>
+<p>Args: accepts a list of orders made from a query for peewee</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.model_controller.polynomialModel">
+<code class="descclassname">chefboyrd.controllers.model_controller.</code><code class="descname">polynomialModel</code><span class="sig-paren">(</span><em>x</em>, <em>*params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/model_controller.html#polynomialModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.model_controller.polynomialModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the polynomial model that will be fit by our algorithm.</p>
+<dl class="docutils">
+<dt>Args: x = input matrix where the features are rows and each predictor(data point) is a column</dt>
+<dd>params = the parameters for the model</dd>
+</dl>
+<p>Returns: sum = the output vector where each indice is a predictor</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.model_controller.sinusoidalModel">
+<code class="descclassname">chefboyrd.controllers.model_controller.</code><code class="descname">sinusoidalModel</code><span class="sig-paren">(</span><em>x</em>, <em>*params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/model_controller.html#sinusoidalModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.model_controller.sinusoidalModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the sinusoidal model that will be fit by our algorithm.</p>
+<dl class="docutils">
+<dt>Args: x = input matrix where the features are rows and each predictor(data point) is a column</dt>
+<dd>params = the parameters for the model</dd>
+</dl>
+<p>Returns: sum = the output vector where each indice is a predictor</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.model_controller.train_regression">
+<code class="descclassname">chefboyrd.controllers.model_controller.</code><code class="descname">train_regression</code><span class="sig-paren">(</span><em>mealDict</em>, <em>modelType</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/model_controller.html#train_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.model_controller.train_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>This trains all of the meals and fits their data to their own set of parameters</p>
+<p>Args:
+mealDict = The meal dictionary containing order data created by orders_to_list
+modelType = the type of model to use(sinusoidal, polynomial)</p>
+<p>Returns:
+mealsParams = a dictionary that contains the parameters for each corresponding meal</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.controllers.model_controller.train_regression_single">
+<code class="descclassname">chefboyrd.controllers.model_controller.</code><code class="descname">train_regression_single</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>modelType</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/model_controller.html#train_regression_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.model_controller.train_regression_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains a single meal and fits it to a model to find its parameters</p>
+<p>Args:
+x = The input vector(which is composed of rows 0 to 3 in the vector)
+y = The expected output vector(the last row)
+modelType = the type of model to use</p>
+<p>Returns:
+params = a list of parameters</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.controllers.prediction_controller">
+<span id="chefboyrd-controllers-prediction-controller-module"></span><h2>chefboyrd.controllers.prediction_controller module<a class="headerlink" href="#module-chefboyrd.controllers.prediction_controller" title="Permalink to this headline">¶</a></h2>
+<p>PredictionController</p>
+<p>This controller performs our machine learning algorithms using non-linear regression fits on the data.</p>
+<dl class="function">
+<dt id="chefboyrd.controllers.prediction_controller.predict_regression">
+<code class="descclassname">chefboyrd.controllers.prediction_controller.</code><code class="descname">predict_regression</code><span class="sig-paren">(</span><em>regression_params</em>, <em>modelType</em>, <em>dt_min=None</em>, <em>dt_max=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/controllers/prediction_controller.html#predict_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.controllers.prediction_controller.predict_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicts the usage of ingredients according to our regression model
+:param regression_params - the parameters for oyur model:
+:param modelType - the type of model you&#8217;re using:
+:param date range - the two dates that you want to predict the regression for:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">mealUsage - a dictionary of meals with associated usage amounts</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-chefboyrd.controllers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chefboyrd.controllers" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">chefboyrd.controllers package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.controllers.booking_controller">chefboyrd.controllers.booking_controller module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.controllers.customer_controller">chefboyrd.controllers.customer_controller module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.controllers.data_controller">chefboyrd.controllers.data_controller module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.controllers.feedback_controller">chefboyrd.controllers.feedback_controller module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.controllers.model_controller">chefboyrd.controllers.model_controller module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.controllers.prediction_controller">chefboyrd.controllers.prediction_controller module</a></li>
+<li><a class="reference internal" href="#module-chefboyrd.controllers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">chefboyrd</a><ul>
+  <li><a href="chefboyrd.html">chefboyrd package</a><ul>
+      <li>Previous: <a href="chefboyrd.html" title="previous chapter">chefboyrd package</a></li>
+      <li>Next: <a href="chefboyrd.models.html" title="next chapter">chefboyrd.models package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/autodoc/chefboyrd.controllers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/autodoc/chefboyrd.controllers.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
