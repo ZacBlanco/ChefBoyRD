@@ -1,8 +1,5 @@
-'''Statistics dashboard for the manager interface
+'''Table dashboard for the manager interface
 TO DO: Limit reservation times to after date,limit guests based on table(going to be hard)
-
-Will be able to render dashboards which include statistics from the database
-of the Point of sale system and other data systems for the business.
 '''
 from flask import Blueprint, render_template, abort, url_for, redirect
 from jinja2 import TemplateNotFound
@@ -23,6 +20,9 @@ page = Blueprint('table_manager', __name__, template_folder='./templates')
 
 # Declare your table
 class ItemTable(Table):
+    '''
+    This itemTable class generates a table of the created reservations. It also has buttons to cancel or confirm a reservation
+    '''
     html_attrs = {'class': 'table table-striped'}
     name = Col('Name')
     guests = Col('Guests')
@@ -36,7 +36,7 @@ class ItemTable(Table):
 @page.route("/",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
 def table_manager_index():
-    '''Renders the index page of the dashboards
+    '''Renders the index page of the table management page
     '''
     # Populate the table
 
@@ -51,7 +51,8 @@ def table_manager_index():
 @page.route("/cancel",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
 def cancel():
-    '''Renders the index page of the dashboards
+    '''
+    This handles when a user needs to cancel a reservation. 
     '''
     id = int(request.args.get('id'))
     tables.Booking.cancel_reservation(id)
@@ -61,7 +62,8 @@ def cancel():
 @page.route("/confirm",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
 def confirm():
-    '''Renders the index page of the dashboards
+    '''
+    This handles when a user needs to confirm a reservation. 
     '''
     id = int(request.args.get('id'))
     id2 = 0
@@ -77,7 +79,8 @@ def confirm():
 @page.route("/change_table",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
 def change_table():
-    '''Renders the index page of the dashboards
+    '''
+    This handles when a user needs to change the status of a table. 
     '''
     id = int(request.form['id'])
     type = int(request.form['type'])
@@ -95,10 +98,19 @@ def change_table():
 @page.route("/update_table",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
 def update_table():
-    '''Renders the index page of the dashboards
+    '''
+    This handles when we need to change the position of a table.
     '''
     coords = []
     for table in tables.Table.select():
         coords.append([table.posX,table.posY, table.occupied,table.id])
     return json.dumps(coords)
 
+@page.route("/add_table",methods=['GET', 'POST'])
+@require_role('admin') # Example of requireing a role(and authentication)
+def add_table():
+    '''
+    This handles when a user adds a table to the layout.
+    '''
+    id = tables.Table.create_tables(1,5, 0,0.5, 0.5)
+    return json.dumps(id)

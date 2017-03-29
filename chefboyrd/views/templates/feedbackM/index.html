@@ -6,14 +6,16 @@
         <br>
         <form name="fb_search"action="" method="post" onsubmit="return validateForm()">
           <dl>
-              <label class="checkbox-inline"><input checked="checked" type="checkbox" name="Time" value="1">Time</label>
-              <label class="checkbox-inline"><input checked="checked" type="checkbox" name="Body" value="1">Body</label>
-              <label class="checkbox-inline"><input type="checkbox" name="Positive" value="1">Positive</label>
-              <label class="checkbox-inline"><input type="checkbox" name="Negative" value="1">Negative</label>
-              <label class="checkbox-inline"><input type="checkbox" name="Exception" value="1">Exception</label>
-              <label class="checkbox-inline"><input type="checkbox" name="Food" value="1">Food</label>
-              <label class="checkbox-inline"><input type="checkbox" name="Service" value="1">Service</label>
-              <label class="checkbox-inline"><input type="checkbox" name="WordCloud" value="1">WordCloud</label>
+            <p>Sort by Category</p>
+              <select name="dropdown">
+                <option value="Good">Good</option>
+                <option value="Bad">Bad</option>
+                <option value="Mixed">Mixed</option>
+                <option value="Food">Food</option>
+                <option value="Service">Service</option>
+                <option value="Exception">Exception</option>
+                <option value="Show All">Show All</option>
+              </select>
             <dt>{{ form.date_time_from.label}}
               <div class='input-group date' id='datetimepicker1'>
                 <input type='text' name='datetimefrom' class="form-control"/>
@@ -69,6 +71,7 @@
         Here is a list of the feedback made
         <br>
         {{table}}
+
         <br>
     </div>
 {% endblock %}
