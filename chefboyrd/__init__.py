@@ -137,22 +137,22 @@ try:
 except:
     pass
 
-try:
-    # Test User:
-    # email: zac
-    # Password: zac 
-    tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
-except:
-    pass
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
+# except:
+#     pass
 
-try:
-    # Test User:
-    # email: zac
-    # Password: zac 
-    if tables.Table.select().count() < 1:
-        tables.Table.create_tables(1,5, 0,0.5, 0.5)
-except:
-    pass
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     if tables.Table.select().count() < 1:
+#         tables.Table.create_tables(1,5, 0,0.5, 0.5)
+# except:
+#     pass
 
 try:
     # Test User:
@@ -162,14 +162,14 @@ try:
 except:
     pass
 
-try:
-    # Test User:
-    # email: zac
-    # Password: zac 
-    if tables.Booking.select().count() < 1:
-        tables.Booking.create_booking(1,6,datetime(2017, 2, 14, 19, 0),datetime(2015, 2, 14, 19, 1),'Brandon','732-333-5555')
-except:
-    pass
+# try:
+#     # Test User:
+#     # email: zac
+#     # Password: zac 
+#     if tables.Booking.select().count() < 1:
+#         tables.Booking.create_booking(1,6,datetime(2017, 2, 14, 19, 0),datetime(2015, 2, 14, 19, 1),'Brandon','732-333-5555')
+# except:
+#     pass
 
 try:
     # email: caz, pw: caz

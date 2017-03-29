@@ -1,8 +1,4 @@
-'''Statistics dashboard for the manager interface
-TO DO: Limit reservation times to after date,limit guests based on table(going to be hard)
-
-Will be able to render dashboards which include statistics from the database
-of the Point of sale system and other data systems for the business.
+'''Reservation dashboard for the manager interface
 '''
 from flask import Blueprint, render_template, abort, url_for, redirect
 from jinja2 import TemplateNotFound
@@ -21,6 +17,9 @@ from flask import request
 page = Blueprint('reservationH', __name__, template_folder='./templates')
 
 class ReservationForm(FlaskForm):
+    '''
+    This is the form that displays fields to make a reservation
+    '''
     name = StringField('Name', [validators.Length(min=2, max=25)])
     num = IntegerField('Guests')
     # phone = StringField('Phone Number', [validators.Length(min=10, max=10)])
@@ -29,6 +28,9 @@ class ReservationForm(FlaskForm):
 
 # Declare your table
 class ItemTable(Table):
+    '''
+    This is a itemTable class that generates text/html automatically to create a table for created reservations
+    '''
     html_attrs = {'class': 'table table-striped'}
     name = Col('Name')
     guests = Col('Guests')
@@ -40,7 +42,8 @@ class ItemTable(Table):
 @page.route("/",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
 def resH_index():
-    '''Renders the index page of the dashboards
+    '''
+    Renders the index page of the reservation page
     '''
     form = ReservationForm()
     if form.validate_on_submit():
@@ -59,7 +62,8 @@ def resH_index():
 @page.route("/cancel",methods=['GET', 'POST'])
 @require_role('admin') # Example of requireing a role(and authentication)
 def cancel():
-    '''Renders the index page of the dashboards
+    '''
+    This handles when a user needs to cancel a reservation. 
     '''
     id = request.args.get('id')
     tables.Booking.cancel_reservation(id)

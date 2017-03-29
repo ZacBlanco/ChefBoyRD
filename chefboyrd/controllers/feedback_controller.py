@@ -159,10 +159,10 @@ def feedback_analysis(inStr):
         list(posFlag,negFlag,exceptionFlag,foodFlag,serviceFlag):
             A list of integers representing whether the input string
             meets the necessary criteria to be flagged as positive,
-            negative, food-related, service-related or contains an exception
+            negative, food-related, service-related or contains an exception.
 
     Throws:
-        TypeError: When argument is not a string
+        TypeError: When argument is not a string.
         
     """
 
@@ -251,11 +251,11 @@ def word_freq_counter(inStr):
                         non-apostrophe punctuation.
 
     Returns:
-        resultDict: A dictionary mapping the distinct words within inStr
-                    to its number of occurrences within the input
+        resultDict: A list of dictionary elements mapping the each distinct word within inStr
+                    to its number of occurrences in the input.
 
     Throws:
-        TypeError: When argument is not a string
+        TypeError: When argument is not a string.
         
     """
 
