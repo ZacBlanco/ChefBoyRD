@@ -125,7 +125,10 @@ def feedback_table():
         table = ItemTable(res)
     if not (res == []):
         return render_template('feedbackM/index.html', logged_in=True, table=table, form=form)
+<<<<<<< HEAD
         #return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=word_freq)
+=======
+>>>>>>> master
     else:
         return render_template('feedbackM/index.html', logged_in=True, form=form)
 
