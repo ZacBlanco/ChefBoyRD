@@ -257,6 +257,7 @@ def word_freq_counter(inStr):
     Throws:
         TypeError: When argument is not a string.
         
+    TODO: only get unique words. nothing like( here, restaurant, there, is)
     """
 
     if not isinstance(inStr, str):
@@ -286,13 +287,13 @@ def word_freq_counter(inStr):
         for  word2 in wordsProcessed:
             if word == word2:
                 freqs[i] = freqs[i] + 1
-                
+    maxfreq = max(freqs)
     res = []
     n = 0
     for n in range(len(wordSet)):
         res.append(dict(text=wordSet[n],size=freqs[n]))
     resultDict = res
-    return resultDict
+    return resultDict, maxfreq
 
 #muhStr = input("Enter the string: ")
 #dictOut = wordFreqCounter(muhStr)

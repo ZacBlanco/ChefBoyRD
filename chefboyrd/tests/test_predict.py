@@ -159,7 +159,7 @@ class ModelTest(unittest.TestCase):
         for x in range(5):
             tm = datetime.now()
             for y in range(7):
-                td = tm.replace(day=(tm.day-y))
+                td = tm - timedelta(days = y)
                 t = Tabs.create(timestamp=td, had_reservation=False, party_size=x)
                 Orders.create(tab=t.get_id(), meal=m1.get_id())
         for x in range(7):

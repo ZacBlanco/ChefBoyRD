@@ -12,6 +12,7 @@ from chefboyrd.auth import require_role
 from chefboyrd.controllers import feedback_controller
 from chefboyrd.models.sms import Sms
 from datetime import datetime, date
+import json
 import copy
 
 page = Blueprint('feedbackM', __name__, template_folder='./templates')
@@ -102,10 +103,7 @@ def feedback_table():
                 (Sms.submission_time  > dtf)& 
                 (Sms.submission_time <= dtt)
                 ).order_by(-Sms.submission_time)
-
-        #if (request.form.get('WordCloud') == 1):
-        #    pass
-            #feedback_controller.word_freq_counter()
+            
         res = []
         all_string_bodies = ""
         #print(len(smss))
@@ -113,18 +111,21 @@ def feedback_table():
             #print('pos:{} neg:{} except:{} food:{} service:{}'.format(sms.pos_flag,sms.neg_flag, sms.exception_flag, sms.food_flag, sms.service_flag))
             res.append(dict(time=sms.submission_time.strftime("%Y-%m-%d %H:%M"),body=sms.body))
 
-        #     all_string_bodies = all_string_bodies + sms.body + ","
-        # if (request.form.get('WordCloud')):
-        #     word_freq = feedback_controller.word_freq_counter(all_string_bodies)
-        # else:
-        # 	word_freq = []
-        # #print(word_freq)
+            all_string_bodies = all_string_bodies + sms.body + ","
+        if (request.form.get('wordcloud')):
+            [word_freq, maxfreq] = feedback_controller.word_freq_counter(all_string_bodies)
+            k = 100/maxfreq
+            for tmpdict in word_freq:
+                tmpdict['size'] = tmpdict['size']*k
+        else:
+            word_freq = []
+        #print(word_freq)
         table = ItemTable(res)
     else:
         res = []
         table = ItemTable(res)
     if not (res == []):
-        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form)
+        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=json.dumps(word_freq), max_freq= maxfreq)
     else:
         return render_template('feedbackM/index.html', logged_in=True, form=form)
 
