@@ -51,59 +51,29 @@ def feedback_table():
         pos_col, neg_col, except_col, food_col, service_col= (-1,-1,-1,-1,-1) # -1 is a don't care term
         dtf = datetime.strptime(request.form['datetimefrom'], "%m/%d/%Y %I:%M %p")
         dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %I:%M %p")
+        query_expr = ((Sms.submission_time  > dtf)&(Sms.submission_time <= dtt))
         if (request.form.get('dropdown') =='Good'):
             #print('Form Good')
             pos_col, neg_col = (1,0)
-            smss = Sms.select().where(
-                (Sms.submission_time  > dtf)& 
-                (Sms.submission_time <= dtt)&
-                (Sms.pos_flag==pos_col)&
-                (Sms.neg_flag==neg_col)
-                ).order_by(-Sms.submission_time)
+            query_expr = ((query_expr)&(Sms.pos_flag==pos_col)&(Sms.neg_flag==neg_col))
         elif (request.form.get('dropdown') =='Bad'):
             pos_col, neg_col = (0,1)
-            smss = Sms.select().where(
-                (Sms.submission_time  > dtf)& 
-                (Sms.submission_time <= dtt)&
-                (Sms.pos_flag==pos_col)&
-                (Sms.neg_flag==neg_col)
-                ).order_by(-Sms.submission_time)
+            query_expr = ((query_expr)&(Sms.pos_flag==pos_col)&(Sms.neg_flag==neg_col))
         elif (request.form.get('dropdown') =='Mixed'):
             pos_col, neg_col = (1,1)
-            smss = Sms.select().where(
-                (Sms.submission_time  > dtf)& 
-                (Sms.submission_time <= dtt)&
-                (Sms.pos_flag==pos_col)&
-                (Sms.neg_flag==neg_col)
-                ).order_by(-Sms.submission_time)
+            query_expr = ((query_expr)&(Sms.pos_flag==pos_col)&(Sms.neg_flag==neg_col))
         elif (request.form.get('dropdown') == 'Food'):
             food_col = 1
-            smss = Sms.select().where(
-                (Sms.submission_time  > dtf)& 
-                (Sms.submission_time <= dtt)&
-                (Sms.food_flag == food_col)
-                ).order_by(-Sms.submission_time)
+            query_expr = ((query_expr)&(Sms.food_flag==food_col))
         elif (request.form.get('dropdown') == 'Service'):
             service_col = 1
-            smss = Sms.select().where(
-                (Sms.submission_time  > dtf)& 
-                (Sms.submission_time <= dtt)&
-                (Sms.service_flag == service_col)
-                ).order_by(-Sms.submission_time)
+            query_expr = ((query_expr)&(Sms.service_flag==service_col))
         elif (request.form.get('dropdown') =='Exception'):
             except_col = 1
-            smss = Sms.select().where(
-                (Sms.submission_time  > dtf)& 
-                (Sms.submission_time <= dtt)&
-                (Sms.exception_flag==except_col)
-                ).order_by(-Sms.submission_time)
+            query_expr = ((query_expr)&(Sms.exception_flag==except_col))
         else:
             pos_col, neg_col, except_col,food_col, service_col = (-1,-1,-1,-1,-1)
-            smss = Sms.select().where(
-                (Sms.submission_time  > dtf)& 
-                (Sms.submission_time <= dtt)
-                ).order_by(-Sms.submission_time)
-            
+        smss = Sms.select().where(query_expr).order_by(-Sms.submission_time)
         res = []
         all_string_bodies = ""
         #print(len(smss))
