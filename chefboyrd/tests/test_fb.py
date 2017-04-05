@@ -19,7 +19,6 @@ class MyModuleTest(unittest.TestCase):
         self.assertTrue(len(Sms.select()) > 0)
         feedback_controller.delete_feedback()
         self.assertEqual(len(Sms.select()), 0)
-        feedback_controller.
 
 
     #delete_twilio_feedback not tested because it could skew results
