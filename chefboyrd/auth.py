@@ -48,6 +48,10 @@ def require_role(role):
             def view_dash():
                 ...
 
+    Args:
+        role(list or str):  A single role name or list of role names for which users are allowed
+        to access the specified resource
+
     If a user is not authorized then the flask_login.unauthorized handler is called.
     '''
     def real_wrap(func):
@@ -55,7 +59,10 @@ def require_role(role):
         @flask_login.login_required
         def wrapper(*args, **kwargs):
             user = flask_login.current_user
-            if user.role == role:
+            if isinstance(role, list):
+                if user.role in role:
+                    return func(*args, **kwargs)
+            elif user.role == role:
                 return func(*args, **kwargs)
             else:
                 return login_manager.unauthorized()
