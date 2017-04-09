@@ -22,8 +22,8 @@ class ItemTable(Table):
     FlaskTable object for organizing feedback info into a table
 
     """
-    time = Col('Time', column_html_attrs={'class': 'spaced-table-col'})
-    body = Col('Body')
+    time = Col('Time', column_html_attrs={'class': 'spaced-table-col'},)
+    body = Col('Body', column_html_attrs={'class': 'spaced-table-col'},)
 
 class DateSpecifyForm(FlaskForm):
     """WTforms object for the date-time form submission for the DB query"""
@@ -79,7 +79,7 @@ def feedback_table():
         #print(len(smss))
         for sms in smss:
             #print('pos:{} neg:{} except:{} food:{} service:{}'.format(sms.pos_flag,sms.neg_flag, sms.exception_flag, sms.food_flag, sms.service_flag))
-            res.append(dict(time=sms.submission_time.strftime("%Y-%m-%d %H:%M"),body=sms.body))
+            res.append(dict(time=sms.submission_time.strftime("%I:%M %p %m/%d/%y"),body=sms.body))
 
             all_string_bodies = all_string_bodies + sms.body + ","
         if (request.form.get('wordcloud')):
@@ -97,7 +97,8 @@ def feedback_table():
     if not (res == []):
         return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=json.dumps(word_freq), max_freq= maxfreq)
     else:
-        return render_template('feedbackM/index.html', logged_in=True, form=form)
+        return render_template('feedbackM/index.html', logged_in=True, form=form) # allow table to stay until it is cleared manually.
+        #persist table across different GET requests
 
 @page.route("/deleteallfeedbackhistory",methods=['GET', 'POST'])
 @require_role('admin')
@@ -134,7 +135,7 @@ def update_all_sms():
     """
     feedback_controller.update_db()
     return "db updates with all sms: Success"
-
+ 
 @page.route('/twiliosms',methods=['POST'])
 def send_sms_route():
     """

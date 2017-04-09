@@ -30,20 +30,13 @@ for option in options:
     except:
         configDict[option] = None
         
-posWordList = configDict['poslist']
-posWordList = posWordList.split(' ')
-negWordList = configDict['neglist']
-negWordList = negWordList.split(' ')
-exceptionWordList = configDict['exceptionlist']
-exceptionWordList = exceptionWordList.split(' ')
-negationWordList = configDict['negationlist']
-negationWordList = negationWordList.split(' ')
-emphasisWordList = configDict['emphasislist']
-emphasisWordList = emphasisWordList.split(' ')
-foodWordList = configDict['foodlist']
-foodWordList = foodWordList.split(' ')
-serviceWordList = configDict['servicelist']
-serviceWordList = serviceWordList.split(' ')
+posWordList = configDict['poslist'].split(' ')
+negWordList = configDict['neglist'].split(' ')
+exceptionWordList = configDict['exceptionlist'].split(' ')
+negationWordList = configDict['negationlist'].split(' ')
+emphasisWordList = configDict['emphasislist'].split(' ')
+foodWordList = configDict['foodlist'].split(' ')
+serviceWordList = configDict['servicelist'].split(' ')
 
 def update_db(*date_from, **update_from):
     """
@@ -100,9 +93,6 @@ def update_db(*date_from, **update_from):
             sms_tmp.exception_flag = res2[2]
             sms_tmp.food_flag = res2[3]
             sms_tmp.service_flag = res2[4]
-            #print(sms_tmp.body)
-            #print(sms_tmp.submission_time) 
-            #print(sms_tmp.body)
             err = sms_tmp.save()
             if not (err):
                 print("Sms could not be saved in db" + sms_tmp.body)
