@@ -277,7 +277,10 @@ def word_freq_counter(inStr):
         for  word2 in wordsProcessed:
             if word == word2:
                 freqs[i] = freqs[i] + 1
-    maxfreq = max(freqs)
+    try:
+        maxfreq = max(freqs)
+    except ValueError:
+        maxfreq = 0
     res = []
     n = 0
     for n in range(len(wordSet)):

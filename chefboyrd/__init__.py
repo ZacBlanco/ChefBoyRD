@@ -84,7 +84,7 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash
+from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash, feedbackC
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
@@ -93,6 +93,7 @@ APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
+APP.register_blueprint(feedbackC.page, url_prefix='/feedbackC')
 
 # Put all table creations after here
 # ==================================
