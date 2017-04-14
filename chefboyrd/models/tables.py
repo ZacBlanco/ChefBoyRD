@@ -67,6 +67,15 @@ class Table(BaseModel):
         except IntegrityError:
             raise ValueError("This should not happen(Table)")
 
+    @classmethod
+    def delTable(cls,id):
+        try:
+            res = cls.get(cls.id == id)
+            res.delete_instance()
+            return
+        except IntegrityError:
+            raise ValueError("This should not happen(Table)")
+
 
 
 class Booking(BaseModel):
@@ -86,9 +95,12 @@ class Booking(BaseModel):
         cls(Booking(: an object representing a booking
         id(int): the id of the booking we want to cancel
         '''
-        res = cls.get(cls.id == id)
-        res.delete_instance()
-        return
+        try:
+            res = cls.get(cls.id == id)
+            res.delete_instance()
+            return
+        except IntegrityError:
+            raise ValueError("This should not happen(Table)")
 
     @classmethod
     def create_booking(cls,table,people,booking_date_time_start,booking_date_time_end, name, phone):

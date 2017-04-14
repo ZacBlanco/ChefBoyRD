@@ -1,27 +1,44 @@
 {% extends "default.html" %}
 {% block body %}
-    <h2>Welcome</h2>
-    <div>
-        This is the Table Management page
-        Here are a list of reservations made
-
-            <br>
-        {{table}}
-        <br>
-        <div id="buttons">
-    <button id="addTable">
-      Add Table
+<h2>Welcome</h2>
+<div> This is the Table Management page
+  Here are a list of reservations made <br>
+  {{table}} <br>
+  <div id="buttons" class="dropdown">
+    <button id="addTable" class="btn btn-success"> Add Table </button>
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Table Size <span class="caret"></span> </button>
+    <ul id = "ts" class="dropdown-menu" role="menu" aria-labelledby="menu1">
+      <li role="presentation"><a role="menuitem" tabindex="-1">1</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">2</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">3</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">4</a></li>
+    </ul>
+    <!--     <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Table Shape
+    <span class="caret"></span>
     </button>
-    </div>
-        <div id="container"></div>
-
-
+    <ul id = "sh" class="dropdown-menu" role="menu" aria-labelledby="menu1">
+      <li role="presentation"><a role="menuitem" tabindex="-1" value=0>Circle</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1" value=1>Square</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1" value=2>Rectangle</a></li>
+    </ul> -->
+    <button id="delTable" class="btn btn-danger pull-right"> Remove Selected Table </button>
+  </div>
+  <div id="container"></div>
   <script>
+var table_size = 1;
+var selected_table = 0;
+
+$(".dropdown-menu li a").click( function() {
+    table_size = $(this).text();
+    var y = document.getElementsByClassName('btn btn-default dropdown-toggle');
+  var aNode = y[0].innerHTML = table_size + ' <span class="caret"></span>'; // Append 
+    // console.log("Table Size " + table_size);
+});
     document.getElementById("container").style.border = "solid #000000";
     var width = document.getElementById("container").clientWidth;
     var height = window.innerHeight;
     radius = width / 15
-    function addCircle(layer, posX, posY, occupied,id) {
+    function addCircle(layer, posX, posY, occupied,id, size) {
         var group = new Konva.Group({
             draggable: true,
             id: 'group'+id,
@@ -32,7 +49,7 @@
               id: id,
               x: 0-radius / 2,
               y: 0 - radius / 2,
-              text: id,
+              text: size,
               fontSize: 30,
               fontFamily: 'Calibri',
             });
@@ -41,7 +58,9 @@
             x: 0,
             y: 0,
             radius: radius,
-            fill: (occupied == 'True') ? 'red' : 'green'
+            fill: (occupied == 'True') ? 'red' : 'green',
+              stroke: 'black',
+            strokeWidth: 2
         });
         tableNo.setListening(false);
         group.add(circle)
@@ -67,6 +86,7 @@
     });
     var dragLayer = new Konva.Layer();
     var layersArr = [];
+    var dragid = 0;
     /*
     * create 10 layers each containing 1000 shapes to create
     * 10,000 shapes.  This greatly improves performance because
@@ -78,7 +98,7 @@
     */
     var layer = new Konva.Layer();
     {% for tb in tables.Table.select() %}
-        addCircle(layer,width * {{tb.posX}},height * {{tb.posY}},'{{tb.occupied}}',{{tb.id}});
+        addCircle(layer,width * {{tb.posX}},height * {{tb.posY}},'{{tb.occupied}}',{{tb.id}}, {{tb.size}});
     {% endfor %}
     layer.add(text);
     stage.add(layer);
@@ -99,25 +119,45 @@
         layer.draw();
     });
 
+    stage.on('dragstart', function(evt) {
+        var circle = evt.target;
+        dragid = circle.id().replace( /^\D+/g, '');;
+    });
+
+    stage.on('click', function(evt) {
+        var circle = evt.target;
+        circle.stroke('blue');
+        var old = stage.findOne('#'+selected_table)
+        if(old != null && old.id() != circle.id()){
+            old.stroke('black');
+        }
+        selected_table = circle.id()
+        writeMessage('Table: ' + selected_table + ' selected');
+        layer.draw();
+    });
+
     stage.on('dragend', function(evt) {
         var circle = evt.target;
+        dragid = 0;
         // circle.setFill('red')
         var x = circle.x() / width;
         var y = circle.y() / height;
-        var id = circle.id().replace( /^\D+/g, '');;
+        var id = circle.id().replace( /^\D+/g, '');
         $.post( "/table_manager/change_table", {
             type: 0,
             posX: x,
             posY: y,
             id: id
         });
-        writeMessage('Table: ' + id + ' at ' + 'x: ' +Math.floor(x*width) + ', y: ' + Math.floor(height*y));
         layer.draw();
     });
-    function updateShapes(new_x, new_y, new_occupied, id){
+    function updateShapes(new_x, new_y, new_occupied, id, size){
+        if(dragid == id){
+            return;
+        }
         var group = stage.findOne('#group'+id)
         if(group == null){
-            addCircle(layer, new_x, new_y, new_occupied,id)
+            addCircle(layer, new_x, new_y, new_occupied,id, size)
             group = stage.findOne('#group'+id)
         }
         var circle = stage.findOne('#'+id)
@@ -129,20 +169,47 @@
     }
 
     document.getElementById('addTable').addEventListener('click', function() {
-        $.get( "/table_manager/add_table", function( data ) {
+        $.post( "/table_manager/add_table", {table_size: table_size}, function( data ) {
             table_data = JSON.parse(data)
-            addCircle(layer,width * table_data[0],height * table_data[1],table_data[2],table_data[3]);
+            addCircle(layer,width * table_data[0],height * table_data[1],table_data[2],table_data[3], table_size);
             layer.draw();
         }); 
     }, false);
+
+    document.getElementById('delTable').addEventListener('click', function() {
+        if(selected_table != 0){
+            $.post( "/table_manager/del_table", {id: selected_table}, function( data ) {
+                var group = stage.findOne('#group'+selected_table)
+                if(group != null){
+                    group.destroy();
+                    layer.draw();
+                }
+        }); 
+        }
+    }, false);
+
     window.setInterval(function(){
+        var circles = stage.find('Circle');
+        var rects = stage.find('Rect');
          $.get( "/table_manager/update_table", function( data ) {
         table_data = JSON.parse(data)
+        var ids = [];
         for(table in table_data){
-            updateShapes(table_data[table][0],table_data[table][1],table_data[table][2],table_data[table][3])
+            if(ids.indexOf(table_data[table][3]) < 0){
+                ids.push(table_data[table][3]);
+            }
+            updateShapes(table_data[table][0],table_data[table][1],table_data[table][2],table_data[table][3], table_data[table][4])
         }
+        circles.each(function(shape){
+            if(ids.indexOf(shape.id()) < 0){
+                console.log("Shape not found: "+shape.id());
+                var group = stage.findOne('#group'+shape.id())
+                group.destroy();
+                layer.draw();
+            }
+        });
         });
 }, 1000);
-  </script>
-    </div>
+  </script> 
+</div>
 {% endblock %}
