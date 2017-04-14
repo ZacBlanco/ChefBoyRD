@@ -84,7 +84,7 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash, feedbackC
+from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash, feedbackC, settings
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
@@ -94,6 +94,7 @@ APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
 APP.register_blueprint(feedbackC.page, url_prefix='/feedbackC')
+APP.register_blueprint(settings.page, url_prefix='/settings')
 
 # Put all table creations after here
 # ==================================
@@ -125,7 +126,7 @@ def index():
                                message='Hello {}'.format(flask_login.current_user.name),
                                logged_in=True)
     else:
-        return render_template('default.html')
+        return render_template('default.html',logged_in=False)
 
 # =============================================================================================== #
 
@@ -175,6 +176,11 @@ except:
 try:
     # email: caz, pw: caz
     User.create_user('caz', 'caz', 'caz', 'notanadmin')
+except:
+    pass
+
+try:
+    User.create_user('admin','admin','admin','admin')
 except:
     pass
 

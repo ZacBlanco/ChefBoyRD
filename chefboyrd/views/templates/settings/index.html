@@ -1,0 +1,71 @@
+{% extends "default.html" %}
+{% block body %}
+    <h2>Welcome</h2>
+    <div>
+        <hr width=100% align=left size=10>
+        <br>
+        <H3>User Settings</H3>
+        {% if main %}
+        <hr width=100% align=left size=10>
+        <H4>Add User</H4>
+        <div>
+        <form name="fb_submit" action="/settings/add_user" method="post" onsubmit="return validateForm()">
+          <div class="col-xs-4">
+            <label for="email">Email:</label>
+            <input name="email" class="form-control" id="ex2" type="text">
+          </div>
+          <div class="col-xs-4">
+            <label for="password">Password:</label>
+            <input name="password" type="password" class="form-control" id="pwd">
+          </div>
+          <div class="col-xs-4">
+            <label for="re_password">Re-Password:</label>
+            <input name="re_password" class="form-control" id="pwd">
+          </div>
+          <div class="col-xs-3">
+            <label for="name">name</label>
+            <input name="name" class="form-control" id="ex2" type="text">
+          </div>
+          <div class="col-xs-3">
+            <label for="role">role</label>
+            <input name="role" class="form-control" id="ex2" type="text">
+          </div>
+          <div class="col-xs-3">
+            <label for=""></label>
+          </div>
+          <div class="col-xs-3">
+            <label for=""></label>
+          </div>
+          <div class="col-xs-3">
+            <input id="ex2" type="submit" value="Submit">
+          </div>
+        </form>
+        <script type="text/javascript">
+          function validateForm() {
+            var labels = ["email","password","re_password","name","role"];
+            var x; var str = "";
+            for (i = 0; i < labels.length; ++i){
+              x = document.forms["fb_submit"][labels[i]].value;
+              if (x == "") {
+                str = ""
+                str.concat(labels[i]);
+                str.concat(" must be filled out");
+                alert(str);
+                return false;
+              }
+            }
+          }
+        </script>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <hr width=100% align=left size=10>
+        <H4>Error</H4>
+        <p>{{error}}</p>
+        {% endif %}
+        <hr width=100% align=left size=10>
+        <H4>{{table_label}}</H4>
+        {{table}}
+    </div>
+{% endblock %}
