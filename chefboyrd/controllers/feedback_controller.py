@@ -4,7 +4,7 @@ Also includes the feedback analysis functions
 
 """
 from chefboyrd.models.sms import Sms
-from twilio.rest import TwilioRestClient
+from twilio.rest import Client
 import twilio.twiml
 from peewee import IntegrityError
 from string import punctuation
@@ -57,7 +57,7 @@ def update_db(*date_from, **update_from):
         messages = test_sms_data(5,datetime(2016, 3, 25))
     else:
         try:
-            client = TwilioRestClient(account_sid,auth_token)
+            client = Client(account_sid,auth_token)
         except:
             raise SystemError
         #better abstraction would be, twilio function returns a list of objects. this list of objects is sent to update to update
@@ -74,6 +74,8 @@ def update_db(*date_from, **update_from):
         try:
             if (message.date_sent != None):
                 date_tmp = message.date_sent - timedelta(hours=4)
+                sms_str = date_tmp.strftime("%Y-%m-%d %H:%M:%S")
+                date_tmp= datetime.strptime(sms_str, "%Y-%m-%d %H:%M:%S")
             else:
                 date_tmp = None
             sms_tmp = Sms(
@@ -114,7 +116,7 @@ def delete_twilio_feedback():
 	ValueError: invalid reference to a stored sms object from the twilio client
     """
     try:
-        client = TwilioRestClient(account_sid,auth_token)
+        client = Client(account_sid,auth_token)
     except:
         raise SystemError
     messages = client.messages.list()
@@ -281,12 +283,8 @@ def word_freq_counter(inStr):
         maxfreq = max(freqs)
     except ValueError:
         maxfreq = 0
-    res = []
-    n = 0
-    for n in range(len(wordSet)):
-        res.append(dict(text=wordSet[n],size=freqs[n]))
-    resultDict = res
-    return resultDict, maxfreq
+    
+    return wordSet, freqs, maxfreq
 
 #muhStr = input("Enter the string: ")
 #dictOut = wordFreqCounter(muhStr)

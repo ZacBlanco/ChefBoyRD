@@ -79,11 +79,22 @@ def feedback_table():
         #print(len(smss))
         for sms in smss:
             #print('pos:{} neg:{} except:{} food:{} service:{}'.format(sms.pos_flag,sms.neg_flag, sms.exception_flag, sms.food_flag, sms.service_flag))
-            res.append(dict(time=sms.submission_time.strftime("%I:%M %p %m/%d/%y"),body=sms.body))
+            if (type(sms.submission_time) is str):
+                sms_dt= datetime.strptime(sms.submission_time[:-6], "%Y-%m-%d %H:%M:%S") #removes the +HH:MM offset in datetime
+            else:
+                sms_dt = sms.submission_time
+            sms_str = sms_dt.strftime("%Y-%m-%d %H:%M:%S")
+            res.append(dict(time=sms_str,body=sms.body))
 
             all_string_bodies = all_string_bodies + sms.body + ","
         if (request.form.get('wordcloud')):
-            [word_freq, maxfreq] = feedback_controller.word_freq_counter(all_string_bodies)
+            [wordSet, freqs, maxfreq] = feedback_controller.word_freq_counter(all_string_bodies)
+            res_wf = []
+            n = 0
+            for n in range(len(wordSet)):
+                res_wf.append(dict(text=wordSet[n],size=freqs[n]))
+            word_freq = res_wf
+            
             k = 100/maxfreq
             for tmpdict in word_freq:
                 tmpdict['size'] = tmpdict['size']*k
