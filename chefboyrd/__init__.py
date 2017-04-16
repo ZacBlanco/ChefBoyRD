@@ -84,7 +84,7 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash
+from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash, shift_manager
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
@@ -94,10 +94,13 @@ APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
 
+APP.register_blueprint(shift_manager.page, url_prefix='/shift_manager')
+
 # Put all table creations after here
 # ==================================
 from chefboyrd.models import Meals, Ingredients, MealIngredients, Quantities, Tabs, Orders
 from chefboyrd.models import customers, user, reservation, tables, sms, Customer, User
+from chefboyrd.models import shifts
 
 Customer.create_table(True)
 User.create_table(True)
@@ -115,6 +118,8 @@ tables.Restaurant.create_table(True)
 tables.Table.create_table(True)
 tables.Booking.create_table(True)
 
+shifts.FreeShift.create_table(True)
+shifts.ClaimedShift.create_table(True)
 # ==================================== Universal Routes ======================================== #
 @APP.route('/')
 def index():

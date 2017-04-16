@@ -1,0 +1,18 @@
+{% extends "default.html" %}
+{% block body %}
+    <h2>Welcome</h2>
+    <div>
+        This is the Shift Management page
+        Here are a list of shifts taken
+
+            <br>
+        {{ table }}
+        <br>
+        <div id="buttons">
+    <button id="addTable">
+      Add Shift
+    </button>
+    </div>
+        <div id="container"></div>
+    </div>
+{% endblock %}
