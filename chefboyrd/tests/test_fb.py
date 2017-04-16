@@ -39,8 +39,8 @@ class MyModuleTest(unittest.TestCase):
         """ Tests for correct performance of word frequency counter on known string inputs."""
         with self.assertRaises(TypeError):
             feedback_controller.word_freq_counter(5)
-        self.assertEqual(feedback_controller.word_freq_counter("hello hello hello hello hello"),[dict(text='hello',size=5)] )
-        self.assertEqual(feedback_controller.word_freq_counter("hello. hello, hello. hello, hello"),[dict(text='hello',size=5)] )
+        self.assertEqual(feedback_controller.word_freq_counter("hello hello hello hello hello"),(['hello'],[5], 5) )
+        self.assertEqual(feedback_controller.word_freq_counter("hello. hello, hello. hello, hello"),(['hello'],[5], 5) )
         testStr2 = "bad bad bad"
-        self.assertEqual(feedback_controller.word_freq_counter(testStr2),[dict(text='bad',size=3)])
+        self.assertEqual(feedback_controller.word_freq_counter(testStr2),(['bad'],[3], 3))
 

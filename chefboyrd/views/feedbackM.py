@@ -92,10 +92,10 @@ def feedback_table():
             res_wf = []
             n = 0
             for n in range(len(wordSet)):
-                res_wf.append(dict(text=wordSet[n],size=freqs[n]))
+                res_wf.append(dict(text=wordSet[n],size=freqs[n])) #word cloud format
             word_freq = res_wf
             
-            k = 100/maxfreq
+            k = 100/maxfreq 
             for tmpdict in word_freq:
                 tmpdict['size'] = tmpdict['size']*k
         else:
