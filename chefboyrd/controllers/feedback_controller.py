@@ -76,7 +76,7 @@ def update_db(*date_from, **update_from):
             if (date_from > datetime.now()):
                 #raise ValueError
                 return 0
-            messages = client.messages.list(DateSent=date_from)
+            messages = client.messages.list(date_sent=date_from)
     for message in messages:
         try:
             if (message.date_sent != None):
