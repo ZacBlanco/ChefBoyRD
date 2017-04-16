@@ -7,8 +7,11 @@
     <div class="page-header">
         <h2 class="td-none"><a class="td-none" href="/">ChefBoyRD</a></h2>
     </div>
-    
-        {% include "header.html" %}
+        {% if logged_in %}      
+            {% include "header.html" %}
+        {% else %}
+            {% include "empty_header.html" %}
+        {% endif %}
     </div>
     <div class="row">
     <div class="col-md-6">
