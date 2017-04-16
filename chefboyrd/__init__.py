@@ -124,7 +124,8 @@ def index():
     if flask_login.current_user.is_authenticated:
         return render_template('default.html',
                                message='Hello {}'.format(flask_login.current_user.name),
-                               logged_in=True)
+                               logged_in=True,
+                               role=flask_login.current_user.role)
     else:
         return render_template('default.html',logged_in=False)
 

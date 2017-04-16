@@ -8,7 +8,7 @@ This view is for displaying the settings page. Users with admin role can:
 from wtforms import TextAreaField, SubmitField
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from jinja2 import TemplateNotFound
-from chefboyrd.auth import require_role
+from chefboyrd.auth import require_role, load_role
 from flask_wtf import FlaskForm
 from flask_table import Table, Col, create_table, ButtonCol
 from chefboyrd.models import User
@@ -38,7 +38,8 @@ class AddUserForm(FlaskForm):
 @page.route("/add_user",methods=['GET'])
 @page.route("/remove_user",methods=['GET'])
 @require_role('admin')
-def settings_display():
+@load_role
+def settings_display(role):
     """Default page for the ChefBoyRD settings
 
     Returns:
@@ -52,14 +53,15 @@ def settings_display():
 
     table = _display_users()
     if (table):
-        return render_template('settings/index.html', logged_in=True, table=table, table_label="Current Users", main=True)
+        return render_template('settings/index.html', logged_in=True, table=table, table_label="Current Users", main=True, role=role)
     else:
-        return render_template('settings/index.html', logged_in=True, main=True)
+        return render_template('settings/index.html', logged_in=True, main=True,role=role)
 
 
 @page.route("/add_user",methods=['POST'])
 @require_role('admin')
-def add_user():
+@load_role
+def add_user(role):
     """Processes form submission for adding user to database
 
     Returns:
@@ -71,18 +73,18 @@ def add_user():
             User.create_user(email=request.form.get('email'), password=request.form.get('password'),name=request.form.get('name'),role=request.form.get('role'))
         except ValueError:
             error = 'User already exists'
-            return render_template('settings/index.html', logged_in=True, error=error, main=True)
+            return render_template('settings/index.html', logged_in=True, error=error, main=True, role=role)
     else:
         error = 'Passwords did not match.'
-        return render_template('settings/index.html', logged_in=True, error=error, main=True)
+        return render_template('settings/index.html', logged_in=True, error=error, main=True,role=role)
 
     res = User.select().where((request.form.get('email') == User.email))
     table = UserTable(res)
     if table:
-        return render_template('settings/index.html', logged_in=True, table=table, table_label="Added User", main=False)
+        return render_template('settings/index.html', logged_in=True, table=table, table_label="Added User", main=False,role=role)
     else:
         error = 'Internal Error. User could not be created'
-        return render_template('settings/index.html', logged_in=True, error=error, main=False)
+        return render_template('settings/index.html', logged_in=True, error=error, main=False,role=role)
 
 @page.route("/remove_user",methods=['POST'])
 @require_role('admin')

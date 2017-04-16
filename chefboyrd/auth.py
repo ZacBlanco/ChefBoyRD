@@ -37,8 +37,9 @@ def require_login(func):
 
     return wrapper
 
-def require_role(role):
-    '''Decorate a function with this in order to require a specific role to access a view.
+def require_role(*roles,**kwargss):
+    '''Decorate a function with this in order to require a specific role(s), to access a view.
+    Also decorates a function, so that you must pass the current user's role into it's first argument if it's needed.
 
     By decorating a function with @require_role you are implicity forcing @login_required as well.
     Example:
@@ -48,6 +49,11 @@ def require_role(role):
             def view_dash():
                 ...
 
+            @APP.route('/reservationH')
+            @require_role('admin','host',getrole=True)
+            def view_dash(role):
+                ...            
+
     If a user is not authorized then the flask_login.unauthorized handler is called.
     '''
     def real_wrap(func):
@@ -55,8 +61,11 @@ def require_role(role):
         @flask_login.login_required
         def wrapper(*args, **kwargs):
             user = flask_login.current_user
-            if user.role == role:
-                return func(*args, **kwargs)
+            if user.role in roles:
+                if (kwargss.get('getrole',False)):
+                    return func(user.role, *args, **kwargs)
+                else:
+                    return func(*args, **kwargs)
             else:
                 return login_manager.unauthorized()
         return wrapper

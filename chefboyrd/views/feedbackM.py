@@ -32,8 +32,8 @@ class DateSpecifyForm(FlaskForm):
     submit_field = SubmitField("search")
 
 @page.route("/",methods=['GET', 'POST'])
-@require_role('admin')
-def feedback_table():
+@require_role('admin', getrole=True)
+def feedback_table(role):
     """
     By default displays a webpage for user to make feedback DB query.
     Display a table of feedback sent in during a specified date-time range.
@@ -107,9 +107,9 @@ def feedback_table():
         res = []
         table = ItemTable(res)
     if not (res == []):
-        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=json.dumps(word_freq), max_freq= maxfreq)
+        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=json.dumps(word_freq), max_freq= maxfreq, role=role)
     else:
-        return render_template('feedbackM/index.html', logged_in=True, form=form) # allow table to stay until it is cleared manually.
+        return render_template('feedbackM/index.html', logged_in=True, form=form, role=role) # allow table to stay until it is cleared manually.
         #persist table across different GET requests
 
 @page.route("/deleteallfeedbackhistory",methods=['GET', 'POST'])
