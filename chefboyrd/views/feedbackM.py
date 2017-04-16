@@ -3,8 +3,8 @@ feedbackM
 This view is specifically for the administrative staff's management of the feedback
 """
 
-from flask import Blueprint, render_template, abort, url_for, redirect, request
-from flask_table import Table, Col, create_table
+from flask import Blueprint, render_template, request
+from flask_table import Table, Col
 from jinja2 import TemplateNotFound
 from flask_wtf import FlaskForm
 from wtforms import DateTimeField, SubmitField
@@ -13,7 +13,6 @@ from chefboyrd.controllers import feedback_controller
 from chefboyrd.models.sms import Sms
 from datetime import datetime, date
 import json
-import copy
 
 page = Blueprint('feedbackM', __name__, template_folder='./templates')
 
@@ -89,10 +88,12 @@ def feedback_table():
             all_string_bodies = all_string_bodies + sms.body + ","
         if (request.form.get('wordcloud')):
             [wordSet, freqs, maxfreq] = feedback_controller.word_freq_counter(all_string_bodies)
+            
+            #word cloud format
             res_wf = []
             n = 0
             for n in range(len(wordSet)):
-                res_wf.append(dict(text=wordSet[n],size=freqs[n])) #word cloud format
+                res_wf.append(dict(text=wordSet[n],size=freqs[n])) 
             word_freq = res_wf
             
             k = 100/maxfreq 
