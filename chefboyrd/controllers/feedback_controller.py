@@ -13,12 +13,17 @@ import configparser
 import os
 from chefboyrd.tests.test_fb_data import test_sms_data, TestMessages
 
-config = configparser.RawConfigParser()
-config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
-account_sid = config['keys']['account_sid']
-auth_token = config['keys']['auth_token']
-cust_phone_number = config['test']['cust_phone_number']
-restaurant_phone_number = config['test']['restaurant_phone_number']
+#if in travis, use environment variables. If not in travis, use configuration file. If configuration file missing. email seobo.shim@rutgers.edu
+if '/home/travis/build' in os.path.dirname(__file__):
+    account_sid = os.environ['account_sid']
+    auth_token = os.environ['auth_token']
+else:
+    config = configparser.RawConfigParser()
+    config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
+    account_sid = config['keys']['account_sid']
+    auth_token = config['keys']['auth_token']
+    cust_phone_number = config['test']['cust_phone_number']
+    restaurant_phone_number = config['test']['restaurant_phone_number']
 
 Config = configparser.ConfigParser()
 Config.read(os.path.join(os.path.dirname(__file__),"criteriaLists.ini"))
