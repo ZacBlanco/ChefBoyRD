@@ -8,7 +8,7 @@ This view is for displaying the settings page. Users with admin role can:
 from wtforms import TextAreaField, SubmitField
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from jinja2 import TemplateNotFound
-from chefboyrd.auth import require_role, load_role
+from chefboyrd.auth import require_role
 from flask_wtf import FlaskForm
 from flask_table import Table, Col, create_table, ButtonCol
 from chefboyrd.models import User
@@ -37,8 +37,7 @@ class AddUserForm(FlaskForm):
 @page.route("/",methods=['GET', 'POST'])
 @page.route("/add_user",methods=['GET'])
 @page.route("/remove_user",methods=['GET'])
-@require_role('admin')
-@load_role
+@require_role('admin',getrole=True)
 def settings_display(role):
     """Default page for the ChefBoyRD settings
 
@@ -59,8 +58,7 @@ def settings_display(role):
 
 
 @page.route("/add_user",methods=['POST'])
-@require_role('admin')
-@load_role
+@require_role('admin',getrole=True)
 def add_user(role):
     """Processes form submission for adding user to database
 
