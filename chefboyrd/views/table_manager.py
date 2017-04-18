@@ -1,7 +1,7 @@
 '''Table dashboard for the manager interface
 TO DO: Limit reservation times to after date,limit guests based on table(going to be hard)
 '''
-from flask import Blueprint, render_template, abort, url_for, redirect
+from flask import Blueprint, render_template, abort, url_for, redirect, flash
 from jinja2 import TemplateNotFound
 from chefboyrd.auth import require_role
 from chefboyrd.controllers import booking_controller
@@ -57,6 +57,7 @@ def cancel():
     id = int(request.args.get('id'))
     tables.Booking.cancel_reservation(id)
     # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+    flash("Reservation successfully cancelled")
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/confirm",methods=['GET', 'POST'])
@@ -74,6 +75,7 @@ def confirm():
     query.execute()
     tables.Booking.cancel_reservation(id)
     # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+    flash("Reservation successfully confirmed")
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/change_table",methods=['GET', 'POST'])

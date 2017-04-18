@@ -375,6 +375,9 @@ $("#sh li a").click( function() {
             group = stage.findOne('#group'+id)
         }
         var circle = stage.findOne('#'+id)
+        if(group.x() == new_x* width && group.y() == new_y *height && ((circle.fill() == 'red') ? 1 : 0) == new_occupied){
+            return;
+        }
         occupied =  (new_occupied) ? 'red' : 'green'
         circle.setFill(occupied)
         group.x(new_x * width)
