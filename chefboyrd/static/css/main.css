@@ -3,8 +3,16 @@
 }
 
 .bg-gray-lighter {
+	background-image: url('/static/img/website_background_brighter.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
 }
 
+.col-md-3 {
+	background-color: #D3E1E4;
+	
+}
 
 .spaced-table-col {
 	padding-left: 2px !important;
