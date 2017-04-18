@@ -1,36 +1,5 @@
 {% extends "default.html" %}
-<meta charset='utf-8' />
-<link href="{{ url_for('static', filename='fullcalendar.min.css') }}" rel='stylesheet' />
-<link href="{{ url_for('static', filename='fullcalendar.print.css') }}" rel='stylesheet' media='print' />
-<script src="{{ url_for('static', filename='lib/moment.min.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='fullcalendar.min.js') }}"></script>
-<script>
-	$(document).ready(function() {
-
-		$('#calendar').fullCalendar({
-			header: {
-				left: 'prev,next today',
-				center: 'title',
-				right: 'month,agendaWeek,agendaDay'
-			},
-			defaultDate: '2014-09-12',
-			editable: true,
-			eventLimit: true, // allow "more" link when too many events
-			events: {
-				url: 'data',
-				error: function() {
-					$('#script-warning').show();
-				}
-			},
-			loading: function(bool) {
-				$('#loading').toggle(bool);
-			}
-		});
-
-	});
-
-</script>
+{% block body %}
 <style>
 
 	body {
@@ -66,7 +35,6 @@
 	}
 
 </style>
-{% block body %}
     <h2>Welcome</h2>
     <div>
         This is the Shift Management page
@@ -86,5 +54,30 @@
 	<div id='loading'>loading...</div>
 
 	<div id='calendar'></div>
+<script>
+	$(document).ready(function() {
 
+		$('#calendar').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			defaultDate: '2014-09-12',
+			editable: true,
+			eventLimit: true, // allow "more" link when too many events
+			events: {
+				url: 'data',
+				error: function() {
+					$('#script-warning').show();
+				}
+			},
+			loading: function(bool) {
+				$('#loading').toggle(bool);
+			}
+		});
+
+	});
+
+</script>
 {% endblock %}

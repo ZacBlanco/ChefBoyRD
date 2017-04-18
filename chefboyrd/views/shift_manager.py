@@ -6,7 +6,7 @@ from flask import Flask, Blueprint, render_template, request, url_for, jsonify
 from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
 from jinja2 import TemplateNotFound
-
+import os 
 from chefboyrd.auth import require_role
 from chefboyrd.models.shifts import ClaimedShift, FreeShift
 from chefboyrd import APP
@@ -47,8 +47,7 @@ def return_data():
     # you don't want to return ALL events   like in this code
     # but since no db or any real storage is implemented I'm just
     # returning data from a text file that contains json elements
-
-    with open("templates/shift_manager/events.json", "r") as input_data:
+    with open("chefboyrd/views/templates/shift_manager/events.json", "r") as input_data:
         # you should use something else here than just plaintext
         # check out jsonfiy method or the built in json module
         # http://flask.pocoo.org/docs/0.10/api/#module-flask.json
