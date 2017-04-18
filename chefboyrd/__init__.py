@@ -40,8 +40,9 @@ Other helpful sources of documentaiton and reading:
 '''
 
 import configparser
+import json
 import flask_login
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 from peewee import SqliteDatabase, fn
 from datetime import datetime, timedelta
 
