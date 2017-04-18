@@ -1,4 +1,4 @@
-from peewee import CharField, DateTimeField
+from peewee import CharField, DateTimeField, IntegrityError
 from chefboyrd.models import BaseModel
 
 class ClaimedShift(BaseModel):

@@ -25,7 +25,7 @@
             {% if request.args.type == "Meals" or request.args.type == "Ingredients" or request.args.type == "Tabs" %}
                 <label for="item-type">Item Type</label>
                 <select onchange="saveValue(this)" id='{{ request.args.type }}-type' class="form-control" name="selector"> 
-                % if options %
+                {% if options %}
                     {% for option in options %}
                         <option>{{ option }}</option>
                     {% endfor %}
@@ -50,7 +50,6 @@
             var val = e.value;
             localStorage.setItem(id, val);
         }
-
         //get the saved value function - return the value of "v" from localStorage. 
         function getSavedValue  (v){
             if (localStorage.getItem(v) === null) {
