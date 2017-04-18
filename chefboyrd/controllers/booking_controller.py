@@ -26,7 +26,7 @@ def book_restaurant_table(restaurant, booking_date_time, people, name, phone, mi
         booking.save()
         return {'booking': booking.id, 'table': table.id}
     else:
-        return None
+        return "Sorry, the time you have chosen has no available tables or the restaurant is not open during the time selected. Please choose another time."
 
 def get_first_table_available(restaurant, booking_date_time, people, minutes_slot=90):
     """

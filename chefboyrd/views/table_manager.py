@@ -88,7 +88,15 @@ def change_table():
     type = int(request.form['type'])
     if type == 0:
         posX = float(request.form['posX'])
+        if posX > 0.99:
+            posX = 0.99
+        if posX < 0.01:
+            posX = 0.01
         posY = float(request.form['posY'])
+        if posY > 0.99:
+            posY = 0.9
+        if posY < 0.01:
+            posY = 0.01
         query = tables.Table.update(posX=posX,posY=posY).where(tables.Table.id==id)
         query.execute() 
     else:

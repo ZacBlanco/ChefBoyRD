@@ -294,6 +294,7 @@ $("#sh li a").click( function() {
       layer.draw();
     }
     var stage = new Konva.Stage({
+        id: "stage",
         container: 'container',
         width: width,
         height: height
@@ -435,6 +436,14 @@ $("#sh li a").click( function() {
         });
         });
 }, 1000);
+    $(window).resize(function(){
+    width = document.getElementById("container").clientWidth;
+    height = window.innerHeight;
+    var group = stage.findOne('container')
+    group.width(width)
+    group.height(height)
+    layer.draw()
+});
   </script> 
 </div>
 {% endblock %}
