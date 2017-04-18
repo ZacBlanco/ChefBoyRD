@@ -29,8 +29,8 @@ class ModelTest(unittest.TestCase):
 
 
         self.restaurant_1 = tables.Restaurant.create(opening_time=18, closing_time=23,name='Pizza Hut',description='Pizza place.')
-        self.restaurant_1_table_1 = tables.Table.create(restaurant=self.restaurant_1, size=2,occupied=0,posX=0,posY=0)
-        self.restaurant_1_table_2 = tables.Table.create(restaurant=self.restaurant_1, size=4,occupied=0,posX=0,posY=0)
+        self.restaurant_1_table_1 = tables.Table.create(restaurant=self.restaurant_1, size=2,occupied=0,posX=0,posY=0,shape =0)
+        self.restaurant_1_table_2 = tables.Table.create(restaurant=self.restaurant_1, size=4,occupied=0,posX=0,posY=0,shape =0)
 
         booking_date_time_start = datetime(2017, 2, 14, 19, 0)
         minutes_slot = 90
