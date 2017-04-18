@@ -90,19 +90,24 @@
         </p>
         <script type="text/javascript">
                 // word cloud implementation by Eric Cooper http://bl.ocks.org/ericcoopey/6382449
-        var frequency_list = JSON.parse('{{word_freq | safe}}');
-        var max = parseInt('{{max_freq}}');
-        var domain_val = [Math.ceil(max*.1),Math.ceil(max*.2), Math.ceil(max*.3), Math.ceil(max*.4), Math.ceil(max*.5), Math.ceil(max*.6), Math.ceil(max*.7), Math.ceil(max*.8), Math.ceil(max*.9), max];
-        var color = d3.scale.linear()
-                .domain([0,6,10,15,20,30,40,50,65,80,100])
-                .range(["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#222"]);
-        d3.layout.cloud().size([800, 300])
-                .words(frequency_list)
-                .rotate(0)
-                .fontSize(function(d) { return d.size; })
-                .on("end", draw)
-                .start();
-
+        try{
+          var frequency_list = JSON.parse('{{word_freq | safe}}');
+          var max = parseInt('{{max_freq}}');
+          var domain_val = [Math.ceil(max*.1),Math.ceil(max*.2), Math.ceil(max*.3), Math.ceil(max*.4), Math.ceil(max*.5), Math.ceil(max*.6), Math.ceil(max*.7), Math.ceil(max*.8), Math.ceil(max*.9), max];
+          var color = d3.scale.linear()
+                  .domain([0,6,10,15,20,30,40,50,65,80,100])
+                  .range(["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#222"]);
+          d3.layout.cloud().size([800, 300])
+                  .words(frequency_list)
+                  .rotate(0)
+                  .fontSize(function(d) { return d.size; })
+                  .on("end", draw)
+                  .start();
+        }
+        catch(err){
+          
+        }
+        
         function draw(words) {
             d3.select("#wordcloud").append("svg")
                     .attr("width", 850)
@@ -122,6 +127,7 @@
                     })
                     .text(function(d) { return d.text; });
         }
+
         </script>
 
         This is the page for displaying feedback
