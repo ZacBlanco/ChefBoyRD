@@ -103,7 +103,7 @@ def update_table():
     '''
     coords = []
     for table in tables.Table.select():
-        coords.append([table.posX,table.posY, table.occupied,table.id, table.size])
+        coords.append([table.posX,table.posY, table.occupied,table.id, table.size, table.shape])
     return json.dumps(coords)
 
 @page.route("/add_table",methods=['GET', 'POST'])
@@ -113,7 +113,8 @@ def add_table():
     This handles when a user adds a table to the layout.
     '''
     table_size = int(request.form['table_size'])
-    id = tables.Table.create_tables(1,table_size, 0,0.5, 0.5)
+    table_shape = int(request.form['table_shape'])
+    id = tables.Table.create_tables(1,table_size, 0,0.5, 0.5, table_shape)
     return json.dumps(id)
 
 @page.route("/del_table",methods=['GET', 'POST'])
