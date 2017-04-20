@@ -57,7 +57,10 @@ def resH_index():
 
     res = []
     for person in tables.Booking.select():
-        res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        try:
+            res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        except:
+            continue;
     table = ItemTable(res)
 
     # Logged in always true because we require admin role

@@ -34,7 +34,7 @@ class Restaurant(BaseModel):
         except IntegrityError:
             raise ValueError("This should not happen(Restaurant)")
 
-class Table(BaseModel):
+class Tables(BaseModel):
     restaurant = ForeignKeyField(Restaurant)
     size = IntegerField()
     shape = IntegerField()
@@ -81,7 +81,7 @@ class Table(BaseModel):
 
 
 class Booking(BaseModel):
-    table = ForeignKeyField(Table)
+    table = ForeignKeyField(Tables)
     people = IntegerField()
     phone = CharField() # Phone number 
     name = CharField() # Name of person who made the reservation

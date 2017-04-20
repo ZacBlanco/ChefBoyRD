@@ -42,7 +42,10 @@ def table_manager_index():
 
     res = []
     for person in tables.Booking.select():
-        res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        try:
+            res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        except:
+            continue
     table = ItemTable(res)
         #person.start.strftime("%Y-%m-%d %H:%M")
     # Logged in always true because we require admin role
@@ -68,14 +71,17 @@ def confirm():
     '''
     id = int(request.args.get('id'))
     id2 = 0
-    for ids in tables.Booking.select().where(tables.Booking.id == id):
-        id2 = int(ids.table.id)
-        break
-    query = tables.Table.update(occupied=1).where(tables.Table.id==id2)
-    query.execute()
-    tables.Booking.cancel_reservation(id)
-    # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
-    flash("Reservation successfully confirmed")
+    try:
+        for ids in tables.Booking.select().where(tables.Booking.id == id):
+            id2 = int(ids.table.id)
+            break
+        query = tables.Tables.update(occupied=1).where(tables.Tables.id==id2)
+        query.execute()
+        tables.Booking.cancel_reservation(id)
+        # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+        flash("Reservation successfully confirmed")
+    except:
+        flash("Could not find the table to confirm")
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/change_table",methods=['GET', 'POST'])
@@ -97,11 +103,11 @@ def change_table():
             posY = 0.9
         if posY < 0.01:
             posY = 0.01
-        query = tables.Table.update(posX=posX,posY=posY).where(tables.Table.id==id)
+        query = tables.Tables.update(posX=posX,posY=posY).where(tables.Tables.id==id)
         query.execute() 
     else:
         occupied = int(request.form['occupied'])
-        query = tables.Table.update(occupied=occupied).where(tables.Table.id==id)
+        query = tables.Tables.update(occupied=occupied).where(tables.Tables.id==id)
         query.execute()
     return redirect(url_for('table_manager.table_manager_index'))
 
@@ -112,7 +118,7 @@ def update_table():
     This handles when we need to change the position of a table.
     '''
     coords = []
-    for table in tables.Table.select():
+    for table in tables.Tables.select():
         coords.append([table.posX,table.posY, table.occupied,table.id, table.size, table.shape])
     return json.dumps(coords)
 
@@ -124,7 +130,7 @@ def add_table():
     '''
     table_size = int(request.form['table_size'])
     table_shape = int(request.form['table_shape'])
-    id = tables.Table.create_tables(1,table_size, 0,0.5, 0.5, table_shape)
+    id = tables.Tables.create_tables(1,table_size, 0,0.5, 0.5, table_shape)
     return json.dumps(id)
 
 @page.route("/del_table",methods=['GET', 'POST'])
@@ -134,5 +140,5 @@ def del_table():
     This handles when a user adds a table to the layout.
     '''
     id = int(request.form['id'])
-    id = tables.Table.delTable(id)
+    id = tables.Tables.delTable(id)
     return json.dumps(id)

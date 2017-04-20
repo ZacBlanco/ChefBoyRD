@@ -312,7 +312,7 @@ $("#sh li a").click( function() {
     * than 20 layers with 500 shapes or 5 layers with 2,000 shapes
     */
     var layer = new Konva.Layer();
-    {% for tb in tables.Table.select() %}
+    {% for tb in tables.Tables.select() %}
         addCircle(layer,width * {{tb.posX}},height * {{tb.posY}},'{{tb.occupied}}',{{tb.id}}, {{tb.size}}, {{tb.shape}});
     {% endfor %}
     layer.add(text);

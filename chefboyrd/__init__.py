@@ -112,7 +112,7 @@ Orders.create_table(True)
 sms.Sms.create_table(True)
 reservation.Reservation.create_table(True)
 tables.Restaurant.create_table(True)
-tables.Table.create_table(True)
+tables.Tables.create_table(True)
 tables.Booking.create_table(True)
 
 # ==================================== Universal Routes ======================================== #
