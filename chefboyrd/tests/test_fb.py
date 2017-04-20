@@ -40,6 +40,12 @@ class MyModuleTest(unittest.TestCase):
             feedback_controller.word_freq_counter(5)
         self.assertEqual(feedback_controller.word_freq_counter("hello hello hello hello hello"),(['hello'],[5], 5) )
         self.assertEqual(feedback_controller.word_freq_counter("hello. hello, hello. hello, hello"),(['hello'],[5], 5) )
-        testStr2 = "bad bad bad"
-        self.assertEqual(feedback_controller.word_freq_counter(testStr2),(['bad'],[3], 3))
-
+        self.assertEqual(feedback_controller.word_freq_counter("bad bad bad"),(['bad'],[3], 3))
+        [a,b,maxfreq] = feedback_controller.word_freq_counter("bad bad bad good good")
+        res = dict(zip(a,b))
+        self.assertEqual(res,{'good':2,'bad':3})
+        self.assertEqual(maxfreq,3)
+        [a,b,maxfreq] = feedback_controller.word_freq_counter("bad bad ..bad ;spaghetti.. good good get out of my kitchen")
+        res = dict(zip(a,b))
+        self.assertEqual(res,{'good':2,'bad':3,'spaghetti':1,'get':1,'out':1,'of':1,'my':1,'kitchen':1})
+        self.assertEqual(maxfreq,3)
