@@ -64,12 +64,10 @@ def require_role(role,**kwargss):
         @flask_login.login_required
         def wrapper(*args, **kwargs):
             user = flask_login.current_user
-            if isinstance(role, list):
-                if user.role in role:
-                    if (kwargss.get('getrole',False)):
-                        return func(user.role, *args, **kwargs)
-                    else:
-                        return func(*args, **kwargs)
+            if (kwargss.get('getrole',False)):
+                args = tuple([user.role])
+            if (isinstance(role, list) and user.role in role):
+                return func(*args, **kwargs)
             elif user.role == role:
                 return func(*args, **kwargs)
             else:

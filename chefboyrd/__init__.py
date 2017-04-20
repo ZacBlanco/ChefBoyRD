@@ -194,4 +194,5 @@ if Orders.select().count() < 1000:
 try:
     feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
 except:
-    
+    print ('Cannot Establish Twilio Connection. Check your Internet Connection. \nError in {}.'.format(__file__))
+    pass
