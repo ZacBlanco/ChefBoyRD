@@ -37,7 +37,7 @@ def require_login(func):
 
     return wrapper
 
-def require_role(*roles,**kwargss):
+def require_role(role,**kwargss):
     '''Decorate a function with this in order to require a specific role(s), to access a view.
     Also decorates a function, so that you must pass the current user's role into it's first argument if it's needed.
 
@@ -53,6 +53,9 @@ def require_role(*roles,**kwargss):
             @require_role('admin','host',getrole=True)
             def view_dash(role):
                 ...            
+    Args:
+        role(list or str):  A single role name or list of role names for which users are allowed
+        to access the specified resource
 
     If a user is not authorized then the flask_login.unauthorized handler is called.
     '''
@@ -61,11 +64,14 @@ def require_role(*roles,**kwargss):
         @flask_login.login_required
         def wrapper(*args, **kwargs):
             user = flask_login.current_user
-            if user.role in roles:
-                if (kwargss.get('getrole',False)):
-                    return func(user.role, *args, **kwargs)
-                else:
-                    return func(*args, **kwargs)
+            if isinstance(role, list):
+                if user.role in role:
+                    if (kwargss.get('getrole',False)):
+                        return func(user.role, *args, **kwargs)
+                    else:
+                        return func(*args, **kwargs)
+            elif user.role == role:
+                return func(*args, **kwargs)
             else:
                 return login_manager.unauthorized()
         return wrapper

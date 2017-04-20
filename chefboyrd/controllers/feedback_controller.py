@@ -34,7 +34,7 @@ for option in options:
         configDict[option] = Config.get("SectionOne", option)
     except:
         configDict[option] = None
-        
+
 posWordList = configDict['poslist'].split(' ')
 negWordList = configDict['neglist'].split(' ')
 exceptionWordList = configDict['exceptionlist'].split(' ')
@@ -52,32 +52,35 @@ def update_db(*date_from, **update_from):
 
     Args:
         date_from (date object): a specified date, where we update db with sms sent after this date
-        update_from: an optional argument. This should be "test" if messages are not coming from twilio, but from the test_fb_data file
+        update_from: an optional argument. This should be "test" if messages are not coming from
+        twilio, but from the test_fb_data file
     Returns:
         1 on success. 0 on error
     Throws:
-        SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or auth_token
+        SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or
+        auth_token
     """
-    if (update_from):
-        messages = test_sms_data(5,datetime(2016, 3, 25))
+    if update_from:
+        messages = test_sms_data(5, datetime(2016, 3, 25))
     else:
         try:
             client = Client(account_sid,auth_token)
         except:
             raise SystemError
-        #better abstraction would be, twilio function returns a list of objects. this list of objects is sent to update to update
+        #better abstraction would be, twilio function returns a list of objects. this list of
+        #objects is sent to update to update
         #TODO: check the dates so that it is not greater
-        if date_from == (): 
+        if date_from == ():
             messages = client.messages.list() # this may have a long random string first
         else:
             date_from = date_from[0]
-            if (date_from > datetime.now()):
+            if date_from > datetime.now():
                 #raise ValueError
                 return 0
             messages = client.messages.list(date_sent=date_from)
     for message in messages:
         try:
-            if (message.date_sent != None):
+            if message.date_sent != None:
                 date_tmp = message.date_sent - timedelta(hours=4)
                 sms_str = date_tmp.strftime("%Y-%m-%d %H:%M:%S")
                 date_tmp= datetime.strptime(sms_str, "%Y-%m-%d %H:%M:%S")
@@ -85,8 +88,8 @@ def update_db(*date_from, **update_from):
                 date_tmp = None
             sms_tmp = Sms(
                 sid=message.sid,
-                submission_time= date_tmp,
-                body=message.body, 
+                submission_time=date_tmp,
+                body=message.body,
                 phone_num=message.from_,
                 pos_flag=-1,
                 neg_flag=-1,
@@ -101,7 +104,7 @@ def update_db(*date_from, **update_from):
             sms_tmp.food_flag = res2[3]
             sms_tmp.service_flag = res2[4]
             err = sms_tmp.save()
-            if not (err):
+            if not err:
                 print("Sms could not be saved in db" + sms_tmp.body)
         except ValueError:
             print("End of messages reached.")
@@ -176,12 +179,11 @@ def feedback_analysis(inStr):
     inStrProcessed = inStr
     for p in list(punctuation):
         if p != '\'':
-            inStrProcessed = inStrProcessed.replace(p,' ')
+            inStrProcessed = inStrProcessed.replace(p, ' ')
 
     inStrProcessed = inStrProcessed.lower()
     wordsProcessed = inStrProcessed.split(' ')
-    wordsProcessed = list(filter(bool,wordsProcessed))
-    
+    wordsProcessed = list(filter(bool, wordsProcessed))
     for i, word in enumerate(wordsProcessed):
         if word in posWordList:
             if i > 0:
@@ -193,7 +195,7 @@ def feedback_analysis(inStr):
                             negFlag = 1
                         else:
                             posFlag = 1
-                        
+
                     else:
                         posFlag = 1
             else:
@@ -210,7 +212,7 @@ def feedback_analysis(inStr):
                             posFlag = 1
                         else:
                             negFlag = 1
-                        
+
                     else:
                         negFlag = 1
             else:
@@ -230,7 +232,7 @@ def feedback_analysis(inStr):
         if word in serviceWordList:
             serviceFlag = 1
             break
-            
+
     #print("posFlag = {}:\nnegFlag = {}:\nexceptionFlag = {}:".format(posFlag,negFlag,exceptionFlag),
     #     "\nfoodFlag = {}:\nserviceFlag = {}:".format(foodFlag,serviceFlag))
 
@@ -259,14 +261,14 @@ def word_freq_counter(inStr):
 
     if not isinstance(inStr, str):
         raise TypeError("Input must be a string")
-    
+
     inStrProcessed = inStr
     for p in list(punctuation):
         if p != '\'':
             inStrProcessed = inStrProcessed.replace(p,' ')
 
     inStrProcessed = inStrProcessed.lower()
-  
+
     wordsProcessed = inStrProcessed.split(' ')
     wordsProcessed = list(filter(bool,wordsProcessed))
     #print("Processed word list: ")

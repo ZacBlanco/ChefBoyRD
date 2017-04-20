@@ -11,16 +11,15 @@ class MyModuleTest(unittest.TestCase):
         """test the send_sms function
         """
         #TODO: if twilio connection not maintained
-        self.assertEqual(feedback_controller.update_db(datetime(2016,3,21),"test"),1)
-        self.assertEqual(feedback_controller.update_db(datetime(2027,3,21),"test"),0)
+        self.assertEqual(feedback_controller.update_db(datetime(2016, 3, 21), "test"), 1)
+        self.assertEqual(feedback_controller.update_db(datetime(2027, 3, 21), "test"), 0)
         feedback_controller.delete_feedback()
-        self.assertEqual(len(Sms.select()),0)
+        self.assertEqual(len(Sms.select()), 0)
         feedback_controller.update_db(update_from="test")
-        self.assertTrue(len(Sms.select())>0)
+        self.assertTrue(len(Sms.select()) > 0)
         feedback_controller.delete_feedback()
-        self.assertEqual(len(Sms.select()),0)
+        self.assertEqual(len(Sms.select()), 0)
 
-        #feedback_controller.update_db()
 
     #delete_twilio_feedback not tested because it could skew results
 
@@ -28,12 +27,12 @@ class MyModuleTest(unittest.TestCase):
         """ Tests for correct performance of feedback analysis on known string inputs."""
         failStr = "Incorrect result for input \'{}\'"
         testStr = "Food was good"
-        self.assertEqual(feedback_controller.feedback_analysis(testStr), [1,0,0,1,0])
+        self.assertEqual(feedback_controller.feedback_analysis(testStr), [1, 0, 0, 1, 0])
         testStr = "Service was bad"
-        self.assertEqual(feedback_controller.feedback_analysis(testStr), [0,1,0,0,1])
-        testStr = "Service was bad, but food was good"
-        self.assertEqual(feedback_controller.feedback_analysis(testStr), [1,1,1,1,1])
-        
+        self.assertEqual(feedback_controller.feedback_analysis(testStr), [0, 1, 0, 0, 1])
+        testStr = "Service was bad,  but food was good"
+        self.assertEqual(feedback_controller.feedback_analysis(testStr), [1, 1, 1, 1, 1])
+
 
     def test_word_freq_counter(self):
         """ Tests for correct performance of word frequency counter on known string inputs."""

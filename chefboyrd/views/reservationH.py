@@ -40,7 +40,7 @@ class ItemTable(Table):
     cancel = ButtonCol('Cancel','reservationH.cancel',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-danger'})
 
 @page.route("/",methods=['GET', 'POST'])
-@require_role('admin','host',getrole=True) # Example of requireing a role(and authentication)
+@require_role(['admin','host'],getrole=True) # Example of requireing a role(and authentication)
 def resH_index(role):
     '''
     Renders the index page of the reservation page
@@ -60,7 +60,7 @@ def resH_index(role):
     return render_template('/reservationH/index.html', res=res,logged_in=True,table=table,form=form,role=role)
 
 @page.route("/cancel",methods=['GET', 'POST'])
-@require_role('admin','host') # Example of requireing a role(and authentication)
+@require_role(['admin','host']) # Example of requireing a role(and authentication)
 def cancel():
     '''
     This handles when a user needs to cancel a reservation. 
