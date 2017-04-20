@@ -84,7 +84,7 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash
+from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash, feedbackC, settings
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
@@ -93,6 +93,8 @@ APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
+APP.register_blueprint(feedbackC.page, url_prefix='/feedbackC')
+APP.register_blueprint(settings.page, url_prefix='/settings')
 
 # Put all table creations after here
 # ==================================
@@ -122,9 +124,10 @@ def index():
     if flask_login.current_user.is_authenticated:
         return render_template('default.html',
                                message='Hello {}'.format(flask_login.current_user.name),
-                               logged_in=True)
+                               logged_in=True,
+                               role=flask_login.current_user.role)
     else:
-        return render_template('default.html')
+        return render_template('default.html',logged_in=False)
 
 # =============================================================================================== #
 
@@ -177,10 +180,19 @@ try:
 except:
     pass
 
+try:
+    User.create_user('admin','admin','admin','admin')
+except:
+    pass
+
 
 from chefboyrd.controllers import data_controller, feedback_controller
 if Orders.select().count() < 1000:
     start_date = datetime.now() - timedelta(days=10)
     data_controller.generate_data(num_days=10, num_tabs=45, dt_start=start_date)
 
-feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
+try:
+    feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
+except:
+    print ('Cannot Establish Twilio Connection. Check your Internet Connection. \nError in {}.'.format(__file__))
+    pass
