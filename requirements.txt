@@ -1,7 +1,7 @@
 requests
 flask
 peewee
-twilio==5.7.0
+twilio
 flask-login
 werkzeug
 gunicorn

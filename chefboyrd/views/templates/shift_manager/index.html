@@ -27,6 +27,24 @@
 	});
 
 </script>
+<script type="text/javascript">
+	$(function () {
+		$('#datetimepicker2').datetimepicker();
+		$('#datetimepicker1').datetimepicker();
+	});
+	function validateForm() {
+		var x = document.forms["fb_search"]["datetimefrom"].value;
+		if (x == "") {
+			alert("date-time must be filled out");
+			return false;
+		}
+		x = document.forms["fb_search"]["datetimeto"].value;
+		if (x == "") {
+			alert("date-time must be filled out");
+			return false;
+		}
+	}
+</script>
 <style>
 
 	body {
@@ -69,9 +87,45 @@
         <br>
         {{ table }}
         <br>
-	    <div id="buttons">
-    	    <button id="addShift">Add Shift</button>
-    	</div>
+		<h1>Add a Shift Here</h1>
+			{% from "_formhelpers.html" import render_field, render_field_date %}
+		<br>
+
+		<form action="" method=post>
+			<dl>
+				{{ form.hidden_tag() }}
+            <dt>{{ form.start.label}}
+              <div class='input-group date' id='datetimepicker1'>
+                <input type='text' name='datetimefrom' class="form-control"/>
+                  {% if form.start.errors %}
+                    <ul class=errors>
+                  {% for error in form.start.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                    </ul>
+                  {% endif %}
+                <span class="input-group-addon">
+                  <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+              </div>
+				<dt>{{ form.end.label }}
+				<div class='input-group date' id='datetimepicker2'>
+					<input type='text' name='datetimeto' class="form-control"/>
+					{% if form.end.errors %}
+						<ul class=errors>
+					{% for error in form.end.errors %}
+						<li>{{ error }}</li>
+					{% endfor %}
+						</ul>
+					{% endif %}
+					<span class="input-group-addon">
+					<span class="glyphicon glyphicon-calendar"></span>
+					</span>
+				</div>
+				{{ render_field(form.role) }}
+			</dl>
+			<p><input type="submit" value="Add Shift">
+		</form>
     <div id='script-warning'>
 		Error getting data from <code>/data</code> endpoint.
 	</div>

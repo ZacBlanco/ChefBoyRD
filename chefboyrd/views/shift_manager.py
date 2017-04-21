@@ -5,6 +5,9 @@ import json
 from flask import Flask, Blueprint, render_template, request, url_for, jsonify
 from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
+from wtforms import StringField, IntegerField, validators
+from wtforms.ext.dateutil.fields import DateTimeField
+from datetime import datetime
 from jinja2 import TemplateNotFound
 import os 
 from chefboyrd.auth import require_role
@@ -13,6 +16,14 @@ from chefboyrd import APP
 
 page = Blueprint('shift_manager', __name__, template_folder='./templates')
 
+class ShiftForm(FlaskForm):
+    '''
+    This is the form that displays fields to make a shift
+    '''
+    start = DateTimeField('Shift Starting Time')
+    end = DateTimeField('Shift Ending Time')
+    role = StringField('Role', [validators.Length(min=2, max=25)])
+
 class ItemTable(Table):
     '''
     This ItemTable class generates a table of the avaliable shifts.
@@ -20,7 +31,8 @@ class ItemTable(Table):
     '''
     name = Col('Name')
     shift_time_start = Col('Starting Time')
-    shift_time_end = Col('Ending Time')
+    duration = Col('Duration')
+    role = Col('Role')
     post = ButtonCol('Post Shift', 'shift_manager.post',url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-danger'})
 
 @page.route("/", methods=['GET', 'POST'])
@@ -30,10 +42,11 @@ def calendar():
     Renders the index page of the shift management page
     '''
     shifts = []
+    form = ShiftForm()
     for person in ClaimedShift.select():
         shifts.append(dict(name=person.name, shift_time_start=person.shift_time_start.strftime("%Y-%m-%d %H:%M"), shift_time_end=person.shift_time_end.strftime("%Y-%m-%d %H:%M")))
     table = ItemTable(shifts)
-    return render_template('/shift_manager/index.html', shifts=shifts, logged_in=True, table=table)
+    return render_template('/shift_manager/index.html', shifts=shifts, logged_in=True, table=table, form=form)
 
 @page.route('/data')
 def return_data():
