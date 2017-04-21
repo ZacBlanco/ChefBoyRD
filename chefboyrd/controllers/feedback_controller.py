@@ -4,7 +4,7 @@ Also includes the feedback analysis functions
 
 """
 from chefboyrd.models.sms import Sms
-from twilio.rest import TwilioRestClient
+from twilio.rest import Client
 import twilio.twiml
 from peewee import IntegrityError
 from string import punctuation
@@ -64,7 +64,7 @@ def update_db(*date_from, **update_from):
         messages = test_sms_data(5,datetime(2016, 3, 25))
     else:
         try:
-            client = TwilioRestClient(account_sid,auth_token)
+            client = Client(account_sid,auth_token)
         except:
             raise SystemError
         #better abstraction would be, twilio function returns a list of objects. this list of objects is sent to update to update
@@ -76,7 +76,7 @@ def update_db(*date_from, **update_from):
             if (date_from > datetime.now()):
                 #raise ValueError
                 return 0
-            messages = client.messages.list(DateSent=date_from)
+            messages = client.messages.list(date_sent=date_from)
     for message in messages:
         try:
             if (message.date_sent != None):
@@ -124,7 +124,7 @@ def delete_twilio_feedback():
 	ValueError: invalid reference to a stored sms object from the twilio client
     """
     try:
-        client = TwilioRestClient(account_sid,auth_token)
+        client = Client(account_sid,auth_token)
     except:
         raise SystemError
     messages = client.messages.list()

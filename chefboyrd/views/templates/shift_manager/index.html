@@ -1,5 +1,32 @@
 {% extends "default.html" %}
 {% block body %}
+<script>
+	$(document).ready(function() {
+		var today = moment().format('YYYY-MM-DD');
+		$('#calendar').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			defaultDate: today,
+			defaultView: 'agendaWeek',
+			editable: true,
+			eventLimit: true, // allow "more" link when too many events
+			events: {
+				url: 'data',
+				error: function() {
+					$('#script-warning').show();
+				}
+			},
+			loading: function(bool) {
+				$('#loading').toggle(bool);
+			}
+		});
+
+	});
+
+</script>
 <style>
 
 	body {
@@ -35,49 +62,21 @@
 	}
 
 </style>
-    <h2>Welcome</h2>
+<h2>Welcome</h2>
     <div>
         This is the Shift Management page
         Here are a list of shifts taken
         <br>
         {{ table }}
         <br>
-    <div id="buttons">
-        <button id="addShift">
-        Add Shift
-        </button>
-    </div>
+	    <div id="buttons">
+    	    <button id="addShift">Add Shift</button>
+    	</div>
     <div id='script-warning'>
 		Error getting data from <code>/data</code> endpoint.
 	</div>
 
 	<div id='loading'>loading...</div>
-
 	<div id='calendar'></div>
-<script>
-	$(document).ready(function() {
-
-		$('#calendar').fullCalendar({
-			header: {
-				left: 'prev,next today',
-				center: 'title',
-				right: 'month,agendaWeek,agendaDay'
-			},
-			defaultDate: '2014-09-12',
-			editable: true,
-			eventLimit: true, // allow "more" link when too many events
-			events: {
-				url: 'data',
-				error: function() {
-					$('#script-warning').show();
-				}
-			},
-			loading: function(bool) {
-				$('#loading').toggle(bool);
-			}
-		});
-
-	});
-
-</script>
+</div>
 {% endblock %}

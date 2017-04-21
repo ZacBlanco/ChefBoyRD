@@ -25,7 +25,7 @@ class ItemTable(Table):
 
 @page.route("/", methods=['GET', 'POST'])
 @require_role('admin')
-def shift_manager_index():
+def calendar():
     '''
     Renders the index page of the shift management page
     '''
@@ -35,11 +35,7 @@ def shift_manager_index():
     table = ItemTable(shifts)
     return render_template('/shift_manager/index.html', shifts=shifts, logged_in=True, table=table)
 
-@APP.route('/', methods=['GET', 'POST'])
-def calendar():
-    return render_template("templates/shift_manager/index.html")
-
-@page.route('/data', methods=['GET', 'POST'])
+@page.route('/data')
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
