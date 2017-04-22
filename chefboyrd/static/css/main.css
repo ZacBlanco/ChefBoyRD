@@ -3,8 +3,33 @@
 }
 
 .bg-gray-lighter {
+	background-image: url('/static/img/website_background_brighter.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+    background-size: cover;
 }
 
+.nav {
+	background-color: #d9eaf7;
+	box-shadow: 1px 1px 1px #aaaff3;
+	margin-bottom:10px;
+}
+
+.col-md-3 {
+	padding-left:0px;
+	padding-right:0px;
+}
+
+.nav-element {
+	border: 1px solid #b9babb !important;
+	margin: 0px !important;
+}
+
+.nav-element > a{
+	color: #575234;
+	font-weight: bold;
+}
 
 .spaced-table-col {
 	padding-left: 2px !important;
@@ -16,4 +41,27 @@
 
 prediction-table {
 	border: 1px solid black;
+}
+
+#main {
+	padding-right: 20px;
+	padding-left: 20px;
+}
+
+.col-md-6 {
+	padding-left:15px;
+	padding-right:15px;
+	margin-right:15px;
+	margin-left:15px;
+	border: 1px solid #D9D4AE !important;
+	background-color:white;
+	opacity:0.88;
+	box-shadow: 1px 1px 1px #aaaff3;
+}
+
+#wordcloud {
+  width:80%;
+  height:350px;
+  margin:0 auto;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
