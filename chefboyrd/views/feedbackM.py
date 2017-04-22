@@ -11,7 +11,7 @@ from wtforms import DateTimeField, SubmitField
 from chefboyrd.auth import require_role
 from chefboyrd.controllers import feedback_controller
 from chefboyrd.models.sms import Sms
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import json
 
 page = Blueprint('feedbackM', __name__, template_folder='./templates')
@@ -75,7 +75,6 @@ def feedback_table(role):
         smss = Sms.select().where(query_expr).order_by(-Sms.submission_time)
         res = []
         all_string_bodies = ""
-        #print(len(smss))
         for sms in smss:
             #print('pos:{} neg:{} except:{} food:{} service:{}'.format(sms.pos_flag,sms.neg_flag, sms.exception_flag, sms.food_flag, sms.service_flag))
             if (type(sms.submission_time) is str):
@@ -87,29 +86,24 @@ def feedback_table(role):
 
             all_string_bodies = all_string_bodies + sms.body + ","
         if (request.form.get('wordcloud')):
+            wc = True
             [wordSet, freqs, maxfreq] = feedback_controller.word_freq_counter(all_string_bodies)
-            
-            #word cloud format
-            res_wf = []
+            #word cloud output format
+            word_freq = []
             n = 0
             for n in range(len(wordSet)):
-                res_wf.append(dict(text=wordSet[n],size=freqs[n])) 
-            word_freq = res_wf
-            
-            k = 100/maxfreq 
-            for tmpdict in word_freq:
-                tmpdict['size'] = tmpdict['size']*k
+                word_freq.append(dict(text=wordSet[n],weight=freqs[n])) 
         else:
+            wc = False
             word_freq = []
-        #print(word_freq)
         table = ItemTable(res)
     else:
         res = []
         table = ItemTable(res)
     if not (res == []):
-        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=json.dumps(word_freq), max_freq= maxfreq, role=role)
+        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=json.dumps(word_freq), max_freq= maxfreq, role=role, wordcloud=wc)
     else:
-        return render_template('feedbackM/index.html', logged_in=True, form=form, role=role) # allow table to stay until it is cleared manually.
+        return render_template('feedbackM/index.html', logged_in=True, form=form, role=role, wordcloud=False) # allow table to stay until it is cleared manually.
         #persist table across different GET requests
 
 @page.route("/deleteallfeedbackhistory",methods=['GET', 'POST'])

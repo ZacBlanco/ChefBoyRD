@@ -2,16 +2,21 @@
 {% block body %}
     <h2>Welcome</h2>
     <div>
-        <H3>Specify feedback range here:</H3>
+        <H3>Rate your Experience!</H3>
         <br>
         <form name="fb_submit"action="" method="post">
           <dl>
-            <p>Sort by Category</p>
+            <p>Food</p><input type="number" name="food_rating" data-max="5" data-empty-value="0" data-min="1" id="some_id" class="rating" data-clearable="remove"/>
+            <p>Service</p><input type="number" name="service_rating" data-max="5" data-empty-value="0" data-min="1" id="some_id" class="rating" data-clearable="remove"/>
+            <p>Cleanliness</p><input type="number" name="clean_rating" data-max="5" data-empty-value="0" data-min="1" id="some_id" class="rating" data-clearable="remove"/>
+            <p>Overall</p><input type="number" name="overall_rating" data-max="5" data-empty-value="0" data-min="1" id="some_id" class="rating" data-clearable="remove"/>
+            <hr width=100% align=left size=10>
               <div class="form-group">
-                <label for="comment">Comment:</label>
+                <label for="comment">Additional Comments:</label>
                 <textarea name="comment_field" class="form-control" rows="5" id="comment"></textarea>
               </div>
           </dl>
+          <script src="/static/js/bootstrap-rating-input.min.js" type="text/javascript"></script>
           <p><input type="submit" value="Submit">
         </form>
     </div>
