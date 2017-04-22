@@ -119,8 +119,7 @@ tables.Restaurant.create_table(True)
 tables.Table.create_table(True)
 tables.Booking.create_table(True)
 
-shifts.FreeShift.create_table(True)
-shifts.ClaimedShift.create_table(True)
+shifts.Shift.create_table(True)
 # ==================================== Universal Routes ======================================== #
 @APP.route('/')
 def index():

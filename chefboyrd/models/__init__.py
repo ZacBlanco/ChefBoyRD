@@ -4,4 +4,4 @@ from chefboyrd.models.customers import Customer
 from chefboyrd.models.user import User
 from chefboyrd.models.statistics import Meals, Tabs, MealIngredients
 from chefboyrd.models.statistics import Ingredients, Quantities, Orders
-from chefboyrd.models.shifts import ClaimedShift, FreeShift
+from chefboyrd.models.shifts import Shift

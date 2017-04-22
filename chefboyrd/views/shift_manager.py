@@ -7,12 +7,12 @@ from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
 from wtforms import StringField, IntegerField, validators
 from wtforms.ext.dateutil.fields import DateTimeField
-from datetime import datetime
+from datetime import datetime   
 from jinja2 import TemplateNotFound
 import os 
 from chefboyrd.auth import require_role
-from chefboyrd.models.shifts import ClaimedShift, FreeShift
-from chefboyrd.controllers import add_shift
+from chefboyrd.models.shifts import Shift
+from chefboyrd.controllers import shift_controller
 
 
 page = Blueprint('shift_manager', __name__, template_folder='./templates')
@@ -32,7 +32,7 @@ class ItemTable(Table):
     '''
     name = Col('Name')
     shift_time_start = Col('Starting Time')
-    duration = Col('Duration')
+    shift_time_end = Col('Ending Time')
     role = Col('Role')
     post = ButtonCol('Post Shift', 'shift_manager.post',url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-danger'})
 
@@ -42,12 +42,11 @@ def calendar():
     '''
     Renders the index page of the shift management page
     '''
-    shifts = []
     form = ShiftForm()
     if form.validate_on_submit():
-        table = []
-    table = ItemTable(shifts)
-    return render_template('/shift_manager/index.html', shifts=shifts, logged_in=True, table=table, form=form)
+        Shift.create_shift(form.start.data, form.end.data, form.role.data)
+    table = shift_controller.getFreeShifts()
+    return render_template('/shift_manager/index.html', logged_in=True, table=table, form=form)
 
 @page.route('/data')
 def return_data():
