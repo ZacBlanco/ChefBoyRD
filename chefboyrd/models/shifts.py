@@ -1,4 +1,4 @@
-from peewee import CharField, DateTimeField, IntegrityError
+from peewee import CharField, DateTimeField, IntegrityError, BooleanField
 from chefboyrd.models import BaseModel
 
 class Shift(BaseModel):
@@ -8,7 +8,7 @@ class Shift(BaseModel):
     role = CharField(max_length=250)
 
     @classmethod
-    def create_shift(cls, name, shift_time_start, shift_time_end, role, claimed):
+    def create_shift(cls, name, shift_time_start, shift_time_end, role):
         '''
         Creates a new Shift
 
@@ -25,15 +25,28 @@ class Shift(BaseModel):
             print(shift_time_start)
             print(shift_time_end)
             print(role)
-            print(claimed)
             cls.create(
                 name=name, 
                 shift_time_start=shift_time_start,
                 shift_time_end=shift_time_end,
-                role=role,
-                claimed=claimed)
+                role=role)
         except IntegrityError:
             raise ValueError("This should not happen (Shift)")
+
+    @classmethod
+    def claim_shift(cls, id, name):
+        '''
+        Attempts to claim a shift given an ID
+
+        Args:
+            cls(Shift): an object representing a shift
+            id(int): the id of the shift that we want to claim
+            name(char): name of the employee that wants to claim the shift
+        '''
+        res = cls.get(cls.id == id)
+        print("Claimer: %s", name)
+        res.name = name
+        return
 
     @classmethod
     def post_shift(cls, id):
@@ -41,13 +54,12 @@ class Shift(BaseModel):
         Attempts to post a shift given an ID
 
         Args:
-            cls(ClaimedShift): an object representing a claimed shift
+            cls(Shift): an object representing a shift
             id(int): the id of the shift we want to post
         Returns:
             N/A
         '''
         res = cls.get(cls.id == id)
-        res.claimed = False
         res.name = ""
         return
 
@@ -57,7 +69,7 @@ class Shift(BaseModel):
         Attempts to remove a shift given an ID
 
         Args:
-            cls(ClaimedShift): an object representing a claimed shift
+            cls(Shift): an object representing a shift
             id(int): the id of the shift we want to post
         Returns:
             N/A

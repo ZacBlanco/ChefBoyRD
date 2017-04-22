@@ -13,6 +13,6 @@ def getFreeShifts():
         N/A
     """
     free_shifts_ids = []
-    for free in Shift.select().where(Shift.name==""):
+    for free in Shift.select().where(Shift.claimed==False):
         free_shifts.append(free.id)
     return free_shifts

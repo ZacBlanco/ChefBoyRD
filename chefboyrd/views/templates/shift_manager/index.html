@@ -83,10 +83,13 @@
 <h2>Welcome</h2>
     <div>
         This is the Shift Management page
-        Here are a list of shifts taken
+        Here is the list of open shifts
         <br>
-        {{ table }}
+        {{ freeTable }}
         <br>
+				Here is the list of taken shifts
+				<br>
+				{{ claimTable }}
 		<h1>Add a Shift Here</h1>
 			{% from "_formhelpers.html" import render_field, render_field_date %}
 		<br>

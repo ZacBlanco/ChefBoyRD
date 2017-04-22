@@ -2,6 +2,7 @@
 Shift management dashboard for the manager interface
 '''
 import json
+import flask_login
 from flask import Flask, Blueprint, render_template, request, url_for, jsonify, redirect
 from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
@@ -25,17 +26,27 @@ class ShiftForm(FlaskForm):
     end = DateTimeField('Shift Ending Time')
     role = StringField('Role', [validators.Length(min=2, max=25)])
 
-class FreeItemTable(Table):
+class FreeTable(Table):
     '''
-    This ItemTable class generates a table of the avaliable shifts.
-    It also has buttons to post a shift
+    This FreeTable class generates a table of the avaliable/open shifts.
+    It also has a button to remove a shift
     '''
-    name = Col('Name')
+    shift_time_start = Col('Starting Time')
+    shift_time_end = Col('Ending Time')
+    role = Col('Role')
+    claim = ButtonCol('Claim Shift', 'shift_manager.claim', url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-success'})
+    remove = ButtonCol('Remove Shift', 'shift_manager.remove', url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-danger'})
+
+class ClaimTable(Table):
+    '''
+    This ClaimTable class generates a table of the claimed shifts.
+    It also has a button to post a shift
+    '''
+    name = Col('Employee Name')
     shift_time_start = Col('Starting Time')
     shift_time_end = Col('Ending Time')
     role = Col('Role')
     post = ButtonCol('Post Shift', 'shift_manager.post',url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-warning'})
-    remove = ButtonCol('Remove Shift', 'shift_manager.remove', url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-danger'})
 
 @page.route("/", methods=['GET', 'POST'])
 @require_role('admin')
@@ -45,12 +56,16 @@ def calendar():
     '''
     form = ShiftForm()
     if form.validate_on_submit():
-        Shift.create_shift("", form.start.data, form.end.data, form.role.data, False)
+        Shift.create_shift("", form.start.data, form.end.data, form.role.data)
     free_shifts = []
-    for freeShift in Shift.select().where(Shift.name == ""):
-        free_shifts.append(dict(name=freeShift.name, shift_time_start=freeShift.shift_time_start, shift_time_end=freeShift.shift_time_end, role=freeShift.role, id=freeShift.id))
-    table = FreeItemTable(free_shifts)
-    return render_template('/shift_manager/index.html', logged_in=True, table=table, form=form)
+    for freeShift in Shift.select().where(Shift.name==""):
+        free_shifts.append(dict(shift_time_start=freeShift.shift_time_start, shift_time_end=freeShift.shift_time_end, role=freeShift.role, id=freeShift.id))
+    freeTable = FreeTable(free_shifts)
+    claim_shifts = []
+    for claimShift in Shift.select().where(Shift.name!=""):
+        claim_shifts.append(dict(name=claimShift.name, shfit_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
+    claimTable = ClaimTable(claim_shifts)
+    return render_template('/shift_manager/index.html', logged_in=True, freeTable=freeTable, claimTable = claimTable, form=form)
 
 @page.route('/data')
 def return_data():
@@ -65,6 +80,17 @@ def return_data():
         # check out jsonfiy method or the built in json module
         # http://flask.pocoo.org/docs/0.10/api/#module-flask.json
         return input_data.read()
+
+@page.route("/claim", methods=['GET', 'POST'])
+@require_role('admin')
+def claim():
+    '''
+    This handles when the user needs to claim a shift
+    '''
+    id = request.args.get('id')
+    name = flask_login.current_user.name
+    Shift.claim_shift(id, name)
+    return   redirect(url_for('shift_manager.calendar'))
 
 @page.route("/post", methods=['GET', 'POST'])
 @require_role('admin')
