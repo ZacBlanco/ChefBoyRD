@@ -16,7 +16,7 @@ class CommentForm(FlaskForm):
     submit_field = SubmitField("Submit")
 
 @page.route("/",methods=['GET', 'POST'])
-@require_role('notanadmin','admin',getrole=True)
+@require_role(['notanadmin','admin'],getrole=True)
 def feedback_submit(role):
     """
     By default displays a webpage text box for user to submit customer feedback.
