@@ -15,6 +15,7 @@
 	box-shadow: 1px 1px 1px #aaaff3;
 	margin-bottom:10px;
 }
+
 .col-md-3 {
 	padding-left:0px;
 	padding-right:0px;
@@ -27,6 +28,7 @@
 
 .nav-element > a{
 	color: #575234;
+	font-weight: bold;
 }
 
 .spaced-table-col {
@@ -55,4 +57,11 @@ prediction-table {
 	background-color:white;
 	opacity:0.88;
 	box-shadow: 1px 1px 1px #aaaff3;
+}
+
+#wordcloud {
+  width:80%;
+  height:350px;
+  margin:0 auto;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
