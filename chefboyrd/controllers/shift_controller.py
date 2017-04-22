@@ -12,7 +12,7 @@ def getFreeShifts():
     Returns: 
         N/A
     """
-    free_shifts = []
-    for free in Shift.select().where(Shift.name)
-        free_shifts.append(free.Shift.id)
+    free_shifts_ids = []
+    for free in Shift.select().where(Shift.name==""):
+        free_shifts.append(free.id)
     return free_shifts

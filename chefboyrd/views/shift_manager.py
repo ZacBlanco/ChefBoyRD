@@ -2,7 +2,7 @@
 Shift management dashboard for the manager interface
 '''
 import json
-from flask import Flask, Blueprint, render_template, request, url_for, jsonify
+from flask import Flask, Blueprint, render_template, request, url_for, jsonify, redirect
 from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
 from wtforms import StringField, IntegerField, validators
@@ -25,7 +25,7 @@ class ShiftForm(FlaskForm):
     end = DateTimeField('Shift Ending Time')
     role = StringField('Role', [validators.Length(min=2, max=25)])
 
-class ItemTable(Table):
+class FreeItemTable(Table):
     '''
     This ItemTable class generates a table of the avaliable shifts.
     It also has buttons to post a shift
@@ -34,7 +34,8 @@ class ItemTable(Table):
     shift_time_start = Col('Starting Time')
     shift_time_end = Col('Ending Time')
     role = Col('Role')
-    post = ButtonCol('Post Shift', 'shift_manager.post',url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-danger'})
+    post = ButtonCol('Post Shift', 'shift_manager.post',url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-warning'})
+    remove = ButtonCol('Remove Shift', 'shift_manager.remove', url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-danger'})
 
 @page.route("/", methods=['GET', 'POST'])
 @require_role('admin')
@@ -44,8 +45,11 @@ def calendar():
     '''
     form = ShiftForm()
     if form.validate_on_submit():
-        Shift.create_shift(form.start.data, form.end.data, form.role.data)
-    table = shift_controller.getFreeShifts()
+        Shift.create_shift("", form.start.data, form.end.data, form.role.data, False)
+    free_shifts = []
+    for freeShift in Shift.select().where(Shift.name == ""):
+        free_shifts.append(dict(name=freeShift.name, shift_time_start=freeShift.shift_time_start, shift_time_end=freeShift.shift_time_end, role=freeShift.role, id=freeShift.id))
+    table = FreeItemTable(free_shifts)
     return render_template('/shift_manager/index.html', logged_in=True, table=table, form=form)
 
 @page.route('/data')
@@ -61,3 +65,23 @@ def return_data():
         # check out jsonfiy method or the built in json module
         # http://flask.pocoo.org/docs/0.10/api/#module-flask.json
         return input_data.read()
+
+@page.route("/post", methods=['GET', 'POST'])
+@require_role('admin')
+def post():
+    '''
+    This handles when the user needs to post a shift
+    '''
+    id = request.args.get('id')
+    Shift.post_shift(id)
+    return redirect(url_for('shift_manager.calendar'))
+
+@page.route("/remove", methods=['GET', 'POST'])
+@require_role('admin')
+def remove():
+    '''
+    This handles when the user needs to remove a shift
+    '''
+    id = request.args.get('id')
+    Shift.remove_shift(id)
+    return redirect(url_for('shift_manager.calendar'))

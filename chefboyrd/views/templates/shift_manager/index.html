@@ -94,9 +94,9 @@
 		<form action="" method=post>
 			<dl>
 				{{ form.hidden_tag() }}
-            <dt>{{ form.start.label}}
+            <dt>{{ form.start.label }}
               <div class='input-group date' id='datetimepicker1'>
-                <input type='text' name='datetimefrom' class="form-control"/>
+                <input type='text' name='start' class="form-control"/>
                   {% if form.start.errors %}
                     <ul class=errors>
                   {% for error in form.start.errors %}
@@ -110,7 +110,7 @@
               </div>
 				<dt>{{ form.end.label }}
 				<div class='input-group date' id='datetimepicker2'>
-					<input type='text' name='datetimeto' class="form-control"/>
+					<input type='text' name='end' class="form-control"/>
 					{% if form.end.errors %}
 						<ul class=errors>
 					{% for error in form.end.errors %}

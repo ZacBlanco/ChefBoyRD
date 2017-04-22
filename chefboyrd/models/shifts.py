@@ -8,7 +8,7 @@ class Shift(BaseModel):
     role = CharField(max_length=250)
 
     @classmethod
-    def create_shift(cls, shift_time_start, shift_time_end, role):
+    def create_shift(cls, name, shift_time_start, shift_time_end, role, claimed):
         '''
         Creates a new Shift
 
@@ -21,14 +21,19 @@ class Shift(BaseModel):
             N/A
         '''
         try:
+            print(name)
+            print(shift_time_start)
+            print(shift_time_end)
+            print(role)
+            print(claimed)
             cls.create(
-                name="", 
+                name=name, 
                 shift_time_start=shift_time_start,
                 shift_time_end=shift_time_end,
                 role=role,
-                claimed=False)
+                claimed=claimed)
         except IntegrityError:
-            raise ValueError("This should not happen(Shift)")
+            raise ValueError("This should not happen (Shift)")
 
     @classmethod
     def post_shift(cls, id):
@@ -42,8 +47,8 @@ class Shift(BaseModel):
             N/A
         '''
         res = cls.get(cls.id == id)
-        res.claimed = None
-        res.name = None
+        res.claimed = False
+        res.name = ""
         return
 
     @classmethod
