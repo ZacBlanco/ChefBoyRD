@@ -1,19 +1,22 @@
 from peewee import CharField, DateTimeField, IntegrityError
 from chefboyrd.models import BaseModel
 
-class ClaimedShift(BaseModel):
+class Shift(BaseModel):
     name = CharField(max_length=250)
     shift_time_start = DateTimeField()
     shift_time_end = DateTimeField()
     role = CharField(max_length=250)
 
     @classmethod
-    def claim_shift(cls, name, shift_time_start, shift_time_end, role):
+    def create_shift(cls, name, shift_time_start, shift_time_end, role, claim):
         '''
-        Attempts to claim a shift given an ID
+        Creates a new Shift
 
         Args:
             name(char): The name of the employee claiming the shift
+            shift_time_start(time): Starting time of shift
+            shift_time_end(time): Ending time of shift
+            role(str): 
         Returns:
             N/A
         '''
@@ -22,7 +25,8 @@ class ClaimedShift(BaseModel):
                 name=name, 
                 shift_time_start=shift_time_start,
                 shift_time_end=shift_time_end,
-                role=role)
+                role=role,
+                claimed=claim)
         except IntegrityError:
             raise ValueError("This should not happen(Shift)")
 
@@ -38,19 +42,14 @@ class ClaimedShift(BaseModel):
             N/A
         '''
         res = cls.get(cls.id == id)
-        res.delete_instance()
+        res.claimed = None
+        res.name = None
         return
-    
-class FreeShift(BaseModel):
-    name = CharField(max_length=250)
-    shift_time_start = DateTimeField()
-    shift_time_end = DateTimeField()
-    role = CharField(max_length=250)
 
     @classmethod
-    def claim_shift(cls, id):
+    def remove_shift(cls, id):
         '''
-        Attempts to post a shift given an ID
+        Attempts to remove a shift given an ID
 
         Args:
             cls(ClaimedShift): an object representing a claimed shift
@@ -61,23 +60,3 @@ class FreeShift(BaseModel):
         res = cls.get(cls.id == id)
         res.delete_instance()
         return
-
-    @classmethod
-    def post_shift(cls, name, shift_time_start, shift_time_end, role):
-        '''
-        Attempts to claim a shift given an ID
-
-        Args:
-            name(char): The name of the employee claiming the shift
-        Returns:
-            N/A
-        '''
-        try:
-            cls.create(
-                name=name, 
-                shift_time_start=shift_time_start,
-                shift_time_end=shift_time_end,
-                role=role)
-        except IntegrityError:
-            raise ValueError("This should not happen(Shift)")
-        
