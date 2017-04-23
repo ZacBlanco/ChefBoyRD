@@ -47,6 +47,7 @@ class Shift(BaseModel):
         print("Claimer - ", name)
         res.name = name
         print(res.name)
+        res.save()
         return
 
     @classmethod
@@ -62,6 +63,7 @@ class Shift(BaseModel):
         '''
         res = cls.get(cls.id == id)
         res.name = ""
+        res.save()
         return
 
     @classmethod

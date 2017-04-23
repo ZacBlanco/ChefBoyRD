@@ -63,7 +63,7 @@ def calendar():
     freeTable = FreeTable(free_shifts)
     claim_shifts = []
     for claimShift in Shift.select().where(Shift.name!=""):
-        claim_shifts.append(dict(name=claimShift.name, shfit_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
+        claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
     claimTable = ClaimTable(claim_shifts)
     return render_template('/shift_manager/index.html', logged_in=True, freeTable=freeTable, claimTable = claimTable, form=form)
 
@@ -74,7 +74,7 @@ def return_data():
     shift_json = []
     for s in Shift.select().where(Shift.name==""):
         shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#66ff66'))
-    for s in Shift.select().where(Shift.name):
+    for s in Shift.select().where(Shift.name!=""):
         shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#3399ff'))
     print(shift_json)
     return json.dumps(shift_json)
