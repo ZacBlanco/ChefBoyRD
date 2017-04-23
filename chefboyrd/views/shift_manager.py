@@ -75,7 +75,7 @@ def return_data():
     for s in Shift.select().where(Shift.name==""):
         shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#66ff66'))
     for s in Shift.select().where(Shift.name!=""):
-        shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#3399ff'))
+        shift_json.append(dict(title=s.name+'-'+s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#3399ff'))
     print(shift_json)
     return json.dumps(shift_json)
 
@@ -87,7 +87,8 @@ def claim():
     '''
     id = request.args.get('id')
     name = flask_login.current_user.name
-    Shift.claim_shift(id, name)
+    if shift_controller.checkAvailability(id, name):
+        Shift.claim_shift(id, name)
     return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/post", methods=['GET', 'POST'])

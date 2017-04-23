@@ -1,18 +1,19 @@
+from datetime import timedelta, datetime
 from chefboyrd.models.shifts import Shift
 
-def getFreeShifts():
+def checkAvailability(id, name):
     """
-    This method creates shifts by created an open shift.
+    This method checks the availability of the shifts and makes sure that there are no
+    scheduling overlaps in terms of duration.
 
     Args:
-        shift_start_time: The start time of the shift
-        shift_end_time: The end time of the shift
-        role: the role that the person must have in order to claim the shift
+        id: the id of the shift that will be in analysis
 
-    Returns: 
-        N/A
+    Returns:
+        True: if there are no scheduling conflicts
+        False: if the worker in question already has a schedule arranged
     """
-    free_shifts_ids = []
-    for free in Shift.select().where(Shift.claimed==False):
-        free_shifts.append(free.id)
-    return free_shifts
+    tryShift = Shift.getShift(id)
+    for workShift in Shift.select().where(Shift.name==name):
+        if workShift.shift_time_start <= tryShift.shift_time_start and workShift.shift_time_end <= tryShift.shift_time_end:
+            return False

@@ -21,10 +21,6 @@ class Shift(BaseModel):
             N/A
         '''
         try:
-            print(name)
-            print(shift_time_start)
-            print(shift_time_end)
-            print(role)
             cls.create(
                 name=name, 
                 shift_time_start=shift_time_start,
@@ -44,9 +40,7 @@ class Shift(BaseModel):
             name(char): name of the employee that wants to claim the shift
         '''
         res = cls.get(cls.id == id)
-        print("Claimer - ", name)
         res.name = name
-        print(res.name)
         res.save()
         return
 
@@ -80,3 +74,17 @@ class Shift(BaseModel):
         res = cls.get(cls.id == id)
         res.delete_instance()
         return
+
+    @classmethod
+    def get_shift(cls, id):
+        '''
+        Attempts to retrieve a shift given an ID
+
+        Args:
+            cls(Shift): an object representing a shift
+            id(int): the id of the shift we want to retrieve
+        Returns:
+            N/A
+        '''
+        res = cls.get(cls.id == id)
+        return res
