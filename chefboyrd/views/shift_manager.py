@@ -71,15 +71,13 @@ def calendar():
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
-    # You'd normally use the variables above to limit the data returned
-    # you don't want to return ALL events   like in this code
-    # but since no db or any real storage is implemented I'm just
-    # returning data from a text file that contains json elements
-    with open("chefboyrd/views/templates/shift_manager/events.json", "r") as input_data:
-        # you should use something else here than just plaintext
-        # check out jsonfiy method or the built in json module
-        # http://flask.pocoo.org/docs/0.10/api/#module-flask.json
-        return input_data.read()
+    shift_json = []
+    for s in Shift.select().where(Shift.name==""):
+        shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#66ff66'))
+    for s in Shift.select().where(Shift.name):
+        shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#3399ff'))
+    print(shift_json)
+    return json.dumps(shift_json)
 
 @page.route("/claim", methods=['GET', 'POST'])
 @require_role('admin')
@@ -90,7 +88,7 @@ def claim():
     id = request.args.get('id')
     name = flask_login.current_user.name
     Shift.claim_shift(id, name)
-    return   redirect(url_for('shift_manager.calendar'))
+    return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/post", methods=['GET', 'POST'])
 @require_role('admin')

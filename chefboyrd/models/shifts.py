@@ -44,8 +44,9 @@ class Shift(BaseModel):
             name(char): name of the employee that wants to claim the shift
         '''
         res = cls.get(cls.id == id)
-        print("Claimer: %s", name)
+        print("Claimer - ", name)
         res.name = name
+        print(res.name)
         return
 
     @classmethod
