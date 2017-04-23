@@ -3,17 +3,25 @@ from flask_wtf import FlaskForm
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from jinja2 import TemplateNotFound
 from chefboyrd.auth import require_role
+from chefboyrd.controllers import feedback_controller
+import matplotlib
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 page = Blueprint('feedbackC', __name__, template_folder='./templates')
 
 class CommentForm(FlaskForm):
     """WTforms object for the feedback form submission"""
-    comment_field = TextAreaField()
+
     food_rating = DecimalField()
     service_rating = DecimalField()
     clean_rating = DecimalField()
+    ambience_rating = DecimalField()
     overall_rating = DecimalField()
-    submit_field = SubmitField("Submit")
+
+    comment_field = TextAreaField()
+
+    submit_field = SubmitField("submit")
 
 @page.route("/",methods=['GET', 'POST'])
 @require_role(['notanadmin','admin'],getrole=True)
@@ -28,9 +36,19 @@ def feedback_submit(role):
     """
     #get all of the feedback objects and insert it into table
     form = CommentForm()
+
     if (request.method== 'POST'):
-        if (request.form.__contains__('comment_field')):
-            #put the data in DB
+        if (request.form['submit_field'] == 'Back'):
+            return render_template('feedbackC/index.html', logged_in=True,role=role)
+
+        rating = {'food':food_rating,
+                    'service':service_rating,
+                    'clean':clean_rating,
+                    'ambience':ambience_rating,
+                    'overall':overall_rating,
+                    'comment':comment_field}
+        update_db_rating(rating)
+        if (request.form['comment_field']):
             comment = request.form['comment_field']
             return render_template('feedbackC/confirmation.html', logged_in=True, comment=comment,role=role)
         else:

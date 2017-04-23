@@ -3,11 +3,11 @@
         <ul class="nav nav-pills nav-stacked">
             <li role="presentation" class="nav-element"><a href="/">Home</a></li>
             {% if role == 'admin'%}
-            <li role="presentation" class="nav-element"><a href="/dashboard">Dashboard</a></li>
+            <li role="presentation" class="nav-element"><a href="/dashboard">Statistic</a></li>
+            <li role="presentation" class="nav-element"><a href="/prediction">Prediction</a></li>
             <li role="presentation" class="nav-element"><a href="/feedbackM">Feedback Management</a></li>
             <li role="presentation" class="nav-element"><a href="/reservationH">Reservation Host</a></li>
             <li role="presentation" class="nav-element"><a href="/table_manager">Table Management</a></li>
-            <li role="presentation" class="nav-element"><a href="/prediction">Prediction</a></li>
             <li role="presentation" class="nav-element"><a href="/settings">Settings</a></li>
             {% endif %}
             {% if role == 'host'%}

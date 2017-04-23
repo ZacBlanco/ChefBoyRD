@@ -29,7 +29,6 @@ class DateSpecifyForm(FlaskForm):
 
     date_time_from = DateTimeField('Time From')
     date_time_to = DateTimeField('Time To')
-    submit_field = SubmitField("search")
 
 @page.route("/",methods=['GET', 'POST'])
 @require_role('admin', getrole=True)

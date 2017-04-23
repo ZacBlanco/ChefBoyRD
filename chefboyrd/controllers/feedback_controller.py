@@ -114,6 +114,23 @@ def update_db(*date_from, **update_from):
             #print("Duplicate Sms Entry " + sms_tmp.body)
     return 1 #this should be on success
 
+def update_db_rating(rating):
+    try:
+        Rating(
+            submission_time=datetime.now(),
+            food=rating['food'],
+            service=rating['service'],
+            clean=rating['clean'],
+            ambience=rating['ambience'],
+            overall=rating['overall'],
+            comment=rating['comment']
+            ).save()
+        return 1
+    except:
+        return 0
+
+def feedback_averages(options):
+    return 0
 
 def delete_twilio_feedback():
     """
@@ -271,6 +288,23 @@ def word_freq_counter(inStr):
 
     wordsProcessed = inStrProcessed.split(' ')
     wordsProcessed = list(filter(bool,wordsProcessed))
+
+    stopWordList = configDict['stoplist']
+    stopWordList = stopWordList.split(' ')
+
+    #print("Stop word list: ")
+    print(stopWordList,"\n")
+
+    result = list();
+
+    for word in wordsProcessed:
+        if word not in stopWordList:
+            result.append(word)
+            
+    #print(wordsProcessed,"\n")
+    #print(result)
+    wordsProcessed = result
+    
     #print("Processed word list: ")
     #print(wordsProcessed)
     #print("\n",set(wordsProcessed))

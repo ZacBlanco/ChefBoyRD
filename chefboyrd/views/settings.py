@@ -32,7 +32,6 @@ class AddUserForm(FlaskForm):
     re_password = TextAreaField('password')
     name = TextAreaField('name')
     role = TextAreaField('role')
-    submit_field = SubmitField("Submit")
 
 @page.route("/",methods=['GET', 'POST'])
 @page.route("/add_user",methods=['GET'])
