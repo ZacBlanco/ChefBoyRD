@@ -87,7 +87,8 @@ def claim():
     '''
     id = request.args.get('id')
     name = flask_login.current_user.name
-    if shift_controller.checkAvailability(id, name):
+    role = flask_login.current_user.role
+    if shift_controller.checkAvailability(id, name, role):
         Shift.claim_shift(id, name)
     return redirect(url_for('shift_manager.calendar'))
 
