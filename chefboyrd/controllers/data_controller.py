@@ -354,7 +354,7 @@ menu = {
                 'onion': '0.3=onion'
             }
         },
-        'chicken parmasean sanwich': {
+        'chicken parmesan sandwich': {
             'price': 11.99,
             'ingredients': {
                 'chicken': '8=oz',

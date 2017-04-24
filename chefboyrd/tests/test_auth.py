@@ -67,6 +67,32 @@ class AuthTest(unittest.TestCase):
         self.assertEqual(rv.status_code, 401, 'Should get a 401')
 
 
+    def test_multi_role(self):
+        '''Test the role requirement wrapper'''
+        try:
+            User.create_user('man2', 'man2', 'man2', 'role1')
+            User.create_user('nam3', 'nam3', 'nam3', 'role2')
+        except:
+            pass
+        rv = self.app.get('/multiroletest')
+        self.assertNotEqual(rv.get_data(True), 'Stop')
+        self.assertEqual(rv.status_code, 401, 'Should get a 401')
+        self.login('man2', 'man2')
+        rv = self.app.get('/multiroletest')
+        self.assertEqual(rv.get_data(True), 'roletest')
+        self.assertEqual(rv.status_code, 200, 'Should get a 200')
+        self.logout()
+
+        rv = self.app.get('/multiroletest')
+        self.assertNotEqual(rv.get_data(True), 'Stop')
+        self.assertEqual(rv.status_code, 401, 'Should get a 401')
+        self.login('nam3', 'nam3')
+        rv = self.app.get('/multiroletest')
+        self.assertEqual(rv.get_data(True), 'roletest')
+        self.assertEqual(rv.status_code, 200, 'Should get a 200')
+        self.logout()
+
+
     def login(self, uname, pw):
         '''Logs a user in'''
         return self.app.post('/auth/login', data=dict(email=uname, pw=pw), follow_redirects=True)
@@ -84,3 +110,8 @@ def req_login():
 @auth.require_role('manager')
 def req_roles():
     return 'admintest'
+
+@chefboyrd.APP.route('/multiroletest')
+@auth.require_role(['role1', 'role2'])
+def req_multi_role():
+    return 'roletest'

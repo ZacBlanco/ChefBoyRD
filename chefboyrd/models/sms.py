@@ -2,16 +2,19 @@ from peewee import TextField, DateTimeField, Model, IntegerField
 from chefboyrd.models import BaseModel
 
 class Sms(Model):
-    '''
+    """
     Args:
 
-    sid(str): is an unique id assigned by twilio. it will help us keep track of sms that is in, or not in db
-    submission_time(datetime): is the date and time the feedback was submitted
-    body(str): the message of the string
-    phone_num(str): Phone number of person who sent in text
+        Submission_time: is the date and time the feedback was submitted
+        Body: the message of the Sms
+        Phone_num: Phone number of person who sent in text
+        Pos_flag: 1 if body includes positive feedback. 0 if not. -1 default value
+        Neg_flag: 1 if body includes negative feedback. 0 if not. -1 default value
+        Exception_flag: 1 if body includes an exception to a present clause. 0 if not. -1 default value
+        Food_flag: 1 if body includes feedback about food. 0 if not. -1 default value
+        Service_flag: 1 if indicating body includes feedback about service. 0 if not. -1 default value
 
-    TODO: submission_time assumes we are in EST time zone
-    '''
+    """
     sid = TextField(unique=True)
     submission_time = DateTimeField() 
     body = TextField()

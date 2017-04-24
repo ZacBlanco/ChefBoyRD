@@ -52,9 +52,19 @@ Once you've run that you need to clone this repository
 
     cd ChefBoyRD/
 
-Great! Make sure that all of the code is there as expected. Then run
+Great! Make sure that all of the code is there as expected. We'll need to use `virtualenv` to install our packages locally for our project.
 
-    sudo pip3 install -r requirements.txt
+    sudo pip install virtualenv
+    virtualenv -p python3 env
+    source env/bin/activate
+
+Okay, so now your prompt should look something like:
+
+    (env) zac@ZB-XPS13:~/.../chefboyrd$
+
+Finally we just install our python packages
+
+    pip install -r requirements.txt
 
 That will install the required python package dependencies so that we can import them successfully.
 
@@ -63,7 +73,10 @@ Here's all of the commands together.
     sudo apt install python3 python3-pip python3-numpy python3-scipy
     git clone https://github.com/zacblanco/ChefBoyRD.git
     cd ChefBoyRD/
-    sudo pip3 install -r requirements.txt
+    sudo pip install virtualenv
+    virtualenv -p python3 env
+    source env/bin/activate
+    pip install -r requirements.txt
 
 **Step 2: Ensure Unit Tests are Running**
 
@@ -107,6 +120,13 @@ This will start the debugging server at `http://localhost:5000` where you can na
 | Proposal  | January 30th |
 | Report 1 Part 1: Statement of Work & Requirements | February 5th |
 | Report 1 Part 2: Functional Requirements Spec & UI | February 12th |
+| Report 1: Full | February 19th |
+| Report 2 Part 1: Interaction Diagrams | February 26th |
+| Report 2 Part 2: Class Diagrams and System Architecture | March 5th |
+| Report 2: Full | March 12th |
+| First Demo | March 27th | 
+| Report 3: Part 1: | April 23rd |
+| Second Demo | April 25th |
 
 
 ## Description:

@@ -2,12 +2,14 @@
 import os
 import unittest
 from unittest.mock import patch
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import tempfile
 import chefboyrd
 from chefboyrd.models import *
 from peewee import SqliteDatabase
 from chefboyrd.controllers import data_controller
+from chefboyrd.controllers import model_controller
+from chefboyrd.controllers import prediction_controller
 
 class ModelTest(unittest.TestCase):
 
@@ -36,6 +38,26 @@ class ModelTest(unittest.TestCase):
     def tearDown(self):
         os.close(self.db_fd)
         os.unlink(self.db_name)
+
+    def test_polynomialModel(self):
+        iv = [1, 2, 3] # Input vector
+        ip = [1, 1, 1, 1] # Input parameters
+        ans = model_controller.polynomialModel(iv, *ip)
+        self.assertEqual(ans, 7) # Expected output is 7
+
+    def test_sinusoidalModel(self):
+        iv = [1, 2, 3]
+        ip = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        ans = model_controller.sinusoidalModel(iv, *ip)
+        self.assertEqual(ans, 1.2936149395776206) # Expected output
+
+    def test_get_earliest_datetime(self):
+        data_controller.generate_data(1, 1, 1)
+        expected_earliest_datetime = datetime.now()
+        earliest_datetime = model_controller.get_earliest_datetime()
+        self.assertEqual(earliest_datetime.year, expected_earliest_datetime.year)
+        self.assertEqual(earliest_datetime.month, expected_earliest_datetime.month)
+        self.assertEqual(earliest_datetime.day, expected_earliest_datetime.day)
 
     def test_create_meal(self):
         try:
@@ -137,7 +159,7 @@ class ModelTest(unittest.TestCase):
         for x in range(5):
             tm = datetime.now()
             for y in range(7):
-                td = tm.replace(day=(tm.day-y))
+                td = tm - timedelta(days=y)
                 t = Tabs.create(timestamp=td, had_reservation=False, party_size=x)
                 Orders.create(tab=t.get_id(), meal=m1.get_id())
         for x in range(7):

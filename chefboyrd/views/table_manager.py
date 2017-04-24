@@ -34,8 +34,8 @@ class ItemTable(Table):
 
 
 @page.route("/",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
-def table_manager_index():
+@require_role(['admin','host'],getrole=True) # Example of requireing a role(and authentication)
+def table_manager_index(role):
     '''Renders the index page of the table management page
     '''
     # Populate the table
@@ -49,10 +49,10 @@ def table_manager_index():
     table = ItemTable(res)
         #person.start.strftime("%Y-%m-%d %H:%M")
     # Logged in always true because we require admin role
-    return render_template('/table_manager/index.html', res=res,logged_in=True,table=table,tables=tables)
+    return render_template('/table_manager/index.html', res=res,logged_in=True,table=table,tables=tables,role=role)
 
 @page.route("/cancel",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
+@require_role(['admin','host']) # Example of requireing a role(and authentication)
 def cancel():
     '''
     This handles when a user needs to cancel a reservation. 
@@ -64,7 +64,7 @@ def cancel():
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/confirm",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
+@require_role(['admin','host']) # Example of requireing a role(and authentication)
 def confirm():
     '''
     This handles when a user needs to confirm a reservation. 
@@ -85,7 +85,7 @@ def confirm():
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/change_table",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
+@require_role(['admin','host']) # Example of requireing a role(and authentication)
 def change_table():
     '''
     This handles when a user needs to change the status of a table. 
@@ -112,7 +112,7 @@ def change_table():
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/update_table",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
+@require_role(['admin','host']) # Example of requireing a role(and authentication)
 def update_table():
     '''
     This handles when we need to change the position of a table.
@@ -123,7 +123,7 @@ def update_table():
     return json.dumps(coords)
 
 @page.route("/add_table",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
+@require_role(['admin','host']) # Example of requireing a role(and authentication)
 def add_table():
     '''
     This handles when a user adds a table to the layout.
