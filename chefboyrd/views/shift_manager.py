@@ -3,7 +3,7 @@ Shift management dashboard for the manager interface
 '''
 import json
 import flask_login
-from flask import Flask, Blueprint, render_template, request, url_for, jsonify, redirect
+from flask import Flask, Blueprint, render_template, request, url_for, jsonify, redirect, flash
 from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
 from wtforms import StringField, IntegerField, validators
@@ -22,9 +22,9 @@ class ShiftForm(FlaskForm):
     '''
     This is the form that displays fields to make a shift
     '''
-    start = DateTimeField('Shift Starting Time')
-    end = DateTimeField('Shift Ending Time')
-    role = StringField('Role', [validators.Length(min=2, max=25)])
+    start = DateTimeField('Shift Starting Time', [validators.required()])
+    end = DateTimeField('Shift Ending Time', [validators.required()])
+    role = StringField('Role', [validators.Length(min=2, max=25), validators.required()])
 
 class FreeTable(Table):
     '''
@@ -54,9 +54,12 @@ def calendar():
     '''
     Renders the index page of the shift management page
     '''
+    employee_name = flask_login.current_user.name
+    employee_role = flask_login.current_user.role
     form = ShiftForm()
     if form.validate_on_submit():
         Shift.create_shift("", form.start.data, form.end.data, form.role.data)
+        flash("Successfully created a shift")   
     free_shifts = []
     current_time = datetime.now()
     for freeShift in Shift.select().where((Shift.name=="") & (Shift.shift_time_end > current_time)):
@@ -66,25 +69,25 @@ def calendar():
     for claimShift in Shift.select().where((Shift.name!="") & (Shift.shift_time_end > current_time)):
         claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
     claimTable = ClaimTable(claim_shifts)
-    return render_template('/shift_manager/index.html', logged_in=True, freeTable=freeTable, claimTable = claimTable, form=form)
+    return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form)
 
 @page.route('/data')
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
     current_time = datetime.now()
-    shift_json = []
-    for s in Shift.select().where((Shift.shift_time_end < current_time) & (Shift.name!= "")):
-        shift_json.append(dict(title=s.name+'-'+s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#85929E'))
+    shift_json = [] 
+    for s in Shift.select().where(  (Shift.shift_time_end < current_time)):
+        if  s.name!="":
+            shift_json.append(dict(title=s.name+'-'+s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#85929E'))
     for s in Shift.select().where((Shift.name=="") & (Shift.shift_time_end > current_time)):
         shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#66ff66'))
     for s in Shift.select().where((Shift.name!="") & (Shift.shift_time_end > current_time)):
         shift_json.append(dict(title=s.name+'-'+s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#3399ff'))
     print(shift_json)
     return json.dumps(shift_json)
-
+ 
 @page.route("/claim", methods=['GET', 'POST'])
-@require_role('admin')
 def claim():
     '''
     This handles when the user needs to claim a shift
@@ -94,24 +97,36 @@ def claim():
     role = flask_login.current_user.role
     if shift_controller.checkAvailability(id, name, role):
         Shift.claim_shift(id, name)
-    return redirect(url_for('shift_manager.calendar'))
+        flash("Successfully claimed the shift")
+        return redirect(url_for('shift_manager.calendar'))
+    else:
+        flash("Unable to claim the shift")
+        return redirect(url_for('shift_manager.calendar'))
+    
 
 @page.route("/post", methods=['GET', 'POST'])
-@require_role('admin')
 def post():
     '''
     This handles when the user needs to post a shift
     '''
     id = request.args.get('id')
-    Shift.post_shift(id)
-    return redirect(url_for('shift_manager.calendar'))
+    name = flask_login.current_user.name
+    role = flask_login.current_user.role
+    if checkPostCondition(id, name, role):
+        Shift.post_shift(id)
+        flash("Successfully posted the shift")
+        return redirect(url_for('shift_manager.calendar'))
+    else:
+        flash("Unable to post the shift (Insufficient privileges.")
+        return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/remove", methods=['GET', 'POST'])
-@require_role('admin')
+@require_role('admin') # or manager
 def remove():
     '''
     This handles when the user needs to remove a shift
     '''
     id = request.args.get('id')
     Shift.remove_shift(id)
+    flash("Successfully removed the shift")
     return redirect(url_for('shift_manager.calendar'))

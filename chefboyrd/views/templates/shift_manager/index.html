@@ -10,7 +10,7 @@
 				right: 'month,agendaWeek,agendaDay'
 			},
 			defaultDate: today,
-			defaultView: 'agendaWeek',
+			defaultView: 'agendaDay',
 			editable: false,
 			eventLimit: true, // allow "more" link when too many events
 			events: {
@@ -80,16 +80,14 @@
 	}
 
 </style>
-<h2>Welcome</h2>
+<h2>Welcome to Shift Management</h2>
     <div>
-        This is the Shift Management page
-				<br>
-        Here is the list of open shifts
-        <br>
+				Employee name: {{ name }} <br> Employee role: {{ role }}
+				<h3> Here is the list of open shifts </h3>
         {{ freeTable }}
-        <br>
+        <h3>
 				Here is the list of taken shifts
-				<br>
+				</h3>
 				{{ claimTable }}
 		<h1>Add a Shift Here</h1>
 			{% from "_formhelpers.html" import render_field, render_field_date %}
