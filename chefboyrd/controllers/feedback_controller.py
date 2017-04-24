@@ -293,7 +293,7 @@ def word_freq_counter(inStr):
     stopWordList = stopWordList.split(' ')
 
     #print("Stop word list: ")
-    print(stopWordList,"\n")
+    #print(stopWordList,"\n")
 
     result = list();
 
