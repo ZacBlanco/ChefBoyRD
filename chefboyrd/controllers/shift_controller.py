@@ -13,9 +13,14 @@ def checkAvailability(id, name, role):
         True: if there are no scheduling conflicts
         False: if the worker in question already has a schedule arranged
     """
-    tryShift = Shift.getShift(id)
+    tryShift = Shift.get_shift(id)
     if tryShift.role!=role:
         return False
     for workShift in Shift.select().where(Shift.name==name):
-        if workShift.shift_time_start <= tryShift.shift_time_start and workShift.shift_time_end <= tryShift.shift_time_end:
+        if tryShift.shift_time_start==workShift.shift_time_start or tryShift.shift_time_end==workShift.shift_time_end:
             return False
+        elif workShift.shift_time_start<tryShift.shift_time_start and workShift.shift_time_end<tryShift.shift_time_end:
+            return False
+        elif workShift.shift_time_start>tryShift.shift_time_start and workShift.shift_time_start<tryShift.shift_time_end:
+            return False
+    return True

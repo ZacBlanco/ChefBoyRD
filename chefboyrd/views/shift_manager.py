@@ -58,11 +58,12 @@ def calendar():
     if form.validate_on_submit():
         Shift.create_shift("", form.start.data, form.end.data, form.role.data)
     free_shifts = []
-    for freeShift in Shift.select().where(Shift.name==""):
+    current_time = datetime.now()
+    for freeShift in Shift.select().where((Shift.name=="") & (Shift.shift_time_end > current_time)):
         free_shifts.append(dict(shift_time_start=freeShift.shift_time_start, shift_time_end=freeShift.shift_time_end, role=freeShift.role, id=freeShift.id))
     freeTable = FreeTable(free_shifts)
     claim_shifts = []
-    for claimShift in Shift.select().where(Shift.name!=""):
+    for claimShift in Shift.select().where((Shift.name!="") & (Shift.shift_time_end > current_time)):
         claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
     claimTable = ClaimTable(claim_shifts)
     return render_template('/shift_manager/index.html', logged_in=True, freeTable=freeTable, claimTable = claimTable, form=form)
@@ -71,10 +72,13 @@ def calendar():
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
+    current_time = datetime.now()
     shift_json = []
-    for s in Shift.select().where(Shift.name==""):
+    for s in Shift.select().where((Shift.shift_time_end < current_time) & (Shift.name!= "")):
+        shift_json.append(dict(title=s.name+'-'+s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#85929E'))
+    for s in Shift.select().where((Shift.name=="") & (Shift.shift_time_end > current_time)):
         shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#66ff66'))
-    for s in Shift.select().where(Shift.name!=""):
+    for s in Shift.select().where((Shift.name!="") & (Shift.shift_time_end > current_time)):
         shift_json.append(dict(title=s.name+'-'+s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#3399ff'))
     print(shift_json)
     return json.dumps(shift_json)
