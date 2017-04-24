@@ -59,6 +59,17 @@ prediction-table {
 	box-shadow: 1px 1px 1px #aaaff3;
 }
 
+.col-md-8 {
+	padding-left:15px;
+	padding-right:15px;
+	margin-right:15px;
+	margin-left:15px;
+	border: 1px solid #D9D4AE !important;
+	background-color:white;
+	opacity:0.88;
+	box-shadow: 1px 1px 1px #aaaff3;
+}
+
 #wordcloud {
   width:100%;
   height:450px;
