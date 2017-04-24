@@ -112,7 +112,7 @@ def post():
     id = request.args.get('id')
     name = flask_login.current_user.name
     role = flask_login.current_user.role
-    if checkPostCondition(id, name, role):
+    if shift_controller.checkPostConditions(id, name, role):
         Shift.post_shift(id)
         flash("Successfully posted the shift")
         return redirect(url_for('shift_manager.calendar'))
