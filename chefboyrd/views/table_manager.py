@@ -1,5 +1,5 @@
 '''Table dashboard for the manager interface
-TO DO: Limit reservation times to after date,limit guests based on table(going to be hard)
+TO DO: Limit reservation times to after date,limit guests based on table(going to be hard)hmm
 '''
 from flask import Blueprint, render_template, abort, url_for, redirect, flash
 from jinja2 import TemplateNotFound
