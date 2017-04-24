@@ -1,7 +1,7 @@
 '''Table dashboard for the manager interface
-TO DO: Limit reservation times to after date,limit guests based on table(going to be hard)
+TO DO: Limit reservation times to after date,limit guests based on table(going to be hard)hmm
 '''
-from flask import Blueprint, render_template, abort, url_for, redirect
+from flask import Blueprint, render_template, abort, url_for, redirect, flash
 from jinja2 import TemplateNotFound
 from chefboyrd.auth import require_role
 from chefboyrd.controllers import booking_controller
@@ -42,7 +42,10 @@ def table_manager_index(role):
 
     res = []
     for person in tables.Booking.select():
-        res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        try:
+            res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        except:
+            continue
     table = ItemTable(res)
         #person.start.strftime("%Y-%m-%d %H:%M")
     # Logged in always true because we require admin role
@@ -57,6 +60,7 @@ def cancel():
     id = int(request.args.get('id'))
     tables.Booking.cancel_reservation(id)
     # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+    flash("Reservation successfully cancelled")
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/confirm",methods=['GET', 'POST'])
@@ -67,13 +71,17 @@ def confirm():
     '''
     id = int(request.args.get('id'))
     id2 = 0
-    for ids in tables.Booking.select().where(tables.Booking.id == id):
-        id2 = int(ids.table.id)
-        break
-    query = tables.Table.update(occupied=1).where(tables.Table.id==id2)
-    query.execute()
-    tables.Booking.cancel_reservation(id)
-    # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+    try:
+        for ids in tables.Booking.select().where(tables.Booking.id == id):
+            id2 = int(ids.table.id)
+            break
+        query = tables.Tables.update(occupied=1).where(tables.Tables.id==id2)
+        query.execute()
+        tables.Booking.cancel_reservation(id)
+        # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+        flash("Reservation successfully confirmed")
+    except:
+        flash("Could not find the table to confirm")
     return redirect(url_for('table_manager.table_manager_index'))
 
 @page.route("/change_table",methods=['GET', 'POST'])
@@ -86,12 +94,20 @@ def change_table():
     type = int(request.form['type'])
     if type == 0:
         posX = float(request.form['posX'])
+        if posX > 0.99:
+            posX = 0.99
+        if posX < 0.01:
+            posX = 0.01
         posY = float(request.form['posY'])
-        query = tables.Table.update(posX=posX,posY=posY).where(tables.Table.id==id)
+        if posY > 0.99:
+            posY = 0.9
+        if posY < 0.01:
+            posY = 0.01
+        query = tables.Tables.update(posX=posX,posY=posY).where(tables.Tables.id==id)
         query.execute() 
     else:
         occupied = int(request.form['occupied'])
-        query = tables.Table.update(occupied=occupied).where(tables.Table.id==id)
+        query = tables.Tables.update(occupied=occupied).where(tables.Tables.id==id)
         query.execute()
     return redirect(url_for('table_manager.table_manager_index'))
 
@@ -102,8 +118,8 @@ def update_table():
     This handles when we need to change the position of a table.
     '''
     coords = []
-    for table in tables.Table.select():
-        coords.append([table.posX,table.posY, table.occupied,table.id])
+    for table in tables.Tables.select():
+        coords.append([table.posX,table.posY, table.occupied,table.id, table.size, table.shape])
     return json.dumps(coords)
 
 @page.route("/add_table",methods=['GET', 'POST'])
@@ -112,5 +128,17 @@ def add_table():
     '''
     This handles when a user adds a table to the layout.
     '''
-    id = tables.Table.create_tables(1,5, 0,0.5, 0.5)
+    table_size = int(request.form['table_size'])
+    table_shape = int(request.form['table_shape'])
+    id = tables.Tables.create_tables(1,table_size, 0,0.5, 0.5, table_shape)
+    return json.dumps(id)
+
+@page.route("/del_table",methods=['GET', 'POST'])
+@require_role('admin') # Example of requireing a role(and authentication)
+def del_table():
+    '''
+    This handles when a user adds a table to the layout.
+    '''
+    id = int(request.form['id'])
+    id = tables.Tables.delTable(id)
     return json.dumps(id)

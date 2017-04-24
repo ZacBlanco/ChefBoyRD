@@ -1,51 +1,283 @@
 {% extends "default.html" %}
 {% block body %}
-    <h2>Welcome</h2>
-    <div>
-        This is the Table Management page
-        Here are a list of reservations made
-
-            <br>
-        {{table}}
-        <br>
-        <div id="buttons">
-    <button id="addTable">
-      Add Table
-    </button>
+<h2>Welcome</h2>
+<div> This is the Table Management page
+  Here are a list of reservations made <br>
+  {{table}} <br>
+  <div id="buttons" class="dropdown">
+    <button id="addTable" class="btn btn-success"> Add Table </button>
+    <div class="btn-group">
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Table Size <span class="caret"></span> </button>
+    <ul id = "ts" class="dropdown-menu" role="menu" aria-labelledby="menu1">
+      <li role="presentation"><a role="menuitem" tabindex="-1">1</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">2</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">3</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">4</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">5</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">6</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1">7</a></li>
+    </ul>
     </div>
-        <div id="container"></div>
-
-
+    <div class="btn-group">
+        <button class="btn btn-default dropdown-toggle" type="button" id="menu2" data-toggle="dropdown">Table Shape
+    <span class="caret"></span>
+    </button>
+    <ul id = "sh" class="dropdown-menu" role="menu" aria-labelledby="menu2">
+      <li role="presentation" value=0><a role="menuitem" tabindex="-1">Circle</a></li>
+      <li role="presentation" value=1><a role="menuitem" tabindex="-1">Square</a></li>
+      <li role="presentation" value=2><a role="menuitem" tabindex="-1">Rectangle</a></li>
+      <li role="presentation" value=3><a role="menuitem" tabindex="-1">Vertical Rectangle</a></li>
+    </ul>
+    </div>
+    <button id="delTable" class="btn btn-danger pull-right"> Remove Selected Table </button>
+  </div>
+  <div style="margin-top:30px"></div>
+  <div id="container"></div>
   <script>
+var table_size = 1;
+var selected_table = 0;
+var table_shape = 0;
+
+$("#ts li a").click( function() {
+    table_size = $(this).text();
+    var y = document.getElementById('menu1');
+  var aNode = y.innerHTML = table_size + ' <span class="caret"></span>'; // Append 
+    // console.log("Table Size " + table_size);
+});
+
+$("#sh li a").click( function() {
+    table_shape_text = $(this).text();
+    table_shape = $(this).parent().val();
+
+    console.log("SHAPE: "+ table_shape);
+    var y = document.getElementById('menu2');
+  var aNode = y.innerHTML = table_shape_text + ' <span class="caret"></span>'; // Append 
+    // console.log("Table Size " + table_size);
+});
     document.getElementById("container").style.border = "solid #000000";
     var width = document.getElementById("container").clientWidth;
     var height = window.innerHeight;
     radius = width / 15
-    function addCircle(layer, posX, posY, occupied,id) {
+    function addCircle(layer, posX, posY, occupied,id, size, shape) {
         var group = new Konva.Group({
             draggable: true,
             id: 'group'+id,
             x: posX,
             y: posY,
         });
-        var tableNo = new Konva.Text({
-              id: id,
-              x: 0-radius / 2,
-              y: 0 - radius / 2,
-              text: id,
-              fontSize: 30,
-              fontFamily: 'Calibri',
+
+        if(shape == 0){
+            // Circle
+            var circle = new Konva.Circle({
+                id: id,
+                x: 0,
+                y: 0,
+                radius: radius,
+                fill: (occupied == 'True') ? 'red' : 'green',
+                  stroke: 'black',
+                strokeWidth: 2
             });
-        var circle = new Konva.Circle({
-            id: id,
-            x: 0,
-            y: 0,
-            radius: radius,
-            fill: (occupied == 'True') ? 'red' : 'green'
-        });
-        tableNo.setListening(false);
+            rad = (360 / size) * 3.14 / 180;
+            for(i = 0; i < size; i++){
+                x = Math.cos(i*rad) * radius*1.2;
+                y = Math.sin(i*rad) * radius*1.2;
+                var chair = new Konva.Circle({
+                    id: "chair",
+                    x: x,
+                    y: y,
+                    radius: radius / 3,
+                    fill: 'brown',
+                      stroke: 'black',
+                    strokeWidth: 2
+                });
+                chair.setListening(false);
+                group.add(chair);
+            }
+        } else if(shape == 1){
+            perimeter_chunk = radius * 8 / (size);
+            // Square
+            var circle = new Konva.Rect({
+                id: id,
+                x: 0,
+                y: 0,
+                width: radius * 2,
+                height: radius * 2,
+                fill: (occupied == 'True') ? 'red' : 'green',
+                  stroke: 'black',
+                strokeWidth: 2
+            });
+            for(i = 0; i < size;i++){
+                len = i* perimeter_chunk;
+                if(len < 2*radius ){
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: perimeter_chunk *i,
+                        y: 0 - radius * 0.2,
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 2*radius && len < radius * 4 ){
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: radius * 2.2,
+                        y: len % (2*radius),
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 4*radius && len < radius * 6 ){
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: 2*radius - len % (2*radius),
+                        y: radius * 2.2,
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 6*radius && len < radius * 8 ){
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: 0 - radius * 0.2,
+                        y: (2* radius) - len % (2*radius),
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                }
+            chair.setListening(false);
+            group.add(chair)
+            }
+        } else if(shape == 2){
+            perimeter_chunk = radius * 6 / (size);
+            // Rect
+            var circle = new Konva.Rect({
+                id: id,
+                x: 0,
+                y: 0,
+                width: radius * 2,
+                height: radius,
+                fill: (occupied == 'True') ? 'red' : 'green',
+                  stroke: 'black',
+                strokeWidth: 2
+            });
+            for(i = 0; i < size;i++){
+                len = i* perimeter_chunk;
+                if(len < 2*radius ){
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: perimeter_chunk *i,
+                        y: 0 - radius * 0.2,
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 2*radius && len < radius * 3 ){
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: radius * 2.2,
+                        y: len % (radius),
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 3*radius && len < radius * 5 ){
+                    len = len - (3 * radius)
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: 2*radius - len % (2*radius),
+                        y: radius * 1.2,
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 5*radius && len < radius * 6 ){
+                    len = len - (5 * radius)
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: 0 - radius * 0.2,
+                        y: (radius) - len % (radius),
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                }
+            chair.setListening(false);
+            group.add(chair)
+            }
+        } else if(shape == 3){
+            // Vert Rect
+             perimeter_chunk = radius * 6 / (size);
+            var circle = new Konva.Rect({
+                id: id,
+                x: 0,
+                y: 0,
+                width: radius,
+                height: radius * 2,
+                fill: (occupied == 'True') ? 'red' : 'green',
+                  stroke: 'black',
+                strokeWidth: 2
+            });
+            for(i = 0; i < size;i++){
+                len = i* perimeter_chunk;
+                if(len < 1*radius ){
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: perimeter_chunk *i,
+                        y: 0 - radius * 0.2,
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 1*radius && len < radius * 3 ){
+                    len = len - (1 * radius)
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: radius * 1.2,
+                        y: len % (2 * radius),
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 3*radius && len < radius * 4 ){
+                    len = len - (3 * radius)
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: radius - len % (radius),
+                        y: radius * 2.2,
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                } else if(len >= 4*radius && len < radius * 6 ){
+                    len = len - (4 * radius)
+                    var chair = new Konva.Circle({
+                        id: "chair",
+                        x: 0 - radius * 0.2,
+                        y: (2*radius) - len % (2*radius),
+                        radius: radius / 3,
+                        fill: 'brown',
+                          stroke: 'black',
+                        strokeWidth: 2
+                    });
+                }
+            chair.setListening(false);
+            group.add(chair)
+            }
+        }
+        //do this for chairs
         group.add(circle)
-        group.add(tableNo)
         layer.add(group);
     }
    var text = new Konva.Text({
@@ -57,16 +289,19 @@
       fill: 'black'
     });
     function writeMessage(message) {
+        text.setListening(false);
       text.setText(message);
       layer.draw();
     }
     var stage = new Konva.Stage({
+        id: "stage",
         container: 'container',
         width: width,
         height: height
     });
     var dragLayer = new Konva.Layer();
     var layersArr = [];
+    var dragid = 0;
     /*
     * create 10 layers each containing 1000 shapes to create
     * 10,000 shapes.  This greatly improves performance because
@@ -77,8 +312,8 @@
     * than 20 layers with 500 shapes or 5 layers with 2,000 shapes
     */
     var layer = new Konva.Layer();
-    {% for tb in tables.Table.select() %}
-        addCircle(layer,width * {{tb.posX}},height * {{tb.posY}},'{{tb.occupied}}',{{tb.id}});
+    {% for tb in tables.Tables.select() %}
+        addCircle(layer,width * {{tb.posX}},height * {{tb.posY}},'{{tb.occupied}}',{{tb.id}}, {{tb.size}}, {{tb.shape}});
     {% endfor %}
     layer.add(text);
     stage.add(layer);
@@ -99,28 +334,51 @@
         layer.draw();
     });
 
+    stage.on('dragstart', function(evt) {
+        var circle = evt.target;
+        dragid = circle.id().replace( /^\D+/g, '');;
+    });
+
+    stage.on('click tap touchstart', function(evt) {
+        var circle = evt.target;
+        circle.stroke('blue');
+        var old = stage.findOne('#'+selected_table)
+        if(old != null && old.id() != circle.id()){
+            old.stroke('black');
+        }
+        selected_table = circle.id()
+        writeMessage('Table: ' + selected_table + ' selected');
+        layer.draw();
+    });
+
     stage.on('dragend', function(evt) {
         var circle = evt.target;
+        dragid = 0;
         // circle.setFill('red')
         var x = circle.x() / width;
         var y = circle.y() / height;
-        var id = circle.id().replace( /^\D+/g, '');;
+        var id = circle.id().replace( /^\D+/g, '');
         $.post( "/table_manager/change_table", {
             type: 0,
             posX: x,
             posY: y,
             id: id
         });
-        writeMessage('Table: ' + id + ' at ' + 'x: ' +Math.floor(x*width) + ', y: ' + Math.floor(height*y));
         layer.draw();
     });
-    function updateShapes(new_x, new_y, new_occupied, id){
+    function updateShapes(new_x, new_y, new_occupied, id, size, shape){
+        if(dragid == id){
+            return;
+        }
         var group = stage.findOne('#group'+id)
         if(group == null){
-            addCircle(layer, new_x, new_y, new_occupied,id)
+            addCircle(layer, new_x, new_y, new_occupied,id, size, shape)
             group = stage.findOne('#group'+id)
         }
         var circle = stage.findOne('#'+id)
+        if(group.x() == new_x* width && group.y() == new_y *height && ((circle.fill() == 'red') ? 1 : 0) == new_occupied){
+            return;
+        }
         occupied =  (new_occupied) ? 'red' : 'green'
         circle.setFill(occupied)
         group.x(new_x * width)
@@ -129,20 +387,63 @@
     }
 
     document.getElementById('addTable').addEventListener('click', function() {
-        $.get( "/table_manager/add_table", function( data ) {
+        $.post( "/table_manager/add_table", {table_size: table_size, table_shape: table_shape}, function( data ) {
             table_data = JSON.parse(data)
-            addCircle(layer,width * table_data[0],height * table_data[1],table_data[2],table_data[3]);
+            addCircle(layer,width * table_data[0],height * table_data[1],table_data[2],table_data[3], table_size, table_shape);
             layer.draw();
         }); 
     }, false);
+
+    document.getElementById('delTable').addEventListener('click', function() {
+        if(selected_table != 0){
+            $.post( "/table_manager/del_table", {id: selected_table}, function( data ) {
+                var group = stage.findOne('#group'+selected_table)
+                if(group != null){
+                    group.destroy();
+                    layer.draw();
+                }
+        }); 
+        }
+    }, false);
+
     window.setInterval(function(){
+        var circles = stage.find('Circle');
+        var rects = stage.find('Rect');
          $.get( "/table_manager/update_table", function( data ) {
         table_data = JSON.parse(data)
+        var ids = [];
         for(table in table_data){
-            updateShapes(table_data[table][0],table_data[table][1],table_data[table][2],table_data[table][3])
+            if(ids.indexOf(table_data[table][3]) < 0){
+                ids.push(table_data[table][3]);
+            }
+            updateShapes(table_data[table][0],table_data[table][1],table_data[table][2],table_data[table][3], table_data[table][4], table_data[table][5])
         }
+        circles.each(function(shape){
+            if(ids.indexOf(shape.id()) < 0 && shape.id() != "chair"){
+                console.log("Shape not found: "+shape.id());
+                var group = stage.findOne('#group'+shape.id())
+                group.destroy();
+                layer.draw();
+            }
+        });
+        rects.each(function(shape){
+            if(ids.indexOf(shape.id()) < 0 && shape.id() != "chair"){
+                console.log("Shape not found: "+shape.id());
+                var group = stage.findOne('#group'+shape.id())
+                group.destroy();
+                layer.draw();
+            }
+        });
         });
 }, 1000);
-  </script>
-    </div>
+    $(window).resize(function(){
+    width = document.getElementById("container").clientWidth;
+    height = window.innerHeight;
+    var group = stage.findOne('container')
+    group.width(width)
+    group.height(height)
+    layer.draw()
+});
+  </script> 
+</div>
 {% endblock %}
