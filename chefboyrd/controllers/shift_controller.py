@@ -32,7 +32,6 @@ def checkAvailability(id, name, role):
     return True
 
 def checkPostConditions(id, name, role):
-    print('checkPostConditions '+ name + " " + role)
     """
     This method checks the ability for the user to post their shift and makes sure that
     the user is not posting another user's shift. The only exceptions are for admins
@@ -57,4 +56,27 @@ def checkPostConditions(id, name, role):
         return True
     else:
         return False
-    
+
+def checkRemoveConditions(id, role):
+    """
+    This method checks the ability for the user to post their shift and makes sure that
+    the user is not posting another user's shift. The only exceptions are for admins
+    and managers.
+
+    Args:
+        id: the id of the shift that will be in analysis
+        name: name of the user that is attempting to claim the shift
+        role: role of the user that is claiming the shift
+
+    Returns:
+        True: if the user or the role has the proper influence
+        False: if the user or role does not meet the criteria
+    """
+    tryShift = Shift.get_shift(id)
+    current_time=datetime.now()
+    if tryShift.shift_time_start<current_time:
+        return False
+    elif role=='admin' or role=='manager':
+        return True
+    else:
+        return False

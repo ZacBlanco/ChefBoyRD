@@ -67,7 +67,7 @@ class ClaimTable(Table):
     post = ButtonCol('Post Shift','shift_manager.post',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-warning'},column_html_attrs={'class': 'spaced-table-col'})
 
 @page.route("/", methods=['GET', 'POST'])
-@require_role('admin')
+@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
 def calendar():
     '''
     Renders the index page of the shift management page
@@ -111,6 +111,7 @@ def calendar():
     return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
 
 @page.route('/data')
+@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
@@ -127,6 +128,7 @@ def return_data():
     return json.dumps(shift_json)
 
 @page.route("/claim", methods=['GET', 'POST'])
+@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
 def claim():
     '''
     This handles when the user needs to claim a shift
@@ -143,6 +145,7 @@ def claim():
         return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/post", methods=['GET', 'POST'])
+@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
 def post():
     '''
     This handles when the user needs to post a shift
@@ -159,12 +162,15 @@ def post():
         return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/remove", methods=['GET', 'POST'])
-@require_role('admin') # or manager
 def remove():
     '''
     This handles when the user needs to remove a shift
     '''
     id = request.args.get('id')
-    Shift.remove_shift(id)
-    flash("Successfully removed the shift")
+    role = flask_login.current_user.role
+    if shift_controller.checkRemoveConditions(id, role):
+        Shift.remove_shift(id)
+        flash("Successfully removed the shift")
+    else:
+        flash("Unable to remove shift")
     return redirect(url_for('shift_manager.calendar'))
