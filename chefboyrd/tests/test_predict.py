@@ -81,7 +81,8 @@ class ModelTest(unittest.TestCase):
 
     def test_create_tab(self):
         try:
-            Tabs.create(had_reservation=False, party_size=12, timestamp=datetime.now())
+            Tabs.create(had_reservation=False, party_size=12, timestamp=datetime.now(),
+                fb_key = "~~~~~~~")
         except:
             pass
         tabs = Tabs.select().where(Tabs.party_size == 10)
@@ -107,7 +108,8 @@ class ModelTest(unittest.TestCase):
         for x in range(20):
             tm = datetime.now()
             times.append(tm)
-            t = Tabs.create(timestamp=tm, had_reservation=False, party_size=x)
+            t = Tabs.create(timestamp=tm, had_reservation=False, party_size=x,
+                fb_key = "~~~~~~~")
             ords.append(Orders.create(tab=t.get_id(), meal=m1.get_id()))
         dcords = data_controller.get_orders_date_range()
         self.assertEqual(len(dcords), 20)
@@ -146,7 +148,8 @@ class ModelTest(unittest.TestCase):
         for x in range(20):
             tm = datetime.now()
             times.append(tm)
-            t = Tabs.create(timestamp=tm, had_reservation=False, party_size=x)
+            t = Tabs.create(timestamp=tm, had_reservation=False, party_size=x,
+                fb_key = "~~~~~~~")
         dcords = data_controller.get_tabs_range()
         self.assertEqual(len(dcords), 20)
         dcords = data_controller.get_tabs_range(times[1])
@@ -177,7 +180,7 @@ class ModelTest(unittest.TestCase):
             tm = datetime.now()
             for y in range(7):
                 td = tm - timedelta(days=y)
-                t = Tabs.create(timestamp=td, had_reservation=False, party_size=x)
+                t = Tabs.create(timestamp=td, had_reservation=False, party_size=x, fb_key = "~~~~~~~")
                 Orders.create(tab=t.get_id(), meal=m1.get_id())
         for x in range(7):
             self.assertEqual(len(data_controller.get_dotw_orders(x)), 5)

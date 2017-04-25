@@ -51,12 +51,11 @@
           </dl>
           <p><input type="submit" value="Search" >
         </form>
-
         <script type="text/javascript">
         var currentDate = new Date();
-        var two_m_ago = new Date().setMonth((currentDate.getMonth()-2));
+        var defaultDateFrom = new Date().setMonth((currentDate.getMonth()-3));
         $("#datetimepicker2").datetimepicker({defaultDate: currentDate});
-        $("#datetimepicker1").datetimepicker({defaultDate: two_m_ago});
+        $("#datetimepicker1").datetimepicker({defaultDate: defaultDateFrom});
             $(function () {
                 $('#datetimepicker2').datetimepicker();
                 $('#datetimepicker1').datetimepicker();

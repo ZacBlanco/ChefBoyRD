@@ -15,4 +15,5 @@ phonenumbers
 scipy
 numpy
 scikit-learn
+hashids
 flask-ask

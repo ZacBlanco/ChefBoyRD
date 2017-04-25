@@ -1,4 +1,4 @@
-from peewee import TextField, DateTimeField, Model, IntegerField
+from peewee import TextField, DateTimeField, Model, IntegerField, BooleanField
 from chefboyrd.models import BaseModel
 
 class Sms(Model):
@@ -13,6 +13,7 @@ class Sms(Model):
         Exception_flag: 1 if body includes an exception to a present clause. 0 if not. -1 default value
         Food_flag: 1 if body includes feedback about food. 0 if not. -1 default value
         Service_flag: 1 if indicating body includes feedback about service. 0 if not. -1 default value
+        Invalid_field: True if needs to be deleted.
 
     """
     sid = TextField(unique=True)
@@ -24,4 +25,5 @@ class Sms(Model):
     exception_flag = IntegerField()
     food_flag = IntegerField()
     service_flag = IntegerField()
+    invalid_field = BooleanField(default=False)
     #additional categories to associate	
