@@ -21,16 +21,16 @@ class ModelTest(unittest.TestCase):
         chefboyrd.DB = SqliteDatabase(self.db_name)
         tables.Restaurant._meta.database = chefboyrd.DB
         tables.Restaurant.create_table(True)
-        tables.Table._meta.database = chefboyrd.DB
-        tables.Table.create_table(True)
+        tables.Tables._meta.database = chefboyrd.DB
+        tables.Tables.create_table(True)
         tables.Booking._meta.database = chefboyrd.DB
         tables.Booking.create_table(True)
 
 
 
         self.restaurant_1 = tables.Restaurant.create(opening_time=18, closing_time=23,name='Pizza Hut',description='Pizza place.')
-        self.restaurant_1_table_1 = tables.Table.create(restaurant=self.restaurant_1, size=2,occupied=0,posX=0,posY=0)
-        self.restaurant_1_table_2 = tables.Table.create(restaurant=self.restaurant_1, size=4,occupied=0,posX=0,posY=0)
+        self.restaurant_1_table_1 = tables.Tables.create(restaurant=self.restaurant_1, size=2,occupied=0,posX=0,posY=0,shape =0)
+        self.restaurant_1_table_2 = tables.Tables.create(restaurant=self.restaurant_1, size=4,occupied=0,posX=0,posY=0,shape =0)
 
         booking_date_time_start = datetime(2017, 2, 14, 19, 0)
         minutes_slot = 90
@@ -139,4 +139,5 @@ class ModelTest(unittest.TestCase):
             booking_date_time=datetime(2017, 2, 14, 21, 0),
             people=2,
             minutes_slot=120,name='Bob',phone='5555555555')
+>>>>>>> master
         self.assertEqual(booking_response['table'], self.restaurant_1_table_1.id)

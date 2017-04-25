@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 page = Blueprint('prediction', __name__, template_folder='./templates')
 
 @page.route("/", methods=['GET', 'POST'])
-@require_role('admin')
-def prediction_index():
+@require_role('admin',getrole=True)
+def prediction_index(role):
 	'''Renders the index page of the prediction page
 	'''
 	beginningDate = None
@@ -44,7 +44,7 @@ def prediction_index():
 		if beginningDate is not None and endingDate is not None:
 			if beginningDate > endingDate:
 				flash('Start Date must be strictly before End Date')
-				return render_template('/prediction/index.html', logged_in=True, meals=mealUsage)
+				return render_template('/prediction/index.html', logged_in=True, meals=mealUsage,role=role)
 
 		modelType = 'Polynomial'
 
@@ -60,14 +60,15 @@ def prediction_index():
 				mainParams = model_controller.train_regression(processedOrders, 'Sinusoidal')
 			except RuntimeError:
 				flash('Unable to predict meal usage with given data')
-				return render_template('/prediction/index.html', logged_in=True, meals=mealUsage)
+				return render_template('/prediction/index.html', logged_in=True, meals=mealUsage,role=role)
 		except TypeError:
-			return render_template('/prediction/index.html', logged_in=True, meals=mealUsage)
+			return render_template('/prediction/index.html', logged_in=True, meals=mealUsage,role=role)
 
 		#print(mainParams)
 		mealUsage = prediction_controller.predict_regression(mainParams, modelType, beginningDate, endingDate)
 		print(mealUsage)
 
-	return render_template('/prediction/index.html', logged_in=True, meals=mealUsage)
+	return render_template('/prediction/index.html', logged_in=True, meals=mealUsage,role=role)
 
 
+>>>>>>> master

@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from chefboyrd.models.tables import Table, Booking, Restaurant
+from chefboyrd.models.tables import Tables, Booking, Restaurant
 
 def book_restaurant_table(restaurant, booking_date_time, people, name, phone, minutes_slot=90):
     """
@@ -26,7 +26,7 @@ def book_restaurant_table(restaurant, booking_date_time, people, name, phone, mi
         booking.save()
         return {'booking': booking.id, 'table': table.id}
     else:
-        return None
+        return "Sorry, the time you have chosen has no available tables or the restaurant is not open during the time selected. Please choose another time."
 
 def get_first_table_available(restaurant, booking_date_time, people, minutes_slot=90):
     """
@@ -65,8 +65,9 @@ def get_first_table_available(restaurant, booking_date_time, people, minutes_slo
     # Then I get a list of all the tables, of the needed size, available in that restaurant and
     # I exclude the previous list of unavailable tables. I order the list from the smaller table
     # to the bigger one and I return the first, smaller one, available.
-    for table in Table.select().where(Table.size >= people).order_by(Table.size):
+    for table in Tables.select().where(Tables.size >= people).order_by(Tables.size):
     	if table.restaurant.opening_time <= booking_date_time.hour and table.restaurant.closing_time >= booking_date_time.hour+(minutes_slot / float(60)):
 	    	if table.id not in tables_booked_ids:
 	    		return table
     return None
+>>>>>>> master

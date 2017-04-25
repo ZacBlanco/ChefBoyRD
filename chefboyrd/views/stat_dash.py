@@ -44,8 +44,8 @@ def create_jinja_object(fig):
     return graph    
 
 @page.route("/", methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
-def dash_index():
+@require_role('admin',getrole=True) # Example of requireing a role(and authentication)
+def dash_index(role):
     '''Renders the index page of the dashboards
     '''
     # Logged in always true because we require admin role
@@ -67,7 +67,7 @@ def dash_index():
         if date_min is not None and date_max is not None:
             if date_min > date_max:
                 flash('Start Date must be strictly before End Date')
-                return render_template('/dashboard/index.html', logged_in=True)
+                return render_template('/dashboard/index.html', logged_in=True,role=role)
     if date_max is None:
         date_max = datetime.today()
     if date_min is None:
@@ -246,4 +246,5 @@ def dash_index():
         graphs.append(create_jinja_object(dfig))
     else:
         pass
-    return render_template('/dashboard/index.html', options=options, logged_in=True, graphs=graphs)
+    return render_template('/dashboard/index.html', options=options, logged_in=True, graphs=graphs,role=role)
+>>>>>>> master

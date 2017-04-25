@@ -54,7 +54,7 @@ class ModelTest(unittest.TestCase):
     def test_get_earliest_datetime(self):
         data_controller.generate_data(1, 1, 1)
         expected_earliest_datetime = datetime.now()
-        earliest_datetime = model_controller.get_earliest_datetime() 
+        earliest_datetime = model_controller.get_earliest_datetime()
         self.assertEqual(earliest_datetime.year, expected_earliest_datetime.year)
         self.assertEqual(earliest_datetime.month, expected_earliest_datetime.month)
         self.assertEqual(earliest_datetime.day, expected_earliest_datetime.day)
@@ -159,7 +159,7 @@ class ModelTest(unittest.TestCase):
         for x in range(5):
             tm = datetime.now()
             for y in range(7):
-                td = tm.replace(day=(tm.day-y))
+                td = tm - timedelta(days=y)
                 t = Tabs.create(timestamp=td, had_reservation=False, party_size=x)
                 Orders.create(tab=t.get_id(), meal=m1.get_id())
         for x in range(7):
@@ -178,3 +178,4 @@ class ModelTest(unittest.TestCase):
             
 
 
+>>>>>>> master

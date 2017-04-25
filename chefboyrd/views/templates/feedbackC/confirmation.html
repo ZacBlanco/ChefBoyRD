@@ -1,0 +1,15 @@
+
+{% extends "default.html" %}
+{% block body %}
+    <h2>Thank you for your feedback</h2>
+    <div>
+        <H3>Your submitted feedback:</H3>
+        <br>
+        <form name="fb_back"action="" method="post">
+          <dl>
+            <p>{{comment}}</p>
+          </dl>
+          <p><input type="submit" value="Back">
+        </form>
+    </div>
+{% endblock %}
