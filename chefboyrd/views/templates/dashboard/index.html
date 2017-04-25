@@ -62,12 +62,15 @@
     <br>
     <div class="row">
     {% if graphs %}
+        <ul>
         {% for graph in graphs %}
-            <div class="">
-                    <img width="{{ graph.width }}" height="{{ graph.height }}" src="{{ graph.img }}"/>
-                </div>
+        <li style="list-style-type: none">
+            <div class="row">
+                <img class="img-rounded img-responsive" width="{{ graph.width }}" height="{{ graph.height }}" src="{{ graph.img }}"/>
             </div>
+        </li>
         {% endfor %}
+        </ul>
     {% endif %}
     </div>
 {% endblock %}

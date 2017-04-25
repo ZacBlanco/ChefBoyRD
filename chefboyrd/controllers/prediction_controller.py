@@ -50,7 +50,8 @@ def predict_regression(regression_params, modelType, dt_min=None, dt_max=None):
 
 	for meal_key in mealUsage:
 		mealUsage[meal_key] = int(round(mealUsage[meal_key]))
+		# Return nothing if the values are bad
+		if mealUsage[meal_key] < 0:
+			return None
 
 	return mealUsage
-
-	
