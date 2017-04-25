@@ -1,6 +1,6 @@
 '''Reservation dashboard for the manager interface
 '''
-from flask import Blueprint, render_template, abort, url_for, redirect
+from flask import Blueprint, render_template, abort, url_for, redirect, flash
 from jinja2 import TemplateNotFound
 from chefboyrd.auth import require_role
 from chefboyrd.controllers import booking_controller
@@ -21,9 +21,10 @@ class ReservationForm(FlaskForm):
     This is the form that displays fields to make a reservation
     '''
     name = StringField('Name', [validators.Length(min=2, max=25)])
-    num = IntegerField('Guests')
+    num = IntegerField('Guests',[validators.NumberRange(min=1, max=None)])
     # phone = StringField('Phone Number', [validators.Length(min=10, max=10)])
-    phone = PhoneNumberField('Phone Number')
+    phone = PhoneNumberField('Phone Number',[validators.DataRequired()])
+    length = IntegerField('Reservation Length(Minutes)',[validators.NumberRange(min=30, max=None)])
     start = DateTimeField('Time and Date')
 
 # Declare your table
@@ -40,27 +41,33 @@ class ItemTable(Table):
     cancel = ButtonCol('Cancel','reservationH.cancel',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-danger'})
 
 @page.route("/",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
-def resH_index():
+@require_role(['admin','host'],getrole=True) # Example of requireing a role(and authentication)
+def resH_index(role):
     '''
     Renders the index page of the reservation page
     '''
     form = ReservationForm()
     if form.validate_on_submit():
-        table = booking_controller.book_restaurant_table(1, form.start.data,form.num.data,form.name.data, form.phone.data)
-        # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
+        error = booking_controller.book_restaurant_table(1, form.start.data,form.num.data,form.name.data, form.phone.data, form.length.data)
+        if(type(error) == str):
+            flash(error)
+        else:
+            flash("Table successfully reserved!")
     # Populate the table
 
     res = []
     for person in tables.Booking.select():
-        res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        try:
+            res.append(dict(name=person.name,guests=person.people,phone=person.phone,time=person.booking_date_time_start.strftime("%Y-%m-%d %H:%M"),table=person.table.id,id=person.id))
+        except:
+            continue;
     table = ItemTable(res)
-        #person.start.strftime("%Y-%m-%d %H:%M")
+
     # Logged in always true because we require admin role
-    return render_template('/reservationH/index.html', res=res,logged_in=True,table=table,form=form)
+    return render_template('/reservationH/index.html', res=res,logged_in=True,table=table,form=form,role=role)
 
 @page.route("/cancel",methods=['GET', 'POST'])
-@require_role('admin') # Example of requireing a role(and authentication)
+@require_role(['admin','host']) # Example of requireing a role(and authentication)
 def cancel():
     '''
     This handles when a user needs to cancel a reservation. 

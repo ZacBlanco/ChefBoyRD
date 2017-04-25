@@ -5,13 +5,17 @@
 <body class="container bg-gray-lighter">
 
     <div class="page-header">
-        <h2 class="td-none"><a class="td-none" href="/">ChefBoyRD</a></h2>
+        <h2 class="td-none"><a class="td-none" href="/">ChefBoyRD</a>
+        {% if not logged_in %}
+            <a class="btn btn-default pull-right" href="/auth/login">Login</a>
+        {% else %}
+            <a class="btn btn-warning pull-right" href="/auth/logout">Logout</a>
+        {% endif %}</h2>
     </div>
-    
         {% include "header.html" %}
     </div>
     <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         
             <!-- Main -->
             {% if message %}
@@ -30,17 +34,10 @@
                 <br>
                 {% block body %}
                     <span class="avatar"><img src="http://dematori.github.io/projects/ChefBoyRD/static/images/avatar.jpg" alt="" /></span>
-                    <p>ChefBoy R.D.</p>
+                    <br>
                 {% endblock %}
                 <br>
             </section>
-    </div>
-    <div class="col-md-2">
-        {% if not logged_in %}
-            <a class="btn btn-default pull-right" href="/auth/login">Login</a>
-        {% else %}
-            <a class="btn btn-warning pull-right" href="/auth/logout">Logout</a>
-        {% endif %}
     </div>
     </div>
     <hr>

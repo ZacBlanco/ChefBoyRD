@@ -55,5 +55,3 @@ def predict_regression(regression_params, modelType, dt_min=None, dt_max=None):
 			return None
 
 	return mealUsage
-
-	

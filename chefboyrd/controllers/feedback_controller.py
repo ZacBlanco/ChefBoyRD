@@ -4,7 +4,7 @@ Also includes the feedback analysis functions
 
 """
 from chefboyrd.models.sms import Sms
-from twilio.rest import Client as TwilioRestClient
+from twilio.rest import Client
 import twilio.twiml
 from peewee import IntegrityError
 from string import punctuation
@@ -13,12 +13,17 @@ import configparser
 import os
 from chefboyrd.tests.test_fb_data import test_sms_data, TestMessages
 
-config = configparser.RawConfigParser()
-config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
-account_sid = config['keys']['account_sid']
-auth_token = config['keys']['auth_token']
-cust_phone_number = config['test']['cust_phone_number']
-restaurant_phone_number = config['test']['restaurant_phone_number']
+#if in travis, use environment variables. If not in travis, use configuration file. If configuration file missing. email seobo.shim@rutgers.edu
+if '/home/travis/build' in os.path.dirname(__file__):
+    account_sid = os.environ['account_sid']
+    auth_token = os.environ['auth_token']
+else:
+    config = configparser.RawConfigParser()
+    config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
+    account_sid = config['keys']['account_sid']
+    auth_token = config['keys']['auth_token']
+    cust_phone_number = config['test']['cust_phone_number']
+    restaurant_phone_number = config['test']['restaurant_phone_number']
 
 Config = configparser.ConfigParser()
 Config.read(os.path.join(os.path.dirname(__file__),"criteriaLists.ini"))
@@ -30,20 +35,13 @@ for option in options:
     except:
         configDict[option] = None
 
-posWordList = configDict['poslist']
-posWordList = posWordList.split(' ')
-negWordList = configDict['neglist']
-negWordList = negWordList.split(' ')
-exceptionWordList = configDict['exceptionlist']
-exceptionWordList = exceptionWordList.split(' ')
-negationWordList = configDict['negationlist']
-negationWordList = negationWordList.split(' ')
-emphasisWordList = configDict['emphasislist']
-emphasisWordList = emphasisWordList.split(' ')
-foodWordList = configDict['foodlist']
-foodWordList = foodWordList.split(' ')
-serviceWordList = configDict['servicelist']
-serviceWordList = serviceWordList.split(' ')
+posWordList = configDict['poslist'].split(' ')
+negWordList = configDict['neglist'].split(' ')
+exceptionWordList = configDict['exceptionlist'].split(' ')
+negationWordList = configDict['negationlist'].split(' ')
+emphasisWordList = configDict['emphasislist'].split(' ')
+foodWordList = configDict['foodlist'].split(' ')
+serviceWordList = configDict['servicelist'].split(' ')
 
 def update_db(*date_from, **update_from):
     """
@@ -66,7 +64,7 @@ def update_db(*date_from, **update_from):
         messages = test_sms_data(5, datetime(2016, 3, 25))
     else:
         try:
-            client = TwilioRestClient(account_sid, auth_token)
+            client = Client(account_sid,auth_token)
         except:
             raise SystemError
         #better abstraction would be, twilio function returns a list of objects. this list of
@@ -79,15 +77,13 @@ def update_db(*date_from, **update_from):
             if date_from > datetime.now():
                 #raise ValueError
                 return 0
-            # import inspect
-            # print(inspect.getargspec(client.messages.list))
-            # print(client.messages)
-            # print(client.messages.list)
             messages = client.messages.list(date_sent=date_from)
     for message in messages:
         try:
             if message.date_sent != None:
                 date_tmp = message.date_sent - timedelta(hours=4)
+                sms_str = date_tmp.strftime("%Y-%m-%d %H:%M:%S")
+                date_tmp= datetime.strptime(sms_str, "%Y-%m-%d %H:%M:%S")
             else:
                 date_tmp = None
             sms_tmp = Sms(
@@ -107,9 +103,6 @@ def update_db(*date_from, **update_from):
             sms_tmp.exception_flag = res2[2]
             sms_tmp.food_flag = res2[3]
             sms_tmp.service_flag = res2[4]
-            #print(sms_tmp.body)
-            #print(sms_tmp.submission_time)
-            #print(sms_tmp.body)
             err = sms_tmp.save()
             if not err:
                 print("Sms could not be saved in db" + sms_tmp.body)
@@ -131,7 +124,7 @@ def delete_twilio_feedback():
 	ValueError: invalid reference to a stored sms object from the twilio client
     """
     try:
-        client = TwilioRestClient(account_sid, auth_token)
+        client = Client(account_sid,auth_token)
     except:
         raise SystemError
     messages = client.messages.list()
@@ -262,7 +255,8 @@ def word_freq_counter(inStr):
 
     Throws:
         TypeError: When argument is not a string.
-
+        
+    TODO: only get unique words. nothing like( here, restaurant, there, is)
     """
 
     if not isinstance(inStr, str):
@@ -292,13 +286,12 @@ def word_freq_counter(inStr):
         for  word2 in wordsProcessed:
             if word == word2:
                 freqs[i] = freqs[i] + 1
-
-    res = []
-    n = 0
-    for n in range(len(wordSet)):
-        res.append(dict(text=wordSet[n],size=freqs[n]))
-    resultDict = res
-    return resultDict
+    try:
+        maxfreq = max(freqs)
+    except ValueError:
+        maxfreq = 0
+    
+    return wordSet, freqs, maxfreq
 
 #muhStr = input("Enter the string: ")
 #dictOut = wordFreqCounter(muhStr)

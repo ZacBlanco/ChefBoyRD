@@ -120,6 +120,13 @@ This will start the debugging server at `http://localhost:5000` where you can na
 | Proposal  | January 30th |
 | Report 1 Part 1: Statement of Work & Requirements | February 5th |
 | Report 1 Part 2: Functional Requirements Spec & UI | February 12th |
+| Report 1: Full | February 19th |
+| Report 2 Part 1: Interaction Diagrams | February 26th |
+| Report 2 Part 2: Class Diagrams and System Architecture | March 5th |
+| Report 2: Full | March 12th |
+| First Demo | March 27th | 
+| Report 3: Part 1: | April 23rd |
+| Second Demo | April 25th |
 
 
 ## Description:

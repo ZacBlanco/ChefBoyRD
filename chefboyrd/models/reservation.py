@@ -16,9 +16,16 @@ class Reservation(UserMixin, BaseModel):
 
     @classmethod
     def cancel_reservation(cls,id):
+        '''Cancels a reservation by id
+        Args: 
+            id(int): Unique Identifier for reservation.
+        
+        Returns:
+            N/A
+        '''
         res = cls.get(cls.id == id)
         res.delete_instance()
-        return
+        return 
 
 
     @classmethod
@@ -46,3 +53,4 @@ class Reservation(UserMixin, BaseModel):
                 start=start)
         except IntegrityError:
             raise ValueError("This should not happen(Reservation)")
+
