@@ -1,4 +1,0 @@
-welcome: Welcome to chef boy are dee. Say "statistics"
-help: You can request statistics or predictions. The statistics which are available are revenue, meals, tabs, performance, and 
-stats: You requested information on {{ stat }}. Here is the information I have.
-stop: Okay. Let me know if you need anything else.
