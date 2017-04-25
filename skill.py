@@ -18,6 +18,7 @@ def reprompt():
     resp._response = {}
     resp._response['directives'] = [{'type':'Dialog.Delegate'}]
     return resp
+
 def todatetime(datestr):
     return datetime.strptime(datestr, '%Y-%m-%d')
 
@@ -26,6 +27,10 @@ def todatetime(datestr):
 def welcome():
     welcome_msg = render_template('welcome')
     return question(welcome_msg)
+
+@ask.intent("AMAZON.HelpIntent")
+def cancel():
+    return statement(render_template('help'))
 
 @ask.intent("AMAZON.StopIntent")
 def cancel():
@@ -38,13 +43,32 @@ def stop():
 @ask.intent("CommandIntent", convert={'stat_type': str, 'start_date': datetime, 'end_date': datetime})
 def statistics(stat_type, start_date, end_date):
     print("Stat Function Args: type: {}, start: {}, end: {}".format(stat_type, start_date, end_date))
-    if start_date is None:
+    if start_date is None or stat_type is None:
         return reprompt()
 
-    msg = 'You wrote bad code'
-    if stat_type is None:
-        pass
+    try:
+        start_date = todatetime(start_date)
+    except:
+        return statement("You must provide a specific day")
+    if end_date is None:
+        end_date = datetime.now()
     else:
+        end_date = todatetime(end_date)
+
+    if end_date < start_date:
+        return statement(render_template('bad_dates'))
+
+    msg = "You should not have done that..... You should not have done that."
+    num = data_controller.people_in_range(start_date, end_date)
+    if stat_type == 'revenue':
+        dollars = int(data_controller.get_dollars_in_range(start_date, end_date))
+        # print(type(render_template('dollars', amount=dollars)))
+        msg = render_template('num_people', num=num, start=start_date.date(), end=end_date.date()) + render_template('dollars', amount=dollars)
+    elif stat_type == 'meals':
+
+    elif stat_type == 'tabs':
+        pass
+    elif stat_type == 'performance':
         pass
 
     return statement(msg)
