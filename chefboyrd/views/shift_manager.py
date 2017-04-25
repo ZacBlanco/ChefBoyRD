@@ -67,7 +67,7 @@ class ClaimTable(Table):
     post = ButtonCol('Post Shift','shift_manager.post',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-warning'},column_html_attrs={'class': 'spaced-table-col'})
 
 @page.route("/", methods=['GET', 'POST'])
-@require_role('admin')
+@require_role(['admin','manager','chef','host','waiter'])
 def calendar():
     '''
     Renders the index page of the shift management page
