@@ -115,4 +115,3 @@ def req_roles():
 @auth.require_role(['role1', 'role2'])
 def req_multi_role():
     return 'roletest'
->>>>>>> master

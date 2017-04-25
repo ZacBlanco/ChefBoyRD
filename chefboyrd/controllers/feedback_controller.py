@@ -296,4 +296,3 @@ def word_freq_counter(inStr):
 #muhStr = input("Enter the string: ")
 #dictOut = wordFreqCounter(muhStr)
 #print(dictOut)
->>>>>>> master

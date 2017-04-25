@@ -70,4 +70,3 @@ def get_first_table_available(restaurant, booking_date_time, people, minutes_slo
 	    	if table.id not in tables_booked_ids:
 	    		return table
     return None
->>>>>>> master

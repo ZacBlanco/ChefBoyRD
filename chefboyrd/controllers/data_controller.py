@@ -379,5 +379,4 @@ menu = {
                 'bun': '1=hoagie roll'
             }
         }
->>>>>>> master
     }
