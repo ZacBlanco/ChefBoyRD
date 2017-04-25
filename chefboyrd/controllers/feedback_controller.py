@@ -198,6 +198,7 @@ def process_incoming_sms():
         try:
             i = message.body.index(' ')
         except ValueError:
+            i = 7
             pass
         non_accept = "Your unique key {" + message.body[:i] + "} is not valid"
         client.messages.create(
@@ -273,7 +274,7 @@ def delete_twilio_feedback(*sidd):
                 print(r)
         elif type(sidd[0]) is str:
             print('sent delete - str')
-            r = client.Api.request('DELETE', 'https://api.twilio.com/2010-04-01/Accounts/' + account_sid + '/Messages/' + ssid[0])
+            r = client.request('DELETE', 'https://api.twilio.com/2010-04-01/Accounts/' + account_sid + '/Messages/' + ssid[0])
             #print('sent delete - str')
             print(r)
         else:

@@ -1,7 +1,7 @@
 '''This module contains all of the peewee model classes which correspond to order statistics. They
 will be used to make predictions and display data about business revenue and growth.
 '''
-from peewee import CharField, FloatField, BooleanField, IntegerField, DateTimeField, ForeignKeyField
+from peewee import CharField, FloatField, BooleanField, IntegerField, DateTimeField, ForeignKeyField, TextField
 from chefboyrd.models import BaseModel
 # from chefboyrd.models.models.prediction import Meal, Tab, MealIngredients, Ingredients, Quantities
 
