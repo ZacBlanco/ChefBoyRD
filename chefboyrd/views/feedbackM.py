@@ -127,12 +127,12 @@ def delete_twilio_feedback():
     Returns:
         Confirmation string
     """
-    #smss = Sms.select().where(Sms.submission_time >= datetime(2017, 4,25, 2,35,00))  #2017-04-24 19:51:46
-    #sidd = []
-    #for sms in smss:
-        #sidd.append(sms.sid)
+    smss = Sms.select().where(Sms.submission_time >= datetime(2017, 4,25, 2,35,00))  #2017-04-25 02:49:49
+    sidd = []
+    for sms in smss:
+        sidd.append(sms.sid)
     #print(sidd)
-    #feedback_controller.delete_twilio_feedback(sidd)
+    feedback_controller.delete_twilio_feedback(sidd)
     #feedback_controller.delete_twilio_feedback()
     return "Twilio Feedback deleted"
 
@@ -156,5 +156,5 @@ def send_sms_route():
     Returns:
         Confirmation string
     """
-    feedback_controller.process_incoming_sms()
+    feedback_controller.process_incoming_sms(1)
     return 'db updated'

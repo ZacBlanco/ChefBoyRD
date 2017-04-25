@@ -13,7 +13,7 @@ from datetime import datetime, date, timedelta
 import configparser
 import os
 from chefboyrd.tests.test_fb_data import test_sms_data, TestMessages
-import requests
+import requests as request
 
 #if in travis, use environment variables. If not in travis, use configuration file. If configuration file missing. email seobo.shim@rutgers.edu
 if '/home/travis/build' in os.path.dirname(__file__):
@@ -67,6 +67,7 @@ def update_db(*date_from, **update_from):
     if update_from:
         messages = test_sms_data(5, datetime(2016, 3, 25))
     else:
+        process_incoming_sms()
         try:
             client = Client(account_sid,auth_token)
         except:
@@ -86,10 +87,9 @@ def update_db(*date_from, **update_from):
         try:
             sms = Sms.get(message.sid == Sms.sid)
             if (sms.invalid_field == True):
-                pass
-                #print('deleting ' + sms.body)
-                #delete_twilio_feedback(sms.sid)
-                #sms.delete_instance()
+                #pass
+                print('deleting ' + sms.body)
+                delete_twilio_feedback(sms.sid)
             else:
                 pass
         except:
@@ -118,9 +118,10 @@ def update_db(*date_from, **update_from):
                 sms_tmp.food_flag = res2[3]
                 sms_tmp.service_flag = res2[4]
                 sms_tmp.invalid_field = False
-                err = sms_tmp.save()
-                if not err:
-                    print("Sms could not be saved in db" + sms_tmp.body)
+                try:
+                    err = sms_tmp.save()
+                except IntegrityError:
+                    pass
             except ValueError:
                 print("End of messages reached.")
                 return 0
@@ -130,7 +131,7 @@ def update_db(*date_from, **update_from):
 
     return 1 #this should be on success
 
-def process_incoming_sms():
+def process_incoming_sms(*one):
     """
     Updates SMS table in database with the incoming SMS. Checks for the unique key to invalidate SMS or keep it
     Only for processing SMS in real time.
@@ -158,74 +159,142 @@ def process_incoming_sms():
     except:
         raise SystemError
 
-    messages = client.messages.list(to=restaurant_phone_number)
-    message = messages[0] # get the first message
-    message_key = []
-    for key in valid_keys:
-        if key in message.body[:len(key)]:
-            #print(key)
-            new_body = message.body.replace(key,'')
-            print(new_body)
-            #remoev key
-            Tabs.select().where(Tabs.fb_key == key)
-            Tabs.fb_key = "~~~~~~~~~~"
-            message_key.append(key)
+    if (one):
+        messages = client.messages.list(to=restaurant_phone_number)
+        message = messages[0] # get the first message
+        message_key = []
+        for key in valid_keys:
+            if key in message.body[:len(key)]:
+                #print(key)
+                new_body = message.body.replace(key,'')
+                #print(new_body)
+                #remoev key
+                tab = Tabs.update(fb_key="~~~~~~~~~~").where(Tabs.fb_key == key)
+                message_key.append(key)
 
-    if (message_key):
-        #i can use the date time as now because feedback comes in immediately here
-        sms_tmp = Sms(
-            sid=message.sid,
-            submission_time=datetime.now(),
-            body=new_body,
-            phone_num=message.from_,
-            pos_flag=-1,
-            neg_flag=-1,
-            exception_flag=-1,
-            food_flag=-1,
-            service_flag=-1
-            )
-        res2 = feedback_analysis(sms_tmp.body)
-        sms_tmp.pos_flag = res2[0]
-        sms_tmp.neg_flag = res2[1]
-        sms_tmp.exception_flag = res2[2]
-        sms_tmp.food_flag = res2[3]
-        sms_tmp.service_flag = res2[4]
-        sms_tmp.invalid_field = False
-        err = sms_tmp.save()
-        if not err:
-            print("Sms could not be saved in db" + sms_tmp.body)
-            return 0
-    else:                
-        try:
-            i = message.body.index(' ')
-        except ValueError:
-            i = 7
-            pass
-        non_accept = "Your unique key {" + message.body[:i] + "} is not valid"
-        client.messages.create(
-            to=message.from_,
-            from_=restaurant_phone_number,
-            body=non_accept,)
-        #delete_twilio_feedback(message.sid)
-        sms_tmp = Sms(
-            sid=message.sid,
-            submission_time=datetime.now(),
-            body=message.body,
-            phone_num=message.from_,
-            pos_flag=-1,
-            neg_flag=-1,
-            exception_flag=-1,
-            food_flag=-1,
-            service_flag=-1
-            )
-        res2 = feedback_analysis(sms_tmp.body)
-        sms_tmp.pos_flag = res2[0]
-        sms_tmp.neg_flag = res2[1]
-        sms_tmp.exception_flag = res2[2]
-        sms_tmp.food_flag = res2[3]
-        sms_tmp.service_flag = res2[4]
-        sms_tmp.invalid_field = True
-        err = sms_tmp.save()
+        if (message_key):
+            #i can use the date time as now because feedback comes in immediately here
+            sms_tmp = Sms(
+                sid=message.sid,
+                submission_time=datetime.now(),
+                body=new_body,
+                phone_num=message.from_,
+                pos_flag=-1,
+                neg_flag=-1,
+                exception_flag=-1,
+                food_flag=-1,
+                service_flag=-1
+                )
+            res2 = feedback_analysis(sms_tmp.body)
+            sms_tmp.pos_flag = res2[0]
+            sms_tmp.neg_flag = res2[1]
+            sms_tmp.exception_flag = res2[2]
+            sms_tmp.food_flag = res2[3]
+            sms_tmp.service_flag = res2[4]
+            sms_tmp.invalid_field = False
+            try:
+                err = sms_tmp.save()
+            except IntegrityError:
+                pass
+        else:                
+            try:
+                i = message.body.index(' ')
+            except ValueError:
+                i = 7
+                pass
+            if (one):
+                non_accept = "Your unique key {" + message.body[:i] + "} is not valid"
+                client.messages.create(
+                    to=message.from_,
+                    from_=restaurant_phone_number,
+                    body=non_accept,)
+            
+            sms_tmp = Sms(
+                sid=message.sid,
+                submission_time=datetime.now(),
+                body=message.body,
+                phone_num=message.from_,
+                pos_flag=-1,
+                neg_flag=-1,
+                exception_flag=-1,
+                food_flag=-1,
+                service_flag=-1
+                )
+            sms_tmp.invalid_field = True
+            try:
+                err = sms_tmp.save()
+            except IntegrityError:
+                pass
+            #delete_twilio_feedback(message.sid)
+    else:
+        messages = client.messages.list(to=restaurant_phone_number, date_sent=datetime.today())
+        for message in messages:
+            message_key = []
+            for key in valid_keys:
+                if key in message.body[:len(key)]:
+                    #print(key)
+                    new_body = message.body.replace(key,'')
+                    #print(new_body)
+                    #remoev key
+                    tab = Tabs.select().where(Tabs.fb_key == key)
+                    tab.fb_key = "~~~~~~~~~~"
+                    message_key.append(key)
+
+            if (message_key):
+                #i can use the date time as now because feedback comes in immediately here
+                sms_tmp = Sms(
+                    sid=message.sid,
+                    submission_time=datetime.now(),
+                    body=new_body,
+                    phone_num=message.from_,
+                    pos_flag=-1,
+                    neg_flag=-1,
+                    exception_flag=-1,
+                    food_flag=-1,
+                    service_flag=-1
+                    )
+                res2 = feedback_analysis(sms_tmp.body)
+                sms_tmp.pos_flag = res2[0]
+                sms_tmp.neg_flag = res2[1]
+                sms_tmp.exception_flag = res2[2]
+                sms_tmp.food_flag = res2[3]
+                sms_tmp.service_flag = res2[4]
+                sms_tmp.invalid_field = False
+                try:
+                    err = sms_tmp.save()
+                except IntegrityError:
+                    pass
+            else:                
+                try:
+                    i = message.body.index(' ')
+                except ValueError:
+                    i = 7
+                    pass
+                if (one):
+                    non_accept = "Your unique key {" + message.body[:i] + "} is not valid"
+                    client.messages.create(
+                        to=message.from_,
+                        from_=restaurant_phone_number,
+                        body=non_accept,)
+                
+                sms_tmp = Sms(
+                    sid=message.sid,
+                    submission_time=datetime.now(),
+                    body=message.body,
+                    phone_num=message.from_,
+                    pos_flag=-1,
+                    neg_flag=-1,
+                    exception_flag=-1,
+                    food_flag=-1,
+                    service_flag=-1
+                    )
+                sms_tmp.invalid_field = True
+                try:
+                    err = sms_tmp.save()
+                except IntegrityError:
+                    pass
+                #delete_twilio_feedback(message.sid)
+
 
     return 1
 
@@ -262,22 +331,31 @@ def delete_twilio_feedback(*sidd):
     try:
         client = Client(account_sid,auth_token)
     except:
-        raise SystemError
-    messagess = client.messages.list(to=restaurant_phone_number)
+        raise SystemErrors
     print(sidd[0])
     if (sidd[0]):
-        print('true')
-        print('true')
         if type(sidd[0]) is list:
-            for sid in sidd[0]:
-                r = client.request('DELETE', 'https://api.twilio.com/2010-04-01/Accounts/' + account_sid + '/Messages/' + sid)
+            for sids in sidd[0]:
                 print('sent delete - list')
-                print(r)
+                try:
+                    sms = Sms.select().where(Sms.sid==sids)
+                    sms.delete()
+                except: 
+                    pass
+                url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sids
+                response = request.delete(url)
+                print(response)
         elif type(sidd[0]) is str:
             print('sent delete - str')
-            r = client.request('DELETE', 'https://api.twilio.com/2010-04-01/Accounts/' + account_sid + '/Messages/' + ssid[0])
-            #print('sent delete - str')
-            print(r)
+            sids = sidd[0]
+            try:
+                sms = Sms.get( Sms.sid== sids)
+                sms.delete()
+            except: 
+                pass
+            url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sids
+            response = request.delete(url)
+            print(response)
         else:
             pass
             #print('else')
