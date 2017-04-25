@@ -67,7 +67,7 @@ class ClaimTable(Table):
     post = ButtonCol('Post Shift','shift_manager.post',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-warning'},column_html_attrs={'class': 'spaced-table-col'})
 
 @page.route("/", methods=['GET', 'POST'])
-@require_role('admin')
+@require_role(['admin','manager','chef','host','waiter'])
 def calendar():
     '''
     Renders the index page of the shift management page
@@ -94,14 +94,14 @@ def calendar():
                 claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
             selection='All Users'
             claimTable = ClaimTable(claim_shifts)
-            flash("Shifts for selected user is displayed")
+            flash("Notification: Shifts for selected user is displayed")
             return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
         else:
             for userShift in Shift.select().where((Shift.name==form2.user.data)&(Shift.shift_time_end>current_time)):
                 claim_shifts.append(dict(shift_time_start=userShift.shift_time_start, shift_time_end=userShift.shift_time_end, role=userShift.role, id=userShift.id))
             selection=form2.user.data
             claimTable = UniqueTable(claim_shifts)
-            flash("Shifts for selected user is displayed")
+            flash("Notification: Shifts for selected user is displayed")
         return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
     else:
         for claimShift in Shift.select().where((Shift.name!="")&(Shift.shift_time_end>current_time)):
@@ -136,10 +136,10 @@ def claim():
     role = flask_login.current_user.role
     if shift_controller.checkAvailability(id, name, role):
         Shift.claim_shift(id, name)
-        flash("Successfully claimed the shift")
+        flash("Notification: Successfully claimed the shift")
         return redirect(url_for('shift_manager.calendar'))
     else:
-        flash("Unable to claim the shift")
+        flash("Insufficient Privileges: Unable to claim the shift")
         return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/post", methods=['GET', 'POST'])
@@ -152,19 +152,22 @@ def post():
     role = flask_login.current_user.role
     if shift_controller.checkPostConditions(id, name, role):
         Shift.post_shift(id)
-        flash("Successfully posted the shift")
+        flash("Notification: Successfully posted the shift")
         return redirect(url_for('shift_manager.calendar'))
     else:
-        flash("Unable to post the shift (Insufficient privileges.")
+        flash("Insufficient Privileges: Unable to post the shift")
         return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/remove", methods=['GET', 'POST'])
-@require_role('admin') # or manager
 def remove():
     '''
     This handles when the user needs to remove a shift
     '''
     id = request.args.get('id')
-    Shift.remove_shift(id)
-    flash("Successfully removed the shift")
+    role = flask_login.current_user.role
+    if shift_controller.checkRemoveConditions(id, role):
+        Shift.remove_shift(id)
+        flash("Successfully removed the shift")
+    else:
+        flask("Insufficient Privileges: Unable to remove shift")
     return redirect(url_for('shift_manager.calendar'))
