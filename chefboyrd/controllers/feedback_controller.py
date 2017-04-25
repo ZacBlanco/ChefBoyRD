@@ -332,11 +332,11 @@ def delete_twilio_feedback(*sidd):
         client = Client(account_sid,auth_token)
     except:
         raise SystemErrors
-    print(sidd[0])
+    #print(sidd[0])
     if (sidd[0]):
         if type(sidd[0]) is list:
             for sids in sidd[0]:
-                print('sent delete - list')
+                #print('sent delete - list')
                 try:
                     sms = Sms.select().where(Sms.sid==sids)
                     sms.delete()
@@ -344,9 +344,9 @@ def delete_twilio_feedback(*sidd):
                     pass
                 url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sids
                 response = request.delete(url)
-                print(response)
+                #print(response)
         elif type(sidd[0]) is str:
-            print('sent delete - str')
+            #print('sent delete - str')
             sids = sidd[0]
             try:
                 sms = Sms.get( Sms.sid== sids)
@@ -355,7 +355,7 @@ def delete_twilio_feedback(*sidd):
                 pass
             url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sids
             response = request.delete(url)
-            print(response)
+            #print(response)
         else:
             pass
             #print('else')
