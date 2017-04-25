@@ -2,13 +2,10 @@
     <header>
         <ul class="nav nav-pills nav-stacked">
             <li role="presentation" class="nav-element"><a href="/">Home</a></li>
-<<<<<<< HEAD
             {% if role != 'admin' and role != 'host' and role != 'chef' and role != 'waiter'%}
             <li role="presentation" class="nav-element"><a href="/reservationG">Guest Reservation</a></li>
             {% endif %}
             {% if role == 'admin' or role == 'manager'%}
-=======
->>>>>>> refs/remotes/origin/new-ui
             <li role="presentation" class="nav-element"><a href="/shift_manager">Shift Management</a></li>
             <li role="presentation" class="nav-element"><a href="/dashboard">Dashboard</a></li>
             <li role="presentation" class="nav-element"><a href="/feedbackM">Feedback Management</a></li>

@@ -67,11 +67,7 @@ class ClaimTable(Table):
     post = ButtonCol('Post Shift','shift_manager.post',url_kwargs=dict(id='id'),button_attrs={'class': 'btn btn-warning'},column_html_attrs={'class': 'spaced-table-col'})
 
 @page.route("/", methods=['GET', 'POST'])
-<<<<<<< HEAD
-@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
-=======
 @require_role(['admin','manager','chef','host','waiter'])
->>>>>>> refs/remotes/origin/new-ui
 def calendar():
     '''
     Renders the index page of the shift management page
@@ -176,9 +172,5 @@ def remove():
         Shift.remove_shift(id)
         flash("Successfully removed the shift")
     else:
-<<<<<<< HEAD
         flash("Unable to remove shift")
-=======
-        flask("Insufficient Privileges: Unable to remove shift")
->>>>>>> refs/remotes/origin/new-ui
     return redirect(url_for('shift_manager.calendar'))
