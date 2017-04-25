@@ -8,3 +8,8 @@ run.sh
 *.DS_Store
 */.DS_Store
 **/.DS_Store
+*/sms.cfg
+
+env/**
+docs/build/**
+docs/build/*
