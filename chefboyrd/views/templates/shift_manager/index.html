@@ -81,6 +81,7 @@
 
 </style>
 <h2>Welcome to Shift Management</h2>
+		{% from "_formhelpers.html" import render_field, render_field_date %}
     <div>
 				Employee name: {{ name }} <br> Employee role: {{ role }}
 				<h3> Here is the list of open shifts </h3>
@@ -88,9 +89,14 @@
         <h3>
 				Here is the list of taken shifts
 				</h3>
+				Select employee to see their shifts: 
+				<form action="" method=post>
+				{{ userShift.hidden_tag() }}
+				{{ render_field(userShift.user) }}<p><input type="submit" value="Check Shifts">
+				</form>
+				<br>
 				{{ claimTable }}
 		<h1>Add a Shift Here</h1>
-			{% from "_formhelpers.html" import render_field, render_field_date %}
 		<br>
 
 		<form action="" method=post>
