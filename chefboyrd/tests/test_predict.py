@@ -39,6 +39,16 @@ class ModelTest(unittest.TestCase):
         os.close(self.db_fd)
         os.unlink(self.db_name)
 
+    def test_badPrediction(self):
+        data_controller.generate_data()
+        start = datetime.now()
+        end = start + timedelta(days=300)
+        modelType = 'Polynomial'
+        orders = data_controller.get_orders_date_range()
+        processedOrders = model_controller.orders_to_list(orders)
+        params = model_controller.train_regression(processedOrders, modelType)
+        mealUsage = prediction_controller.predict_regression(params, modelType, start, end)
+
     def test_polynomialModel(self):
         iv = [1, 2, 3] # Input vector
         ip = [1, 1, 1, 1] # Input parameters

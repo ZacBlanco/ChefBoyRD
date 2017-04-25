@@ -66,7 +66,10 @@ def prediction_index():
 
 		#print(mainParams)
 		mealUsage = prediction_controller.predict_regression(mainParams, modelType, beginningDate, endingDate)
-		print(mealUsage)
+		# Check if values were good
+		if mealUsage is None:
+			flash('The predicted values are unsuited for the specified date range. Pick a better date range.')
+		#print(mealUsage)
 
 	return render_template('/prediction/index.html', logged_in=True, meals=mealUsage)
 
