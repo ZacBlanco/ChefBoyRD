@@ -22,6 +22,9 @@ def reprompt():
 def todatetime(datestr):
     return datetime.strptime(datestr, '%Y-%m-%d')
 
+def speak_date(dd):
+    return dd.strftime("%B %d, %Y")
+
 
 @ask.launch
 def welcome():
@@ -56,14 +59,14 @@ def statistics(stat_type, start_date, end_date):
         end_date = todatetime(end_date)
 
     if end_date < start_date:
-        return statement(render_template('bad_dates'))
+        return statement(render_template('bad_dates', start=speak_date(start_date.date()), end=speak_date(end_date.date())))
 
-    msg = "You should not have done that..... You should not have done that."
+    msg = "Uh oh, I've encountered an error. Please try again"
     num = data_controller.people_in_range(start_date, end_date)
     if stat_type == 'revenue':
         dollars = int(data_controller.get_dollars_in_range(start_date, end_date))
         # print(type(render_template('dollars', amount=dollars)))
-        msg = render_template('num_people', num=num, start=start_date.date(), end=end_date.date()) + render_template('dollars', amount=dollars)
+        msg = render_template('num_people', num=num, start=speak_date(start_date.date()), end=speak_date(end_date.date())) + render_template('dollars', amount=dollars)
     elif stat_type == 'meals':
         num_meals = data_controller.get_meals_in_range(start_date, end_date)
         msg = render_template('meals', meal=num_meals)
@@ -76,8 +79,9 @@ def statistics(stat_type, start_date, end_date):
         num_meals = data_controller.get_meals_in_range(start_date, end_date)
         msg = render_template('tabs', parties=parties)
         msg += render_template('meals', meal=num_meals)
-        msg += render_template('num_people', num=num, start=start_date.date(), end=end_date.date()) + render_template('dollars', amount=dollars)
+        msg += render_template('num_people', num=num, start=speak_date(start_date.date()), end=speak_date(end_date.date())) + render_template('dollars', amount=dollars)
 
+    print(msg)
     return statement(msg)
 
 @ask.intent("PredictionIntent", convert={'meal_type': str, 'start_date': datetime, 'end_date': datetime})
