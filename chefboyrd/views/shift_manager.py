@@ -3,7 +3,7 @@ Shift management dashboard for the manager interface
 '''
 import json
 import flask_login
-from flask import Flask, Blueprint, render_template, request, url_for, jsonify, redirect, flash
+from flask import Flask, Blueprint, render_template, request, url_for, redirect, flash
 from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
 from wtforms import SelectField, validators
@@ -16,14 +16,15 @@ from chefboyrd.models.shifts import Shift
 from chefboyrd.models.user import User
 from chefboyrd.controllers import shift_controller
 
-
 page = Blueprint('shift_manager', __name__, template_folder='./templates')
+USER_SELECTION_1 = {}
+USER_SELECTION_2 = {}
 
 class ShiftForm(FlaskForm):
     '''
     This is the form that displays fields to make a shift
     '''
-    role = SelectField('Role', choices={(r.role, r.role) for r in User.select()}, validators=[validators.required()])
+    role = SelectField('Role', choices=USER_SELECTION_1, validators=[validators.required()])
     start = DateTimeField('Shift Starting Time', [validators.required()])
     end = DateTimeField('Shift Ending Time', [validators.required()])
 
@@ -31,10 +32,7 @@ class CheckForm(FlaskForm):
     '''
     This is the form that allows users to pick between different people that work at the same place.
     '''
-    default = {('', 'All Users')}
-    others = {(u.name, u.name) for u in User.select()}
-    combined = default.union(others)
-    user = SelectField('', choices=combined)
+    user = SelectField('', choices=USER_SELECTION_2)
 
 class FreeTable(Table):
     '''
@@ -74,6 +72,9 @@ def calendar():
     '''
     Renders the index page of the shift management page
     '''
+    USER_SELECTION_1 = {(r.role, r.role) for r in User.select()}
+    temp = {('', 'All Users')}
+    USER_SELECTION_2 = USER_SELECTION_1.union(temp)
     current_time = datetime.now()
     employee_name = flask_login.current_user.name
     employee_role = flask_login.current_user.role

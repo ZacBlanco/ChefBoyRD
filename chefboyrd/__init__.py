@@ -94,9 +94,7 @@ APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
-
 APP.register_blueprint(shift_manager.page, url_prefix='/shift_manager')
-
 # Put all table creations after here
 # ==================================
 from chefboyrd.models import Meals, Ingredients, MealIngredients, Quantities, Tabs, Orders
@@ -120,6 +118,7 @@ tables.Table.create_table(True)
 tables.Booking.create_table(True)
 
 shifts.Shift.create_table(True)
+
 # ==================================== Universal Routes ======================================== #
 @APP.route('/')
 def index():
