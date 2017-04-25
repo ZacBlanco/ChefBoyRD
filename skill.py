@@ -18,7 +18,8 @@ def reprompt():
     resp._response = {}
     resp._response['directives'] = [{'type':'Dialog.Delegate'}]
     return resp
-
+def todatetime(datestr):
+    return datetime.strptime(datestr, '%Y-%m-%d')
 
 
 @ask.launch
@@ -50,11 +51,15 @@ def statistics(stat_type, start_date, end_date):
 
 @ask.intent("PredictionIntent", convert={'meal_type': str, 'start_date': datetime, 'end_date': datetime})
 def prediction(meal_type, start_date, end_date):
- 
+    print("Prediction Function Args: type: {}, start: {}, end: {}".format(meal_type, start_date, end_date))
+
     if meal_type is None or start_date is None or end_date is None:
         return reprompt()
- 
     modelType = 'Polynomial'
+    start_date = todatetime(start_date)
+    end_date = todatetime(end_date)
+    print(type(start_date))
+    print(type(end_date))
     orders = data_controller.get_orders_date_range()
     processedOrders = model_controller.orders_to_list(orders)
     params = model_controller.train_regression(processedOrders, modelType)
