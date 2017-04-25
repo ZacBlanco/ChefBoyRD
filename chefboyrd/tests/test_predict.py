@@ -178,6 +178,3 @@ class ModelTest(unittest.TestCase):
         # print(Ingredients._meta.database.database)
         data_controller.generate_data(num_days=1, num_tabs=5)
         orders.asser_called_once()
-            
-
-
