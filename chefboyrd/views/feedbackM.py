@@ -48,8 +48,8 @@ def feedback_table(role):
     if (request.method== 'POST'):
         pos_col, neg_col, except_col, food_col, service_col= (-1,-1,-1,-1,-1) # -1 is a don't care term
         dtf = datetime.strptime(request.form['datetimefrom'], "%m/%d/%Y %I:%M %p")
-        dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %I:%M %p")
-        query_expr = ((Sms.submission_time  > dtf)&(Sms.submission_time <= dtt))
+        dtt = datetime.strptime(request.form['datetimeto'], "%m/%d/%Y %I:%M %p") + timedelta(minutes= 2)
+        query_expr = ((Sms.submission_time  > dtf)&(Sms.submission_time <= dtt)&(Sms.invalid_field == False))
         if (request.form.get('dropdown') =='Good'):
             #print('Form Good')
             pos_col, neg_col = (1,0)
@@ -71,6 +71,7 @@ def feedback_table(role):
             query_expr = ((query_expr)&(Sms.exception_flag==except_col))
         else:
             pos_col, neg_col, except_col,food_col, service_col = (-1,-1,-1,-1,-1)
+        feedback_controller.update_db()
         smss = Sms.select().where(query_expr).order_by(-Sms.submission_time)
         res = []
         all_string_bodies = ""
@@ -115,7 +116,7 @@ def delete_feedback():
         Confirmation string
     """
     res = feedback_controller.delete_feedback()
-    return String.format("%03d amount of sms entries deleted", res) 
+    return "{} amount of sms entries deleted".format(res) 
 
 @page.route("/deletealltwiliofeedbackhistory",methods=['GET', 'POST'])
 @require_role('admin')
@@ -126,7 +127,13 @@ def delete_twilio_feedback():
     Returns:
         Confirmation string
     """
-    feedback_controller.delete_twilio_feedback()
+    #smss = Sms.select().where(Sms.submission_time >= datetime(2017, 4,25, 2,35,00))  #2017-04-24 19:51:46
+    #sidd = []
+    #for sms in smss:
+        #sidd.append(sms.sid)
+    #print(sidd)
+    #feedback_controller.delete_twilio_feedback(sidd)
+    #feedback_controller.delete_twilio_feedback()
     return "Twilio Feedback deleted"
 
 @page.route("/updateallsms",methods=['GET','POST'])
@@ -149,5 +156,5 @@ def send_sms_route():
     Returns:
         Confirmation string
     """
-    feedback_controller.update_db(date.today())
+    feedback_controller.process_incoming_sms()
     return 'db updated'

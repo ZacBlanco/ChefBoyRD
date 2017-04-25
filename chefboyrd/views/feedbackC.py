@@ -1,6 +1,6 @@
 from wtforms import TextAreaField, SubmitField, DecimalField
 from flask_wtf import FlaskForm
-from flask import Blueprint, render_template, abort, url_for, redirect, request
+from flask import Blueprint, render_template, abort, url_for, redirect, request, flash
 from jinja2 import TemplateNotFound
 from chefboyrd.auth import require_role
 from chefboyrd.controllers import feedback_controller
@@ -19,9 +19,7 @@ class CommentForm(FlaskForm):
     ambience_rating = DecimalField()
     overall_rating = DecimalField()
 
-    comment_field = TextAreaField()
-
-    submit_field = SubmitField("submit")
+    submit = SubmitField("submit")
 
 @page.route("/",methods=['GET', 'POST'])
 @require_role(['notanadmin','admin'],getrole=True)
@@ -37,21 +35,14 @@ def feedback_submit(role):
     #get all of the feedback objects and insert it into table
     form = CommentForm()
 
-    if (request.method== 'POST'):
-        if (request.form['submit_field'] == 'Back'):
-            return render_template('feedbackC/index.html', logged_in=True,role=role)
-
-        rating = {'food':food_rating,
-                    'service':service_rating,
-                    'clean':clean_rating,
-                    'ambience':ambience_rating,
-                    'overall':overall_rating,
-                    'comment':comment_field}
-        update_db_rating(rating)
-        if (request.form['comment_field']):
-            comment = request.form['comment_field']
-            return render_template('feedbackC/confirmation.html', logged_in=True, comment=comment,role=role)
-        else:
-            return render_template('feedbackC/index.html', logged_in=True,role=role)
+    if (request.method == 'POST'):
+        rating = {'food':form.food_rating.data,
+                    'service':form.service_rating.data,
+                    'clean':form.clean_rating.data,
+                    'ambience':form.ambience_rating.data,
+                    'overall':form.overall_rating.data}
+        feedback_controller.update_db_rating(rating)
+        flash("Thank you for your feedback!")
+        return render_template('feedbackC/index.html', logged_in=True,role=role)
     else:
         return render_template('feedbackC/index.html', logged_in=True,role=role)

@@ -186,13 +186,11 @@ except:
     pass
 
 
-from chefboyrd.controllers import data_controller, feedback_controller
+from chefboyrd.controllers import data_controller, feedback_controller, receipt
 if Orders.select().count() < 1000:
     start_date = datetime.now() - timedelta(days=10)
     data_controller.generate_data(num_days=10, num_tabs=45, dt_start=start_date)
 
-try:
-    feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
-except:
-    print ('Cannot Establish Twilio Connection. Check your Internet Connection. \nError in {}.'.format(__file__))
-    pass
+feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
+
+receipt.get_receipts()

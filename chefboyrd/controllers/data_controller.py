@@ -4,7 +4,9 @@ from calendar import monthrange
 from math import ceil, floor
 from datetime import datetime, timedelta, date, time
 from chefboyrd.models import Orders, Tabs, Meals, Ingredients, MealIngredients, Quantities
+from hashids import Hashids
 
+hashids = Hashids() # does this result in different encode and decodes?s
 
 def get_orders_date_range(dt_min=None, dt_max=None):
     '''Gets a range of orders from one datetime to another datetime joined on Tabs.
@@ -165,7 +167,8 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
                               hour=tab_time.hour,
                               minute=tab_time.minute)
             num_orders = int(clamp_rng(abs(random.gauss(order_per_tab, 1)), 1, 200)) #rng w/ mean of order_per_tab
-            tab = Tabs.create(timestamp=tab_dt, had_reservation=randbool(), party_size=num_orders)
+            tab = Tabs.create(timestamp=tab_dt, had_reservation=randbool(), party_size=num_orders, 
+                fb_key= hashids.encode(int ( (tab_dt - datetime(1970, 8, 15, 6, 0, 0 )).total_seconds())))
             for order in range(num_orders):
                 # Pick a random meal
                 mealname = list(menu.keys())[random.randint(0, len(menu)-1)]

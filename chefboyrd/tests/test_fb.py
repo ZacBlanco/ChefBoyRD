@@ -49,3 +49,5 @@ class MyModuleTest(unittest.TestCase):
         res = dict(zip(a,b))
         self.assertEqual(res,{'good':2,'bad':3,'spaghetti':1,'get':1,'kitchen':1})
         self.assertEqual(maxfreq,3)
+
+    #test stopwords

@@ -11,7 +11,6 @@ class Rating(Model):
         clean(int): 0-5 rating for cleanliness
         ambience(int): 0-5 rating for ambience
         overall(int): 0-5 rating for overall experience
-        comment(str): submitted comment
 
     """
     submission_time = DateTimeField()
@@ -21,5 +20,3 @@ class Rating(Model):
     clean = IntegerField()
     ambience = IntegerField()
     overall = IntegerField()
-
-    comment = TextField()
