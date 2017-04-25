@@ -91,7 +91,7 @@
 				<form action="" method=post>
 				{{ userShift.hidden_tag() }}
 				{{ render_field(userShift.user) }}
-				<p><input type="submit" value="Check Shifts">
+				{{ userShift.submit }}
 				<br>
 				<h3>
 				Current Table for: {{ selection }}
@@ -133,7 +133,7 @@
 					</span>
 				</div>
 			</dl>
-			<p><input type="submit" value="Add Shift">
+			{{ form.submit }}
 		</form>
     <div id='script-warning'>
 		Error getting data from <code>/data</code> endpoint.

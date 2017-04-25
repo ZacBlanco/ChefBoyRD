@@ -1,5 +1,6 @@
 from peewee import CharField, DateTimeField, IntegrityError, BooleanField
 from chefboyrd.models import BaseModel
+from datetime import datetime
 
 class Shift(BaseModel):
     name = CharField(max_length=250)
@@ -27,7 +28,7 @@ class Shift(BaseModel):
                 shift_time_end=shift_time_end,
                 role=role)
         except IntegrityError:
-            raise ValueError("This should not happen (Shift)")
+            raise ValueError("This should not happen (Shift)") 
 
     @classmethod
     def claim_shift(cls, id, name):
