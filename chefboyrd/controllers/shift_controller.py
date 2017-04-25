@@ -56,16 +56,27 @@ def checkPostConditions(id, name, role):
         return True
     else:
         return False
+<<<<<<< HEAD
 
 def checkRemoveConditions(id, role):
     """
     This method checks the ability for the user to post their shift and makes sure that
     the user is not posting another user's shift. The only exceptions are for admins
+=======
+    
+def checkRemoveConditions(id, role):
+    """
+    This method checks the ability for the user to remove the shift and makes sure that
+    the user is not removing shifts without the proper permissions. The only exceptions are for admins
+>>>>>>> refs/remotes/origin/new-ui
     and managers.
 
     Args:
         id: the id of the shift that will be in analysis
+<<<<<<< HEAD
         name: name of the user that is attempting to claim the shift
+=======
+>>>>>>> refs/remotes/origin/new-ui
         role: role of the user that is claiming the shift
 
     Returns:
@@ -74,9 +85,13 @@ def checkRemoveConditions(id, role):
     """
     tryShift = Shift.get_shift(id)
     current_time=datetime.now()
+<<<<<<< HEAD
     if tryShift.shift_time_start<current_time:
         return False
     elif role=='admin' or role=='manager':
+=======
+    if role=='admin' or role=='manager':
+>>>>>>> refs/remotes/origin/new-ui
         return True
     else:
         return False
