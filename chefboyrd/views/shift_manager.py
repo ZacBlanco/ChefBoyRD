@@ -6,13 +6,14 @@ import flask_login
 from flask import Flask, Blueprint, render_template, request, url_for, jsonify, redirect, flash
 from flask_table import Table, Col, ButtonCol
 from flask_wtf import FlaskForm, CsrfProtect
-from wtforms import StringField, IntegerField, validators
+from wtforms import SelectField, validators
 from wtforms.ext.dateutil.fields import DateTimeField
 from datetime import datetime   
 from jinja2 import TemplateNotFound
 import os 
 from chefboyrd.auth import require_role
 from chefboyrd.models.shifts import Shift
+from chefboyrd.models.user import User
 from chefboyrd.controllers import shift_controller
 
 
@@ -22,9 +23,9 @@ class ShiftForm(FlaskForm):
     '''
     This is the form that displays fields to make a shift
     '''
+    role = SelectField('Role', choices={(r.role, r.role) for r in User.select()}, validators=[validators.required()])
     start = DateTimeField('Shift Starting Time', [validators.required()])
     end = DateTimeField('Shift Ending Time', [validators.required()])
-    role = StringField('Role', [validators.Length(min=2, max=25), validators.required()])
 
 class FreeTable(Table):
     '''
@@ -58,8 +59,11 @@ def calendar():
     employee_role = flask_login.current_user.role
     form = ShiftForm()
     if form.validate_on_submit():
-        Shift.create_shift("", form.start.data, form.end.data, form.role.data)
-        flash("Successfully created a shift")   
+        if shift_controller.checkShiftConditions(form.start.data, form.end.data, form.role.data):
+            Shift.create_shift("", form.start.data, form.end.data, form.role.data)
+            flash("Successfully created a shift")   
+        else:
+            flash("Unable to create shift")
     free_shifts = []
     current_time = datetime.now()
     for freeShift in Shift.select().where((Shift.name=="") & (Shift.shift_time_end > current_time)):

@@ -96,6 +96,7 @@
 		<form action="" method=post>
 			<dl>
 				{{ form.hidden_tag() }}
+				{{ render_field(form.role) }}
             <dt>{{ form.start.label }}
               <div class='input-group date' id='datetimepicker1'>
                 <input type='text' name='start' class="form-control"/>
@@ -124,7 +125,6 @@
 					<span class="glyphicon glyphicon-calendar"></span>
 					</span>
 				</div>
-				{{ render_field(form.role) }}
 			</dl>
 			<p><input type="submit" value="Add Shift">
 		</form>

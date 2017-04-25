@@ -1,6 +1,23 @@
 from datetime import timedelta, datetime
 from chefboyrd.models.shifts import Shift
 
+def checkShiftConditions(start, end, role):
+    """
+    This method checks that the shift is a reasonable accommadation for the restaurant
+
+    Args:
+        start: the time that the shift starts
+        end: the time that the shift ends
+        role: role of the user that is required to claim the shift
+
+    Returns:
+        True: if the shift is reasonable
+        False: if the shift is unreasonable
+    """
+    daily_hour_limit = timedelta(hours=8)
+    if start-end > daily_hour_limit:
+        return False
+
 def checkAvailability(id, name, role):
     """
     This method checks the availability of the shifts and makes sure that there are no
