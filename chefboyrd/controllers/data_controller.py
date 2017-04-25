@@ -100,12 +100,10 @@ def get_meals_in_range(dt_min, dt_max):
         dt_max (datetime): Ending datetime
     Returns:
         int: The total number of meals served in the range.
-    
-    
+
     '''
-    meals = Orders.select(fn.COUNT()).join(Tabs).where(Tabs.timestamp >= dt_min,
-                                                       Tabs.timestamp <= dt_max).fn()
-    return 
+    meals = get_orders_date_range(dt_min, dt_max)
+    return len(meals)
 
 
 def people_in_range(dt_min=None, dt_max=None):
