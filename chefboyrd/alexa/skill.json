@@ -1,0 +1,356 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": [
+        "nevermind"
+      ]
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": [
+        "What commands are available",
+        "list commands",
+        "list commands please",
+        "help"
+      ]
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": [
+        "stop"
+      ]
+    },
+    {
+      "name": "CommandIntent",
+      "samples": [
+        "Can I hear about our restuarant statistics",
+        "How is the restaurant doing",
+        "how is the business doing",
+        "How is {stat_type}  doing from {start_date}  to {end_date} ",
+        "How have we been doing since {start_date} ",
+        "Tell me about {stat_type} from {start_date} to {end_date} ",
+        "Tell me about {stat_type} from {start_date} until {end_date} ",
+        "Tell me about {stat_type} since {start_date}",
+        "{stat_type} ",
+        "how the business is doing",
+        "the business"
+      ],
+      "slots": [
+        {
+          "name": "stat_type",
+          "type": "STAT_TYPES",
+          "samples": []
+        },
+        {
+          "name": "start_date",
+          "type": "AMAZON.DATE",
+          "samples": [
+            "{start_date} "
+          ]
+        },
+        {
+          "name": "end_date",
+          "type": "AMAZON.DATE",
+          "samples": []
+        }
+      ]
+    },
+    {
+      "name": "PredictionIntent",
+      "samples": [
+        "What are the predicted meal usages",
+        "Can I get a meal prediction",
+        "Give me the predicted meal usages",
+        "Give me meal predictions",
+        "What are the meal predictions",
+        "I want the predictions for {meal_type} ",
+        "I want the predictions for {meal_type} from {start_date} to {end_date}",
+        "about the predictions for {meal_type}",
+        "about the predictions for {meal_type} from {start_date} to {end_date}",
+        "about meal predictions"
+      ],
+      "slots": [
+        {
+          "name": "meal_type",
+          "type": "PREDICTION_TYPES",
+          "samples": [
+            "{meal_type}",
+            "I want {meal_type}"
+          ]
+        },
+        {
+          "name": "start_date",
+          "type": "AMAZON.DATE",
+          "samples": [
+            "{start_date}"
+          ]
+        },
+        {
+          "name": "end_date",
+          "type": "AMAZON.DATE",
+          "samples": [
+            "{end_date}"
+          ]
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "PREDICTION_TYPES",
+      "values": [
+        {
+          "name": {
+            "value": "hamburger"
+          }
+        },
+        {
+          "name": {
+            "value": "cheeseburger"
+          }
+        },
+        {
+          "name": {
+            "value": "bacon burger"
+          }
+        },
+        {
+          "name": {
+            "value": "cheesesteak"
+          }
+        },
+        {
+          "name": {
+            "value": "blt"
+          }
+        },
+        {
+          "name": {
+            "value": "hoagie"
+          }
+        },
+        {
+          "name": {
+            "value": "french fries"
+          }
+        },
+        {
+          "name": {
+            "value": "onion rings"
+          }
+        },
+        {
+          "name": {
+            "value": "grilled cheese"
+          }
+        },
+        {
+          "name": {
+            "value": "tuna sandwich"
+          }
+        },
+        {
+          "name": {
+            "value": "chicken quesadilla"
+          }
+        },
+        {
+          "name": {
+            "value": "turkey sandwich"
+          }
+        },
+        {
+          "name": {
+            "value": "caesar wrap"
+          }
+        },
+        {
+          "name": {
+            "value": "pizza steak"
+          }
+        },
+        {
+          "name": {
+            "value": "pulled pork"
+          }
+        },
+        {
+          "name": {
+            "value": "buffalo chicken cheesesteak"
+          }
+        },
+        {
+          "name": {
+            "value": "roast beef sandwich"
+          }
+        },
+        {
+          "name": {
+            "value": "chicken parmesan sandwich"
+          }
+        },
+        {
+          "name": {
+            "value": "steak"
+          }
+        },
+        {
+          "name": {
+            "value": "spaghetti and meatballs"
+          }
+        },
+        {
+          "name": {
+            "value": "rock sandwich"
+          }
+        }
+      ]
+    },
+    {
+      "name": "STAT_TYPES",
+      "values": [
+        {
+          "name": {
+            "value": "performance"
+          }
+        },
+        {
+          "name": {
+            "value": "meals"
+          }
+        },
+        {
+          "name": {
+            "value": "tabs"
+          }
+        },
+        {
+          "name": {
+            "value": "ingredients"
+          }
+        },
+        {
+          "name": {
+            "value": "revenue"
+          }
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "Elicit.Intent-CommandIntent.IntentSlot-start_date",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What is the start date of the report?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-PredictionIntent.IntentSlot-meal_type",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What is the meal that you are interested in?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-PredictionIntent.IntentSlot-start_date",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What is the start date?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-PredictionIntent.IntentSlot-end_date",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What is the end date?"
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "CommandIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "stat_type",
+            "type": "STAT_TYPES",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "start_date",
+            "type": "AMAZON.DATE",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-CommandIntent.IntentSlot-start_date"
+            }
+          },
+          {
+            "name": "end_date",
+            "type": "AMAZON.DATE",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          }
+        ]
+      },
+      {
+        "name": "PredictionIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "meal_type",
+            "type": "PREDICTION_TYPES",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-PredictionIntent.IntentSlot-meal_type"
+            }
+          },
+          {
+            "name": "start_date",
+            "type": "AMAZON.DATE",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-PredictionIntent.IntentSlot-start_date"
+            }
+          },
+          {
+            "name": "end_date",
+            "type": "AMAZON.DATE",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-PredictionIntent.IntentSlot-end_date"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

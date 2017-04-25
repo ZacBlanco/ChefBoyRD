@@ -1,0 +1,12 @@
+welcome: Welcome to chef boy are dee. Say "help" for a list of commands 
+help: You can request statistics or predictions. The statistics which are available are revenue, meals, tabs, and performance 
+stats: You requested information on {{ stat }}. Here is the information I have 
+stop: Okay. Let me know if you need anything else 
+bad_dates: The report start date was {{ start }} The end date was {{ end }} The end date should be after the start date Please ask again
+num_people: We served {{ num }} people from {{ start }} to {{ end }} 
+dollars: The amount of revenue collected was {{ amount }} dollars 
+meals: We served a total of {{ meal }} meals to our customers 
+tabs: Our restaurant served a total of {{ parties }} parties during this time 
+prediction: You should make {{ meal_count }} of {{ meal_type }} 
+unsuited_prediction: The predicted values are unsuited for the specified date range. Pick a better date range 
+failed_prediction: I was unable to find your meal 
