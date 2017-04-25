@@ -3,10 +3,10 @@ import sys
 from datetime import datetime
 from flask import Flask, render_template
 from flask_ask import Ask, statement, question, session
-
-sys.path.append('..')
-
 from chefboyrd.controllers import data_controller
+from chefboyrd.controllers import model_controller
+from chefboyrd.controllers import prediction_controller
+
 
 
 APP = Flask(__name__)
