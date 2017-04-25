@@ -90,7 +90,6 @@ def calendar():
     form2.user.default=''
     if form2.validate_on_submit() and form2.submit.data:
         if form2.user.data=='':
-            print("All user table")
             for claimShift in Shift.select().where((Shift.name!="")&(Shift.shift_time_end>current_time)):
                 claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
             selection='All Users'
@@ -98,7 +97,6 @@ def calendar():
             flash("Shifts for selected user is displayed")
             return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
         else:
-            print("unique table")
             for userShift in Shift.select().where((Shift.name==form2.user.data)&(Shift.shift_time_end>current_time)):
                 claim_shifts.append(dict(shift_time_start=userShift.shift_time_start, shift_time_end=userShift.shift_time_end, role=userShift.role, id=userShift.id))
             selection=form2.user.data
@@ -106,7 +104,6 @@ def calendar():
             flash("Shifts for selected user is displayed")
         return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
     else:
-        print("default table")
         for claimShift in Shift.select().where((Shift.name!="")&(Shift.shift_time_end>current_time)):
             claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
         selection='All Users'
