@@ -39,6 +39,17 @@ class ModelTest(unittest.TestCase):
         os.close(self.db_fd)
         os.unlink(self.db_name)
 
+    # def test_badPrediction(self):
+    #     data_controller.generate_data(num_days=8, num_tabs=25, order_per_tab=2)
+    #     start = datetime.now()
+    #     end = start + timedelta(days=300)
+    #     modelType = 'Polynomial'
+    #     orders = data_controller.get_orders_date_range()
+    #     processedOrders = model_controller.orders_to_list(orders)
+    #     params = model_controller.train_regression(processedOrders, modelType)
+    #     mealUsage = prediction_controller.predict_regression(params, modelType, start, end)
+        # Assertion??
+
     def test_polynomialModel(self):
         iv = [1, 2, 3] # Input vector
         ip = [1, 1, 1, 1] # Input parameters
@@ -89,7 +100,7 @@ class ModelTest(unittest.TestCase):
         mis = MealIngredients.select().where(MealIngredients.quantity_amt == 1)
         self.assertEqual(len(mis), 1)
 
-    def test_get_order_range(self):
+    def test_fpriorder_range(self):
         m1 = Meals.create(name="Burger", price=8.99)
         num = 20
         times = []
@@ -123,6 +134,12 @@ class ModelTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             data_controller.get_orders_date_range(times[5], times[4])
+
+    def test_get_meals(self):
+        start = datetime.now()
+        end = start + timedelta(days=5)
+        data_controller.generate_data(2, 1, 1)
+        self.assertNotEqual(0, data_controller.get_meals_in_range(datetime.now(), end), 'Should get more than 1 meal.')
 
     def test_get_tab_range(self):
         num = 20

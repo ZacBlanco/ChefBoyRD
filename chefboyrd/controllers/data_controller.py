@@ -5,6 +5,7 @@ from math import ceil, floor
 from datetime import datetime, timedelta, date, time
 from chefboyrd.models import Orders, Tabs, Meals, Ingredients, MealIngredients, Quantities
 from hashids import Hashids
+from peewee import fn
 
 hashids = Hashids() # does this result in different encode and decodes?s
 
@@ -65,17 +66,17 @@ def get_tabs_range(dt_min=None, dt_max=None):
 
 def get_dotw_orders(dotw):
     '''Gets all orders on a given day of the week
-    
+
     Interesting challenge because we only have a datetime value.
     Args:
         dotw (int): An integer representing the day of the week. 0 for Monday, 6 for Sunday.
-    
+
     Returns:
         list: A list of all order models on a given day of the week.
     '''
     if dotw < 0 or dotw > 6:
         raise ValueError("DoTW {} is not in the valid range of [0, 6]".format(dotw))
-    
+
     ords = []
     orders = Orders.select()
     for order_t in orders:
@@ -84,14 +85,28 @@ def get_dotw_orders(dotw):
             ords.append(order)
     return ords
 
-
-def get_dollars_in_range(dt_min=None, dt_max=None):
+def get_dollars_in_range(dt_min, dt_max):
     '''Returns the total sum of revenue from a range of dates'''
-    meals = get_meals(dt_min, dt_max)
-    sum = 0
-    for meal in meals:
-        sum += meal.price
-    return sum
+    meals = Orders.select().join(Meals).switch(Orders).join(Tabs).where(Tabs.timestamp >= dt_min,
+                                                                        Tabs.timestamp <= dt_max)
+    tot = 0
+    for order in meals:
+        tot += order.meal.price
+    return tot
+
+def get_meals_in_range(dt_min, dt_max):
+    '''Returns the total sum of meals from a range of datetimes
+
+    Args:
+        dt_min (datetime): Starting datetime
+        dt_max (datetime): Ending datetime
+    Returns:
+        int: The total number of meals served in the range.
+
+    '''
+    meals = get_orders_date_range(dt_min, dt_max)
+    return len(meals)
+
 
 def people_in_range(dt_min=None, dt_max=None):
     '''Returns the total number of people served in a range of dates'''
@@ -122,7 +137,7 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
       - Opening time is 7AM
       - Closing time is 10PM
       - Tabs are generated throughout the day UNEVENLY. Orders increase during the evening
-    
+
     Args:
         num_days (int): default=10, The number of days to generate data for
         num_tabs (int): default=50, The average number of tabs per day
