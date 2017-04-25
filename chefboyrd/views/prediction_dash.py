@@ -70,5 +70,3 @@ def prediction_index(role):
 
 	return render_template('/prediction/index.html', logged_in=True, meals=mealUsage,role=role)
 
-
->>>>>>> master

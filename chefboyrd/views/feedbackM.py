@@ -152,4 +152,3 @@ def send_sms_route():
     """
     feedback_controller.update_db(date.today())
     return 'db updated'
->>>>>>> master

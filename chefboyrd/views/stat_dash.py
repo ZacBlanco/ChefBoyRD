@@ -247,4 +247,3 @@ def dash_index(role):
     else:
         pass
     return render_template('/dashboard/index.html', options=options, logged_in=True, graphs=graphs,role=role)
->>>>>>> master

@@ -75,5 +75,4 @@ def cancel():
     id = request.args.get('id')
     tables.Booking.cancel_reservation(id)
     # reservation.Reservation.create_reservation(form.name.data,form.num.data,form.phone.data,form.start.data)
->>>>>>> master
     return redirect(url_for('reservationH.resH_index'))

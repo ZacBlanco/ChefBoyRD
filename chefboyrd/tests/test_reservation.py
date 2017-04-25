@@ -139,5 +139,4 @@ class ModelTest(unittest.TestCase):
             booking_date_time=datetime(2017, 2, 14, 21, 0),
             people=2,
             minutes_slot=120,name='Bob',phone='5555555555')
->>>>>>> master
         self.assertEqual(booking_response['table'], self.restaurant_1_table_1.id)

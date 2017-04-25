@@ -142,4 +142,3 @@ def del_table():
     id = int(request.form['id'])
     id = tables.Tables.delTable(id)
     return json.dumps(id)
->>>>>>> master
