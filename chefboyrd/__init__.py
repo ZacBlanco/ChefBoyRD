@@ -84,12 +84,13 @@ def after_request(response):
 # Register all views after here
 # =======================
 from chefboyrd.auth import auth_pages
-from chefboyrd.views import root, stat_dash, reservationH, table_manager, feedbackM, prediction_dash, feedbackC, settings
+from chefboyrd.views import root, stat_dash, reservationH, reservationG, table_manager, feedbackM, prediction_dash, feedbackC, settings
 
 APP.register_blueprint(root.page, url_prefix='/test')
 APP.register_blueprint(stat_dash.page, url_prefix='/dashboard')
 APP.register_blueprint(auth_pages, url_prefix='/auth')
 APP.register_blueprint(reservationH.page, url_prefix='/reservationH')
+APP.register_blueprint(reservationG.page, url_prefix='/reservationG')
 APP.register_blueprint(table_manager.page, url_prefix='/table_manager')
 APP.register_blueprint(feedbackM.page, url_prefix='/feedbackM')
 APP.register_blueprint(prediction_dash.page, url_prefix='/prediction')
@@ -114,7 +115,7 @@ Orders.create_table(True)
 sms.Sms.create_table(True)
 reservation.Reservation.create_table(True)
 tables.Restaurant.create_table(True)
-tables.Table.create_table(True)
+tables.Tables.create_table(True)
 tables.Booking.create_table(True)
 
 # ==================================== Universal Routes ======================================== #
@@ -140,13 +141,13 @@ try:
 except:
     pass
 
-# try:
-#     # Test User:
-#     # email: zac
-#     # Password: zac 
-#     tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
-# except:
-#     pass
+try:
+    # Test User:
+    # email: zac
+    # Password: zac 
+    tables.Restaurant.create_restaurant('Pizzeria Vesuvio','Traditional pizza of Napoli',9,23)
+except:
+    pass
 
 # try:
 #     # Test User:

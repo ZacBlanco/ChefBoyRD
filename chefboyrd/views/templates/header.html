@@ -2,6 +2,9 @@
     <header>
         <ul class="nav nav-pills nav-stacked">
             <li role="presentation" class="nav-element"><a href="/">Home</a></li>
+            {% if role != 'admin' and role != 'host' and role != 'chef'%}
+            <li role="presentation" class="nav-element"><a href="/reservationG">Guest Reservation</a></li>
+            {% endif %}
             {% if role == 'admin'%}
             <li role="presentation" class="nav-element"><a href="/dashboard">Statistics</a></li>
             <li role="presentation" class="nav-element"><a href="/prediction">Prediction</a></li>

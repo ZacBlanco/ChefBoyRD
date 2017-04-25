@@ -3,7 +3,7 @@ from chefboyrd.models import BaseModel
 
 
 class Restaurant(BaseModel):
-    name = CharField(max_length=250)
+    name = CharField(max_length=250,unique=True)
     description = CharField(max_length=250)
     opening_time = IntegerField()
     closing_time = IntegerField()
@@ -34,15 +34,16 @@ class Restaurant(BaseModel):
         except IntegrityError:
             raise ValueError("This should not happen(Restaurant)")
 
-class Table(BaseModel):
+class Tables(BaseModel):
     restaurant = ForeignKeyField(Restaurant)
     size = IntegerField()
+    shape = IntegerField()
     occupied = BooleanField()
     posX = FloatField()
     posY = FloatField()
 
     @classmethod
-    def create_tables(cls,restaurant,size, occupied, posX, posY):
+    def create_tables(cls,restaurant,size, occupied, posX, posY, shape):
         '''Creates a new reservation
         
         Args:
@@ -52,6 +53,7 @@ class Table(BaseModel):
             occupied(bool): Determines if a table is occupied. 0 is not occupied, and 1 is occupied
             posX(float): The relative x position of the table
             posY(float): The relative y position of the table
+            shape(int): An integer representing the shape of the table. 0 = Circle, 1 = Square, 2 = Rectangle, 3 = Vertical Rectangle
 
         Returns:
             N/A
@@ -62,15 +64,24 @@ class Table(BaseModel):
         try:
             tb = cls.create(
                 restaurant=restaurant,
-                size=size, occupied=occupied, posX=posX,posY=posY)
+                size=size, occupied=occupied, posX=posX,posY=posY, shape=shape)
             return [tb.posX,tb.posY,tb.occupied,tb.id]
+        except IntegrityError:
+            raise ValueError("This should not happen(Table)")
+
+    @classmethod
+    def delTable(cls,id):
+        try:
+            res = cls.get(cls.id == id)
+            res.delete_instance()
+            return
         except IntegrityError:
             raise ValueError("This should not happen(Table)")
 
 
 
 class Booking(BaseModel):
-    table = ForeignKeyField(Table)
+    table = ForeignKeyField(Tables)
     people = IntegerField()
     phone = CharField() # Phone number 
     name = CharField() # Name of person who made the reservation
@@ -86,9 +97,12 @@ class Booking(BaseModel):
         cls(Booking(: an object representing a booking
         id(int): the id of the booking we want to cancel
         '''
-        res = cls.get(cls.id == id)
-        res.delete_instance()
-        return
+        try:
+            res = cls.get(cls.id == id)
+            res.delete_instance()
+            return
+        except IntegrityError:
+            raise ValueError("This should not happen(Table)")
 
     @classmethod
     def create_booking(cls,table,people,booking_date_time_start,booking_date_time_end, name, phone):
