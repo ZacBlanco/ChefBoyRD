@@ -84,17 +84,18 @@
 		{% from "_formhelpers.html" import render_field, render_field_date %}
     <div>
 				Employee name: {{ name }} <br> Employee role: {{ role }}
-				<h3> Here is the list of open shifts </h3>
+				<h3> Open Shifts (Available)</h3>
         {{ freeTable }}
-        <h3>
-				Here is the list of taken shifts
-				</h3>
+        <h3>Claimed Shifts (Taken)</h3>
 				Select employee to see their shifts: 
 				<form action="" method=post>
 				{{ userShift.hidden_tag() }}
-				{{ render_field(userShift.user) }}<p><input type="submit" value="Check Shifts">
-				</form>
+				{{ render_field(userShift.user) }}
+				<p><input type="submit" value="Check Shifts">
 				<br>
+				<h3>
+				Current Table for: {{ selection }}
+				</h3>
 				{{ claimTable }}
 		<h1>Add a Shift Here</h1>
 		<br>

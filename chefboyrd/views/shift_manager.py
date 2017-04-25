@@ -31,7 +31,10 @@ class CheckForm(FlaskForm):
     '''
     This is the form that allows users to pick between different people that work at the same place.
     '''
-    user = SelectField('', choices={(u.name, u.name) for u in User.select()})
+    default = {('', 'All Users')}
+    others = {(u.name, u.name) for u in User.select()}
+    combined = default.union(others)
+    user = SelectField('', choices=combined)
 
 class FreeTable(Table):
     '''
@@ -44,11 +47,22 @@ class FreeTable(Table):
     claim = ButtonCol('Claim Shift', 'shift_manager.claim', url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-success'}, column_html_attrs={'class': 'spaced-table-col'})
     remove = ButtonCol('Remove Shift', 'shift_manager.remove', url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-danger'}, column_html_attrs={'class': 'spaced-table-col'})
 
+class UniqueTable(Table):
+    '''
+    This UniqueTable class generates a table of the claimed shifts
+    for a specific user. It also has a button to post a shift
+    '''
+    role = Col('Role', column_html_attrs={'class': 'spaced-table-col'})
+    shift_time_start = Col('Starting Time', column_html_attrs={'class': 'spaced-table-col'})
+    shift_time_end = Col('Ending Time', column_html_attrs={'class': 'spaced-table-col'})
+    post = ButtonCol('Post Shift', 'shift_manager.post',url_kwargs=dict(id='id'), button_attrs={'class': 'btn btn-warning'}, column_html_attrs={'class': 'spaced-table-col'})
+
 class ClaimTable(Table):
     '''
     This ClaimTable class generates a table of the claimed shifts.
     It also has a button to post a shift
     '''
+    name = Col('Name', column_html_attrs={'class': 'spaced-table-col'})
     role = Col('Role', column_html_attrs={'class': 'spaced-table-col'})
     shift_time_start = Col('Starting Time', column_html_attrs={'class': 'spaced-table-col'})
     shift_time_end = Col('Ending Time', column_html_attrs={'class': 'spaced-table-col'})
@@ -76,17 +90,28 @@ def calendar():
     for freeShift in Shift.select().where((Shift.name=="") & (Shift.shift_time_end > current_time)):
         free_shifts.append(dict(shift_time_start=freeShift.shift_time_start, shift_time_end=freeShift.shift_time_end, role=freeShift.role, id=freeShift.id))
     freeTable = FreeTable(free_shifts)
-
     claim_shifts = []
     if form2.validate_on_submit():
+        if form2.user.data=='':
+            for claimShift in Shift.select().where((Shift.name!="") & (Shift.shift_time_end > current_time)):
+                claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
+            selection='All Users'
+            claimTable = ClaimTable(claim_shifts)
+            flash("Shifts for selected user is displayed")
+            return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
+        else:
+            for userShift in Shift.select().where(Shift.name==form2.user.data):
+                claim_shifts.append(dict(shift_time_start=userShift.shift_time_start, shift_time_end=userShift.shift_time_end, role=userShift.role, id=userShift.id))
+            selection=form2.user.data
+            claimTable=UniqueTable(claim_shifts)
         flash("Shifts for selected user is displayed")
-        for userShift in Shift.select().where(Shift.name==form2.user.data):
-            claim_shifts.append(dict(shift_time_start=userShift.shift_time_start, shift_time_end=userShift.shift_time_end, role=userShift.role, id=userShift.id))
+        return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
     else:
         for claimShift in Shift.select().where((Shift.name!="") & (Shift.shift_time_end > current_time)):
             claim_shifts.append(dict(name=claimShift.name, shift_time_start=claimShift.shift_time_start, shift_time_end=claimShift.shift_time_end, role=claimShift.role, id=claimShift.id))
-    claimTable = ClaimTable(claim_shifts)
-    return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2)
+        selection='All Users'
+        claimTable = ClaimTable(claim_shifts)
+        return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
 
 @page.route('/data')
 def return_data():
