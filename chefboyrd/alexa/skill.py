@@ -8,6 +8,11 @@ APP = Flask(__name__)
 ask = Ask(APP, "/")
 logging.getLogger("flask_ask").setLevel(logging.INFO)
 
+def reprompt():
+    resp = statement('')
+    resp._response = {}
+    resp._response['directives'] = [{'type':'Dialog.Delegate'}]
+    return resp
 
 @ask.launch
 def welcome():
@@ -24,11 +29,9 @@ def stop():
 
 @ask.intent("CommandIntent", convert={'stat_type': str, 'start_date': datetime, 'end_date': datetime})
 def statistics(stat_type, start_date, end_date):
-
-    if stat_type is None or start_date is None:
-        resp = statement('')
-        resp._response = {}
-        resp._response['directives'] = {'type':'Dialog.Delegate'}
+    print("Stat Function Args: type: {}, start: {}, end: {}".format(stat_type, start_date, end_date))
+    if start_date is None:
+        return reprompt()
 
     return statement('I got all of your information')
 
@@ -36,9 +39,9 @@ def statistics(stat_type, start_date, end_date):
 def prediction(meal_type, start_date, end_date):
 
     if meal_type is None or start_date is None:
-        resp = statement('')
-        resp._response = {}
-        resp._response['directives'] = {'type':'Dialog.Delegate'}
+        return reprompt()
+
+
 
     return statement('I got all of your information for prediction.')
 
