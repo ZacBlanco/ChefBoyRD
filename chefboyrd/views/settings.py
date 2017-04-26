@@ -1,8 +1,13 @@
 """
+written by: Seo Bo Shim
+tested by: Seo Bo Shim
+debugged by: Seo Bo Shim
+"""
+
+"""
 settings
 This view is for displaying the settings page. Users with admin role can:
     -add and remove users
-
 """
 
 from wtforms import TextAreaField, SubmitField
@@ -63,6 +68,9 @@ def add_user(role):
 
     Returns:
         Template with an error or a confirmation page with the added user
+    table(FlaskTable object): formatted table to display in index.
+    table_label(str): label for the displayed table
+    main(bool): Condition to display the add-user form. Confirmation pages accessed with POST methods have main=False
     """
     form = AddUserForm()
     if request.form.get('password') == request.form.get('re_password'):
@@ -101,6 +109,9 @@ def remove_user():
 
 def _display_users():
     """Helper function for displaying table of Users in DB
+    Returns:
+        table(Table object) if successful. 0 if no users could be found
+
     """
     try:
         res = User.select().order_by(-User.role)

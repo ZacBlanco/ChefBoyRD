@@ -7,17 +7,22 @@ from datetime import datetime
 
 class MyModuleTest(unittest.TestCase):
 
-    def test_update_db_delete(self):
+    def test_update_db(self):
         """test the send_sms function
         """
         #TODO: if twilio connection not maintained
         self.assertEqual(feedback_controller.update_db(datetime(2016, 3, 21), "test"), 1)
         self.assertEqual(feedback_controller.update_db(datetime(2027, 3, 21), "test"), 0)
-        feedback_controller.delete_feedback()
+        query = Sms.delete()
+        res = query.execute()
         self.assertEqual(len(Sms.select()), 0)
         feedback_controller.update_db(update_from="test")
         self.assertTrue(len(Sms.select()) > 0)
-        feedback_controller.delete_feedback()
+        smss = Sms.select().where(Sms.sid == 1)
+        for sms in smss:
+            self.assertEqual(sms.phone_num, "+12345678905")
+        query = Sms.delete()
+        res = query.execute()
         self.assertEqual(len(Sms.select()), 0)
 
 
@@ -33,6 +38,11 @@ class MyModuleTest(unittest.TestCase):
         testStr = "Service was bad,  but food was good"
         self.assertEqual(feedback_controller.feedback_analysis(testStr), [1, 1, 1, 1, 1])
 
+    def test_delete_twilio_feedback(self):
+        self.assertEqual(feedback_controller.delete_twilio_feedback(9),0)
+        self.assertEqual(feedback_controller.delete_twilio_feedback("87fuei8a9s7"),0)
+        #with self.assertRaises(ValueError):
+        #    feedback_controller.delete_twilio_feedback("87fuei8a9s7")
 
     def test_word_freq_counter(self):
         """ Tests for correct performance of word frequency counter on known string inputs."""
