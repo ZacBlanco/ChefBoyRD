@@ -1,5 +1,6 @@
-'''PredictionController
-This controller performs our machine learning algorithms
+'''This controller performs our machine learning algorithms using
+non-linear regression fits on the data.
+
 written by: Richard Ahn
 tested by: Richard Ahn
 debugged by: Richard Ahn

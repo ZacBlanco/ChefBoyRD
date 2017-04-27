@@ -1,3 +1,6 @@
+'''This module and its functions handle the logic for table reservations for the restaurant.
+It also handles moving data in and out of our database via the via our application models.'''
+
 from datetime import timedelta, datetime
 from chefboyrd.models.tables import Tables, Booking, Restaurant
 

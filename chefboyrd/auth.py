@@ -53,10 +53,10 @@ def require_role(role,**kwargss):
     By decorating a function with @require_role you are implicity forcing @login_required as well.
     Example:
 
-            @APP.route('/admin-dashboard')
-            @require_role('admin')
-            def view_dash():
-                ...
+        @APP.route('/admin-dashboard')
+        @require_role('admin')
+        def view_dash():
+        # Something here
 
             @APP.route('/reservationH')
             @require_role('admin','host',getrole=True)
