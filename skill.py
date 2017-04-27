@@ -1,3 +1,10 @@
+'''Amazon Alexa Skill using Flask-Ask
+
+written by: Zachary Blanco, Richard Ahn
+tested by: Zachary Blanco
+debugged by: Zachary Blanco
+'''
+
 import logging
 import sys
 from datetime import datetime

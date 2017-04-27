@@ -1,5 +1,8 @@
 '''PredictionController
 This controller performs our machine learning algorithms
+written by: Richard Ahn
+tested by: Richard Ahn
+debugged by: Richard Ahn
 '''
 
 import numpy as np

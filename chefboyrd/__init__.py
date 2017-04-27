@@ -1,5 +1,10 @@
 '''Main file to register blueprints and run the flask application
 
+
+written by: Zachary Blanco, Jeffrey Huang, Seo Bo Shim, Brandon Smith, Jarod Morin
+tested by: Zachary Blanco, Jeffrey Huang, Seo Bo Shim, Brandon Smith, Jarod Morin
+debugged by: Zachary Blanco, Jeffrey Huang, Seo Bo Shim, Brandon Smith, Jarod Morin
+
 This is where most of the app setup is done. We shouldn't have to modify this file except
 for two different cases:
 
@@ -38,7 +43,6 @@ Other helpful sources of documentaiton and reading:
 
 
 '''
-
 import configparser
 import flask_login
 from flask import Flask, render_template

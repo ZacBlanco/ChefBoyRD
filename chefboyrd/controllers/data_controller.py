@@ -1,4 +1,10 @@
-'''DataController - This is used to get relevant data for the model controller.'''
+'''Used to get relevant data for the model controller and statistics dashboard
+
+written by: Zachary Blanco, Richard Ahn
+tested by: Zachary Blanco, Richard Ahn
+debugged by: Zachary Blanco, Richard Ahn
+
+'''
 import random
 from calendar import monthrange
 from math import ceil, floor
@@ -34,7 +40,7 @@ def get_orders_date_range(dt_min=None, dt_max=None):
         raise ValueError("Max datetime must be greater than min datetime")
     else:
         ords = Orders.select().join(Tabs).where(Tabs.timestamp >= dt_min,
-                                                           Tabs.timestamp <= dt_max)
+                                                Tabs.timestamp <= dt_max)
     return ords
 
 def get_tabs_range(dt_min=None, dt_max=None):
@@ -109,7 +115,12 @@ def get_meals_in_range(dt_min, dt_max):
 
 
 def people_in_range(dt_min=None, dt_max=None):
-    '''Returns the total number of people served in a range of dates'''
+    '''Returns the total number of people served in a range of dates
+
+    Args:
+        dt_min (datetime): Beginning datetime in range
+        dt_max (datetime): Ending datetime in range
+    '''
     tabs = get_tabs_range(dt_min, dt_max)
     total_people = 0
     for tab in tabs:
@@ -117,7 +128,14 @@ def people_in_range(dt_min=None, dt_max=None):
     return total_people
 
 def get_reservations_on_dotw(dotw):
-    '''Gets the number of reservations on a given day of the week.'''
+    '''Gets the number of reservations on a given day of the week
+
+    Args:
+        dotw (int): Integer representing day of the week
+
+    Returns:
+        int: Number of reservations on the day of the week.
+    '''
     if dotw < 0 or dotw > 6:
         raise ValueError("DoTW {} is not in the valid range of [0, 6]".format(dotw))
 
@@ -192,6 +210,7 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
                 new_meal = Orders.create(meal=meal.get_id(), tab=tab.get_id())
 
 def randbool():
+    '''Return a random boolean (approx 50/50)'''
     return random.gauss(0, 1) >= 0
 
 def clamp_rng(num, lo, hi):
@@ -202,6 +221,7 @@ def clamp_rng(num, lo, hi):
     '''
     return lo + (abs(num) % (hi-lo))
 
+'''The menu used to generate data for our demos'''
 menu = {
         'hamburger': {
             'price': 8.99,
