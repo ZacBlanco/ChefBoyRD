@@ -1,13 +1,14 @@
+"""feedbackM
+This view is specifically for the administrative staff's management of the feedback.
+"""
+
 """
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
 """
 
-"""
-feedbackM
-This view is specifically for the administrative staff's management of the feedback
-"""
+
 
 from flask import Blueprint, render_template, request
 from flask_table import Table, Col

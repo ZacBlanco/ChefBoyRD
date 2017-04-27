@@ -1,16 +1,16 @@
+"""Sms
+Contains the SMS model. Feedback submitted
+"""
 """
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
 """
 
-"""Contains the SMS model. Feedback submitted via text message
-"""
-
 from peewee import TextField, DateTimeField, Model, IntegerField, BooleanField
 from chefboyrd.models import BaseModel
 
-class Sms(Model):
+class Sms(BaseModel):
     """ A model for SMS objects to be stored and analyzed. The many flags hold a range of values between -1 and 1
     """
     sid = TextField(unique=True)

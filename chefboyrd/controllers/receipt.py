@@ -1,12 +1,10 @@
+"""receipt
+Interfaces with an external system that generates receipts
+"""
 """
 written by: Seo Bo Shim
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
-"""
-
-"""
-receipt
-Interfaces with an external system that generates receipts
 """
 
 from chefboyrd.models.statistics import Tabs

@@ -1,15 +1,13 @@
+"""FeedbackController 
+Houses all the functions to add or delete sms objects into the database
+Includes the feedback analysis functions
+
+"""
 """
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim, Jarod Morin
 debugged by: Seo Bo Shim, Jarod Morin
 """
-
-"""
-This houses all the functions to add or delete sms objects into the database
-Includes the feedback analysis functions
-
-"""
-
 
 from chefboyrd.models.sms import Sms
 from chefboyrd.models.statistics import Tabs
@@ -20,7 +18,7 @@ from string import punctuation
 from datetime import datetime, date, timedelta
 import configparser
 import os
-from chefboyrd.tests.test_fb_data import test_sms_data, TestMessages
+from chefboyrd.tests.test_fb_data import test_sms_data, TestMessages, auto_generate_sms_data
 import requests as request
 
 #if in travis, use environment variables. If not in travis, use configuration file. If configuration file missing. email seobo.shim@rutgers.edu
@@ -53,8 +51,9 @@ negationWordList = configDict['negationlist'].split(' ')
 emphasisWordList = configDict['emphasislist'].split(' ')
 foodWordList = configDict['foodlist'].split(' ')
 serviceWordList = configDict['servicelist'].split(' ')
+stopWordList = configDict['stoplist'].split(' ')
 
-def update_db(*date_from, **update_from):
+def update_db(*date_from, **kwargs):
     """Updates the sms in the database starting from the date_from specified (at time midnight)
     no param = updates the sms feedback in database with all message entries
     analyze feedback when sms is sent
@@ -71,12 +70,21 @@ def update_db(*date_from, **update_from):
         auth_token
     """
 
-    if update_from:
-        messages = test_sms_data(5, datetime(2016, 3, 25))
+    if (kwargs):
+        if(kwargs["update_from"]):
+            if(kwargs['update_from'] == "test"):
+                messages = test_sms_data(5, datetime(2016, 3, 25))
+            elif(kwargs['update_from'] == "autogen"):
+                messages = auto_generate_sms_data()
+            else:
+                return 0
+        else:
+            return 0
     else:
         process_incoming_sms()
         try:
             client = Client(account_sid,auth_token)
+            messages = client.messages.list(to=restaurant_phone_number)
         except:
             raise SystemError
         #better abstraction would be, twilio function returns a list of objects. this list of
@@ -153,6 +161,7 @@ def process_incoming_sms(*one):
             valid_keys.append(key)
     try:
         client = Client(account_sid,auth_token)
+        messages = client.messages.list(to=restaurant_phone_number)
     except:
         raise SystemError
 
@@ -311,7 +320,6 @@ def delete_twilio_feedback(sidd):
             for sid in sidd:
                 url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sid
                 response = request.delete(url)
-                sms.delete()
                 if response.status_code == 204:
                     return 1
                 if response.status_code == 404:
@@ -467,9 +475,6 @@ def word_freq_counter(inStr):
 
     wordsProcessed = inStrProcessed.split(' ')
     wordsProcessed = list(filter(bool,wordsProcessed))
-
-    stopWordList = configDict['stoplist']
-    stopWordList = stopWordList.split(' ')
 
     #print("Stop word list: ")
     #print(stopWordList,"\n")

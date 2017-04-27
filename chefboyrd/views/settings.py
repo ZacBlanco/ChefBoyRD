@@ -1,15 +1,12 @@
+"""settings
+This view is for displaying the settings page. Users with admin role can:
+    -add and remove users
+"""
 """
 written by: Seo Bo Shim
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
 """
-
-"""
-settings
-This view is for displaying the settings page. Users with admin role can:
-    -add and remove users
-"""
-
 from wtforms import TextAreaField, SubmitField
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from jinja2 import TemplateNotFound

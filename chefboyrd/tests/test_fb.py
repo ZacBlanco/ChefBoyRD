@@ -1,4 +1,12 @@
-"""test_fb for unittesting the feedback-related functions"""
+"""
+test_fb for unittesting the functions in feedback_controller
+"""
+"""
+written by: Seo Bo Shim, Jarod Morin
+tested by: Seo Bo Shim, Jarod Morin
+debugged by: Seo Bo Shim, Jarod Morin
+"""
+
 import unittest
 from unittest.mock import patch
 from chefboyrd.controllers import feedback_controller
@@ -11,8 +19,8 @@ class MyModuleTest(unittest.TestCase):
         """test the send_sms function
         """
         #TODO: if twilio connection not maintained
-        self.assertEqual(feedback_controller.update_db(datetime(2016, 3, 21), "test"), 1)
-        self.assertEqual(feedback_controller.update_db(datetime(2027, 3, 21), "test"), 0)
+        self.assertEqual(feedback_controller.update_db(datetime(2016, 3, 21), update_from="test"), 1)
+        self.assertEqual(feedback_controller.update_db(datetime(2027, 3, 21), update_from="test"), 0)
         query = Sms.delete()
         res = query.execute()
         self.assertEqual(len(Sms.select()), 0)

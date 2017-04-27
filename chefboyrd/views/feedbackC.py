@@ -1,11 +1,10 @@
+"""feedbackC
+Contains methods that render the interface for customers to submit in-store ratings
+"""
 """
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
-"""
-
-"""feedbackC
-Contains methods that render the interface for customers to submit in-store ratings
 """
 
 from wtforms import TextAreaField, SubmitField, DecimalField
