@@ -28,7 +28,10 @@ if '/home/travis/build' in os.path.dirname(__file__):
     restaurant_phone_number = "+19083325081" # remoev
 else:
     config = configparser.RawConfigParser()
-    config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
+    try:
+        config.read(os.path.join(os.path.dirname(__file__),'sms.cfg')) #assuming config file same path as this controller
+    except:
+        print("no sms.cfg file, sms data will not be from Twilio")
     account_sid = config['keys']['account_sid']
     auth_token = config['keys']['auth_token']
     cust_phone_number = config['test']['cust_phone_number']
