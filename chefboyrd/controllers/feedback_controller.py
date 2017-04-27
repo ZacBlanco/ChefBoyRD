@@ -73,9 +73,24 @@ def update_db(*date_from, **kwargs):
     if (kwargs):
         if(kwargs["update_from"]):
             if(kwargs['update_from'] == "test"):
+                if date_from == ():
+                    messages = test_sms_data(5, datetime(2016, 3, 25))
+                else:
+                    date_from = date_from[0]
+                    if (date_from > datetime.now()):
+                        return 0
+                    else:
+                        messages = test_sms_data(5, date_from)
                 messages = test_sms_data(5, datetime(2016, 3, 25))
             elif(kwargs['update_from'] == "autogen"):
-                messages = auto_generate_sms_data()
+                if date_from == ():
+                    messages = auto_generate_sms_data()
+                else:
+                    date_from = date_from[0]
+                    if (date_from > datetime.now()):
+                        return 0
+                    else:
+                        messages = auto_generate_sms_data(date_from=date_from)
             else:
                 return 0
         else:
