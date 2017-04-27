@@ -1,17 +1,17 @@
+"""Rating.py
+Contains the Rating model, submitted by customers through the online interface
+"""
+"""
+written by: Seo Bo Shim, Jarod Morin
+tested by: Seo Bo Shim
+debugged by: Seo Bo Shim
+"""
+
 from peewee import TextField, DateTimeField, Model, IntegerField
 from chefboyrd.models import BaseModel
 
 class Rating(Model):
-    """
-    Args:
-
-        Submission_time(datetime): is the date and time the rating was submitted
-        food(int): 0-5 rating for food
-        service(int): 0-5 rating for service
-        clean(int): 0-5 rating for cleanliness
-        ambience(int): 0-5 rating for ambience
-        overall(int): 0-5 rating for overall experience
-
+    """ A model for restaurant ratings that have a numerical value between 0 and 5.
     """
     submission_time = DateTimeField()
     

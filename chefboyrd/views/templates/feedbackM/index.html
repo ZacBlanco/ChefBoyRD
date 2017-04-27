@@ -2,6 +2,11 @@
 {% block body %}
     <h2>Feedback Management</h2>
     <div>
+        <div>
+          <H3>Average Reatings
+          </H3>
+          {{current_rating}}
+        </div>
         <H3>Specify feedback range here:</H3>
         <br>
         <form name="fb_search"action="" method="post" onsubmit="return validateForm()">
@@ -51,6 +56,7 @@
           </dl>
           <p><input type="submit" value="Search" >
         </form>
+
         <script type="text/javascript">
         var currentDate = new Date();
         var defaultDateFrom = new Date().setMonth((currentDate.getMonth()-3));
@@ -77,7 +83,6 @@
         {% if wordcloud == True%}
             <div id= "wordcloud">
             </div>
-          
           <script type="text/javascript">
           //now.format("dd/MM/yyyy hh:mm TT");
           try{

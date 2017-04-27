@@ -1,7 +1,14 @@
+"""feedbackM
+This view is specifically for the administrative staff's management of the feedback.
 """
-feedbackM
-This view is specifically for the administrative staff's management of the feedback
+
 """
+written by: Seo Bo Shim, Jarod Morin
+tested by: Seo Bo Shim
+debugged by: Seo Bo Shim
+"""
+
+
 
 from flask import Blueprint, render_template, request
 from flask_table import Table, Col
@@ -17,15 +24,14 @@ import json
 page = Blueprint('feedbackM', __name__, template_folder='./templates')
 
 class ItemTable(Table):
-    """
-    FlaskTable object for organizing feedback info into a table
-
+    """FlaskTable object for organizing feedback info into a table
     """
     time = Col('Time', column_html_attrs={'class': 'spaced-table-col'},)
     body = Col('Body', column_html_attrs={'class': 'spaced-table-col'},)
 
 class DateSpecifyForm(FlaskForm):
-    """WTforms object for the date-time form submission for the DB query"""
+    """WTforms object for the date-time form submission for the DB query
+    """
 
     date_time_from = DateTimeField('Time From')
     date_time_to = DateTimeField('Time To')
@@ -36,12 +42,15 @@ def feedback_table(role):
     """
     By default displays a webpage for user to make feedback DB query.
     Display a table of feedback sent in during a specified date-time range.
-    Also, depending on whether category flags are specified, this page will only display
+    Also, depending on whether category flags are specified, this page will only display that category
+    table: table of feedback to display
+    form: form that specifies the query instructions.
 
+    Args:
+        role: correct role of user in this context acquired from the require_role wrapper
+    
     Returns:
         The template to display with the appropriate parameters
-	table: table of feedback to display
-	form: form that specifies the query instructions.
     """
     #get all of the feedback objects and insert it into table
     form = DateSpecifyForm()
@@ -83,7 +92,6 @@ def feedback_table(role):
                 sms_dt = sms.submission_time
             sms_str = sms_dt.strftime("%Y-%m-%d %H:%M:%S")
             res.append(dict(time=sms_str,body=sms.body))
-
             all_string_bodies = all_string_bodies + sms.body + ","
         if (request.form.get('wordcloud')):
             wc = True
@@ -96,33 +104,35 @@ def feedback_table(role):
         else:
             wc = False
             word_freq = []
+            maxfreq = 0 # fix wc error
         table = ItemTable(res)
     else:
         res = []
         table = ItemTable(res)
     if not (res == []):
-        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, word_freq=json.dumps(word_freq), max_freq= maxfreq, role=role, wordcloud=wc)
+        return render_template('feedbackM/index.html', logged_in=True, table=table, form=form, 
+            word_freq=json.dumps(word_freq), max_freq= maxfreq, role=role, wordcloud=wc)
     else:
-        return render_template('feedbackM/index.html', logged_in=True, form=form, role=role, wordcloud=False) # allow table to stay until it is cleared manually.
+        return render_template('feedbackM/index.html', logged_in=True,
+         form=form, role=role, wordcloud=False) # allow table to stay until it is cleared manually.
         #persist table across different GET requests
 
 @page.route("/deleteallfeedbackhistory",methods=['GET', 'POST'])
 @require_role('admin')
 def delete_feedback():
-    """
-    Calls the delete_feedback function, returns a message confirming # of feedback entries deleted
+    """Calls the delete_feedback function, returns a message confirming # of feedback entries deleted
 
     Returns:
         Confirmation string
     """
-    res = feedback_controller.delete_feedback()
+    query = Sms.delete() # deletes all SMS objects
+    res = query.execute()
     return "{} amount of sms entries deleted".format(res) 
 
 @page.route("/deletealltwiliofeedbackhistory",methods=['GET', 'POST'])
 @require_role('admin')
 def delete_twilio_feedback():
-    """
-    wipe all message history on twilio. Only needs to be called once to clear data.
+    """Wipe all message history on twilio since a specified time. Only needs to be called once to clear data.
 
     Returns:
         Confirmation string
@@ -133,14 +143,12 @@ def delete_twilio_feedback():
         sidd.append(sms.sid)
     #print(sidd)
     feedback_controller.delete_twilio_feedback(sidd)
-    #feedback_controller.delete_twilio_feedback()
     return "Twilio Feedback deleted"
 
 @page.route("/updateallsms",methods=['GET','POST'])
 @require_role('admin')
 def update_all_sms():
-    """
-    Update sms data from external Twilio database
+    """Update sms data from external Twilio database
 
     Returns:
         Confirmation string
@@ -151,8 +159,9 @@ def update_all_sms():
 @page.route('/twiliosms',methods=['POST'])
 def send_sms_route():
     """
-    This is the directory we need to configure twilio for.
+    This is the directory we need to configure twilio for. Configure Webhook POST for https://{webserver}/feedbackM/twiliosms
     When Twilio makes a POST request, db will be updated with new sms messages from today
+
     Returns:
         Confirmation string
     """
