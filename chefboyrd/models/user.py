@@ -1,4 +1,8 @@
-'''The basic user model
+'''The basic user model (For logins)
+
+written by: Zachary Blanco
+tested by: Zachary Blanco
+debugged by: Zachary Blanco
 
 The users will have roles i.e. chef, manager, host, waitress, etc..
 '''
