@@ -14,3 +14,6 @@ run.sh
 env/**
 docs/build/**
 docs/build/*
+
+*.html
+docs/_build/**

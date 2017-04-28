@@ -123,7 +123,7 @@ def return_data():
         shift_json.append(dict(title=s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#66ff66'))
     for s in Shift.select().where((Shift.name!="") & (Shift.shift_time_end > current_time)):
         shift_json.append(dict(title=s.name+' - '+s.role,start=str(s.shift_time_start),end=str(s.shift_time_end), backgroundColor='#3399ff'))
-    print(shift_json)
+    # print(shsift_json)
     return json.dumps(shift_json)
 
 @page.route("/claim", methods=['GET', 'POST'])
