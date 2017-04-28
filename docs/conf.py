@@ -1,6 +1,6 @@
 import sys, os
 print(os.getcwd())
-sys.path.append('..')
+sys.path.append('../')
 import chefboyrd
 
 # -*- coding: utf-8 -*-

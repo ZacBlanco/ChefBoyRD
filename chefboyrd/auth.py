@@ -1,8 +1,8 @@
 '''Module for authentication and authorization
 
-written by: Zachary Blanco
-tested by: Zachary Blanco
-debugged by: Zachary Blanco
+- written by: Zachary Blanco
+- tested by: Zachary Blanco
+- debugged by: Zachary Blanco
 
 Uses the flask-login plugin as well as some custom wrapper functions to ensure
 that logged in users are only able to access authorized resources.
@@ -53,19 +53,20 @@ def require_role(role,**kwargss):
     By decorating a function with @require_role you are implicity forcing @login_required as well.
     Example:
 
+    .. code-block:: python
+
         @APP.route('/admin-dashboard')
         @require_role('admin')
         def view_dash():
         # Something here
 
-            @APP.route('/reservationH')
-            @require_role('admin','host',getrole=True)
-            def view_dash(role):
-                ...
+        @APP.route('/reservationH')
+        @require_role('admin','host',getrole=True)
+        def view_dash(role):
+            ...
 
     Args:
-        role(list or str):  A single role name or list of role names for which users are allowed
-        to access the specified resource
+        role(list or str):  A single role name or list of role names for which users are allowed to access the specified resource
 
     If a user is not authorized then the flask_login.unauthorized handler is called.
     '''
