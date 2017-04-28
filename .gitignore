@@ -17,3 +17,4 @@ docs/build/*
 
 *.html
 docs/_build/**
+receipts.json
