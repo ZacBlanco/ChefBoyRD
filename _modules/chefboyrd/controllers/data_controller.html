@@ -1,0 +1,510 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.controllers.data_controller &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.controllers.data_controller</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;Used to get relevant data for the model controller and statistics dashboard</span>
+
+<span class="sd">written by: Zachary Blanco, Richard Ahn</span>
+<span class="sd">tested by: Zachary Blanco, Richard Ahn</span>
+<span class="sd">debugged by: Zachary Blanco, Richard Ahn</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">calendar</span> <span class="k">import</span> <span class="n">monthrange</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="n">Orders</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">,</span> <span class="n">Meals</span><span class="p">,</span> <span class="n">Ingredients</span><span class="p">,</span> <span class="n">MealIngredients</span><span class="p">,</span> <span class="n">Quantities</span>
+<span class="kn">from</span> <span class="nn">hashids</span> <span class="k">import</span> <span class="n">Hashids</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">fn</span>
+
+<span class="n">hashids</span> <span class="o">=</span> <span class="n">Hashids</span><span class="p">()</span> <span class="c1"># does this result in different encode and decodes?s</span>
+
+<div class="viewcode-block" id="get_orders_date_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.get_orders_date_range">[docs]</a><span class="k">def</span> <span class="nf">get_orders_date_range</span><span class="p">(</span><span class="n">dt_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Gets a range of orders from one datetime to another datetime joined on Tabs.</span>
+
+<span class="sd">    If dt_min is None then all orders less than max will be returned.</span>
+<span class="sd">    If dt_max is None then all orders greater than dt_min is returned</span>
+<span class="sd">    If both are none then all orders are returned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dt_min (datetime): A datetime object for the range to begin at. (Inclusive)</span>
+<span class="sd">        dt_max (datetime): A datetime object for the range end begin at. (Inclusive)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        iterable: An iterable of order models (peewee set).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ords</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">dt_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dt_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ords</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">dt_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ords</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Tabs</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">dt_max</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dt_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ords</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Tabs</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">dt_min</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">timedelta</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(</span><span class="n">dt_max</span> <span class="o">-</span> <span class="n">dt_min</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Max datetime must be greater than min datetime&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ords</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Tabs</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">dt_min</span><span class="p">,</span>
+                                                <span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">dt_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ords</span></div>
+
+<div class="viewcode-block" id="get_tabs_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.get_tabs_range">[docs]</a><span class="k">def</span> <span class="nf">get_tabs_range</span><span class="p">(</span><span class="n">dt_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Gets a range of tabs from one datetime to another datetime</span>
+
+<span class="sd">    If dt_min is None then all tabs less than max will be returned.</span>
+<span class="sd">    If dt_max is None then all tabs greater than dt_min is None</span>
+<span class="sd">    If both are none then all tabs are returned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dt_min (datetime): A datetime object for the range to begin at. (Inclusive)</span>
+<span class="sd">        dt_max (datetime): A datetime object for the range end begin at. (Inclusive)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        iterable: An iterable of order models (peewee set).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">dt_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dt_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">dt_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">dt_max</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dt_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">dt_min</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">timedelta</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(</span><span class="n">dt_max</span> <span class="o">-</span> <span class="n">dt_min</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Max datetime must be greater than min datetime&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">dt_min</span><span class="p">,</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">dt_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tabs</span></div>
+
+<div class="viewcode-block" id="get_dotw_orders"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.get_dotw_orders">[docs]</a><span class="k">def</span> <span class="nf">get_dotw_orders</span><span class="p">(</span><span class="n">dotw</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Gets all orders on a given day of the week</span>
+
+<span class="sd">    Interesting challenge because we only have a datetime value.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        dotw (int): An integer representing the day of the week. 0 for Monday, 6 for Sunday.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: A list of all order models on a given day of the week.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">dotw</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dotw</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DoTW </span><span class="si">{}</span><span class="s2"> is not in the valid range of [0, 6]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotw</span><span class="p">))</span>
+
+    <span class="n">ords</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">orders</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">order_t</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">order_t</span><span class="o">.</span><span class="n">tab</span>
+        <span class="k">if</span> <span class="n">date</span><span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">order</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">order</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">day</span><span class="p">)</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">==</span> <span class="n">dotw</span><span class="p">:</span>
+            <span class="n">ords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ords</span></div>
+
+<div class="viewcode-block" id="get_dollars_in_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.get_dollars_in_range">[docs]</a><span class="k">def</span> <span class="nf">get_dollars_in_range</span><span class="p">(</span><span class="n">dt_min</span><span class="p">,</span> <span class="n">dt_max</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns the total sum of revenue from a range of dates&#39;&#39;&#39;</span>
+    <span class="n">meals</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Meals</span><span class="p">)</span><span class="o">.</span><span class="n">switch</span><span class="p">(</span><span class="n">Orders</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Tabs</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">dt_min</span><span class="p">,</span>
+                                                                        <span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">dt_max</span><span class="p">)</span>
+    <span class="n">tot</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">meals</span><span class="p">:</span>
+        <span class="n">tot</span> <span class="o">+=</span> <span class="n">order</span><span class="o">.</span><span class="n">meal</span><span class="o">.</span><span class="n">price</span>
+    <span class="k">return</span> <span class="n">tot</span></div>
+
+<div class="viewcode-block" id="get_meals_in_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.get_meals_in_range">[docs]</a><span class="k">def</span> <span class="nf">get_meals_in_range</span><span class="p">(</span><span class="n">dt_min</span><span class="p">,</span> <span class="n">dt_max</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns the total sum of meals from a range of datetimes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dt_min (datetime): Starting datetime</span>
+<span class="sd">        dt_max (datetime): Ending datetime</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The total number of meals served in the range.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">meals</span> <span class="o">=</span> <span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">dt_min</span><span class="p">,</span> <span class="n">dt_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">meals</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="people_in_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.people_in_range">[docs]</a><span class="k">def</span> <span class="nf">people_in_range</span><span class="p">(</span><span class="n">dt_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns the total number of people served in a range of dates</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dt_min (datetime): Beginning datetime in range</span>
+<span class="sd">        dt_max (datetime): Ending datetime in range</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="n">get_tabs_range</span><span class="p">(</span><span class="n">dt_min</span><span class="p">,</span> <span class="n">dt_max</span><span class="p">)</span>
+    <span class="n">total_people</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">:</span>
+        <span class="n">total_people</span> <span class="o">+=</span> <span class="n">tab</span><span class="o">.</span><span class="n">party_size</span>
+    <span class="k">return</span> <span class="n">total_people</span></div>
+
+<div class="viewcode-block" id="get_reservations_on_dotw"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.get_reservations_on_dotw">[docs]</a><span class="k">def</span> <span class="nf">get_reservations_on_dotw</span><span class="p">(</span><span class="n">dotw</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Gets the number of reservations on a given day of the week</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dotw (int): Integer representing day of the week</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Number of reservations on the day of the week.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">dotw</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dotw</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DoTW </span><span class="si">{}</span><span class="s2"> is not in the valid range of [0, 6]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dotw</span><span class="p">))</span>
+
+    <span class="n">num_reservations</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">orders</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">order_t</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">order_t</span><span class="o">.</span><span class="n">tab</span>
+        <span class="k">if</span> <span class="n">date</span><span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">order</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">order</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">day</span><span class="p">)</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">==</span> <span class="n">dotw</span> <span class="ow">and</span> <span class="n">order</span><span class="o">.</span><span class="n">had_reservation</span><span class="p">:</span>
+            <span class="n">num_reservations</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">num_reservations</span></div>
+
+
+<div class="viewcode-block" id="generate_data"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.generate_data">[docs]</a><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">num_days</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">num_tabs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">order_per_tab</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dt_start</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Generates and stores data for the models in chefboyrd.models.statistics</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">      - Opening time is 7AM</span>
+<span class="sd">      - Closing time is 10PM</span>
+<span class="sd">      - Tabs are generated throughout the day UNEVENLY. Orders increase during the evening</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        num_days (int): default=10, The number of days to generate data for</span>
+<span class="sd">        num_tabs (int): default=50, The average number of tabs per day</span>
+<span class="sd">        order_per_tab (int): default=3, Number of orders which exist on each tab</span>
+<span class="sd">        dt_start (datetime): default=(datetime.now()), The datetime to start creating orders</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The number of new orders created in the DB.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Populate necessary tables</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">menu</span><span class="p">:</span>
+        <span class="c1"># 1. Add meal to meals table w/ price</span>
+        <span class="c1"># 2. Add the ingredient to ingredients table</span>
+        <span class="c1"># 3. Add the quantity to quantities table</span>
+        <span class="c1"># 4. Add the MealIngredients after getting the ingredient ID and quanitity ID</span>
+        <span class="n">meal</span> <span class="o">=</span> <span class="n">Meals</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">item</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="n">menu</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;price&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="n">menu</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;ingredients&#39;</span><span class="p">]:</span>
+            <span class="n">qna</span> <span class="o">=</span> <span class="n">menu</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="s1">&#39;ingredients&#39;</span><span class="p">][</span><span class="n">ingredient</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+            <span class="n">ingredient</span> <span class="o">=</span> <span class="n">Ingredients</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">ingredient</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">quant</span> <span class="o">=</span> <span class="n">Quantities</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">qna</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">m_ingr</span> <span class="o">=</span> <span class="n">MealIngredients</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">meal_id</span><span class="o">=</span><span class="n">meal</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+                                                   <span class="n">ingredient_id</span><span class="o">=</span><span class="n">ingredient</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+                                                   <span class="n">quantity_meas_id</span><span class="o">=</span><span class="n">quant</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+                                                   <span class="n">quantity_amt</span><span class="o">=</span><span class="n">qna</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="c1"># Database tables are now properly populated with menu items, ingredients, prices, etc..</span>
+    <span class="c1"># Now we need to create a number of tabs with each tab having 1 to n different orders.</span>
+    <span class="c1"># This will simulate a real restaurant.</span>
+    <span class="k">if</span> <span class="n">dt_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dt_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_days</span><span class="p">):</span>
+        <span class="n">tab_date</span> <span class="o">=</span> <span class="n">dt_start</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">day</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">clamp_rng</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="n">num_tabs</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20000000</span><span class="p">))):</span>
+            <span class="c1"># Create tab here</span>
+            <span class="n">tab_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">clamp_rng</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gammavariate</span><span class="p">(</span><span class="mf">60.25</span><span class="p">,</span> <span class="o">.</span><span class="mi">1991701244813278</span><span class="p">),</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">21</span><span class="p">)),</span>
+                            <span class="n">minute</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">59</span><span class="p">))</span>
+            <span class="n">tab_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">tab_date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+                              <span class="n">day</span><span class="o">=</span><span class="n">tab_date</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
+                              <span class="n">month</span><span class="o">=</span><span class="n">tab_date</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
+                              <span class="n">hour</span><span class="o">=</span><span class="n">tab_time</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span>
+                              <span class="n">minute</span><span class="o">=</span><span class="n">tab_time</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span>
+            <span class="n">num_orders</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clamp_rng</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="n">order_per_tab</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span> <span class="c1">#rng w/ mean of order_per_tab</span>
+            <span class="n">tab</span> <span class="o">=</span> <span class="n">Tabs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">tab_dt</span><span class="p">,</span> <span class="n">had_reservation</span><span class="o">=</span><span class="n">randbool</span><span class="p">(),</span> <span class="n">party_size</span><span class="o">=</span><span class="n">num_orders</span><span class="p">,</span> 
+                <span class="n">fb_key</span><span class="o">=</span> <span class="n">hashids</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="nb">int</span> <span class="p">(</span> <span class="p">(</span><span class="n">tab_dt</span> <span class="o">-</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1970</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">))</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())))</span>
+            <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_orders</span><span class="p">):</span>
+                <span class="c1"># Pick a random meal</span>
+                <span class="n">mealname</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">menu</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+                <span class="n">meal</span> <span class="o">=</span> <span class="n">Meals</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Meals</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">mealname</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Add the order with the meal</span>
+                <span class="n">new_meal</span> <span class="o">=</span> <span class="n">Orders</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">meal</span><span class="o">=</span><span class="n">meal</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">tab</span><span class="o">=</span><span class="n">tab</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="randbool"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.randbool">[docs]</a><span class="k">def</span> <span class="nf">randbool</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Return a random boolean (approx 50/50)&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="clamp_rng"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.data_controller.clamp_rng">[docs]</a><span class="k">def</span> <span class="nf">clamp_rng</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Forces a number to fall within min/max range by doing lo + (num % (hi-lo))</span>
+
+<span class="sd">    Hi and lo should always be positive.</span>
+<span class="sd">    If num is &lt; 0 then we take its absolute value and clamp that.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">lo</span> <span class="o">+</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">num</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">hi</span><span class="o">-</span><span class="n">lo</span><span class="p">))</span></div>
+
+<span class="sd">&#39;&#39;&#39;The menu used to generate data for our demos&#39;&#39;&#39;</span>
+<span class="n">menu</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;hamburger&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">8.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;beef&#39;</span><span class="p">:</span> <span class="s1">&#39;2=patty&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=bun&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lettuce&#39;</span><span class="p">:</span> <span class="s1">&#39;2=leaves&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ketchup&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mustard&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;cheeseburger&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">9.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;beef&#39;</span><span class="p">:</span> <span class="s1">&#39;2=patty&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=bun&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lettuce&#39;</span><span class="p">:</span> <span class="s1">&#39;2=leaves&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ketchup&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mustard&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cheddar cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;2=slices&#39;</span>
+            <span class="p">}</span>
+
+        <span class="p">},</span>
+        <span class="s1">&#39;bacon burger&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">11.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;beef&#39;</span><span class="p">:</span> <span class="s1">&#39;2=patty&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=bun&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lettuce&#39;</span><span class="p">:</span> <span class="s1">&#39;2=leaves&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ketchup&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mustard&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cheddar cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;2=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bacon&#39;</span><span class="p">:</span> <span class="s1">&#39;4=strips&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;cheesesteak&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">10.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;beef&#39;</span><span class="p">:</span> <span class="s1">&#39;8=oz&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=hoagie roll&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cheddar cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;2=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;onions&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=onion&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;blt&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">6.75</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;bread&#39;</span><span class="p">:</span> <span class="s1">&#39;2=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bacon&#39;</span><span class="p">:</span> <span class="s1">&#39;4=strips&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lettuce&#39;</span><span class="p">:</span><span class="s1">&#39;2=leaves&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;hoagie&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">6.50</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=hoagie roll&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;salami&#39;</span><span class="p">:</span> <span class="s1">&#39;4=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;capicola&#39;</span><span class="p">:</span> <span class="s1">&#39;4=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;provolone cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;4=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;onion&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=onion&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lettuce&#39;</span><span class="p">:</span> <span class="s1">&#39;2=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tomato&#39;</span><span class="p">:</span> <span class="s1">&#39;1=tomato&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;french fries&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">3.85</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;potato&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;salt&#39;</span><span class="p">:</span> <span class="s1">&#39;1=teaspoon&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;onion rings&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">4.15</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;onion&#39;</span><span class="p">:</span> <span class="s1">&#39;1=onion&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;salt&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=teaspoon&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;grilled cheese&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">4.50</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;bread&#39;</span><span class="p">:</span><span class="s1">&#39;2=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;cheese&#39;</span><span class="p">:</span><span class="s1">&#39;2=slices&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;tuna sandwich&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">5.50</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;tuna fish&#39;</span><span class="p">:</span> <span class="s1">&#39;1=can&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span><span class="s1">&#39;1=hoagie roll&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mayo&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;salt&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=teaspoon&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;chicken quesadilla&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">6.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;butter&#39;</span><span class="p">:</span> <span class="s1">&#39;1=tablespoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tortilla&#39;</span><span class="p">:</span> <span class="s1">&#39;1=tortilla&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;chicken&#39;</span><span class="p">:</span> <span class="s1">&#39;1=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;salsa&#39;</span><span class="p">:</span> <span class="s1">&#39;1=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;sour cream&#39;</span><span class="p">:</span> <span class="s1">&#39;4=tablespoon&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;turkey sandwich&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">6.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;turkey&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mayo&#39;</span><span class="p">:</span> <span class="s1">&#39;2=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bread&#39;</span><span class="p">:</span> <span class="s1">&#39;2=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pepper&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=teaspoon&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;ceasar wrap&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">5.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;ceasar dressing&#39;</span><span class="p">:</span> <span class="s1">&#39;2=tablespoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tortilla&#39;</span><span class="p">:</span> <span class="s1">&#39;1=tortilla&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;chicken&#39;</span><span class="p">:</span> <span class="s1">&#39;0.35=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lettuce&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=cup&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;pizza steak&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">7.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;cheddar cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mozzarella cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=hoagie roll&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tomato sauce&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;steak&#39;</span><span class="p">:</span> <span class="s1">&#39;1=steak&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;pulled pork&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">14.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;pork&#39;</span><span class="p">:</span> <span class="s1">&#39;1=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spices&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=tablespoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;potatoes&#39;</span><span class="p">:</span> <span class="s1">&#39;1=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;barbecue sauce&#39;</span><span class="p">:</span> <span class="s1">&#39;0.3=cup&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;steak&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">17.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;steak&#39;</span><span class="p">:</span><span class="s1">&#39;2=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;potatoes&#39;</span><span class="p">:</span> <span class="s1">&#39;2=cups&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;A1&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;salt&#39;</span><span class="p">:</span><span class="s1">&#39;0.25=teaspoon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pepper&#39;</span><span class="p">:</span> <span class="s1">&#39;0.3=teeaspoon&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;buffalo chicken cheesesteak&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">9.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;chicken&#39;</span><span class="p">:</span> <span class="s1">&#39;8=oz&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=hoagie roll&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mozzarella cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;2=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;onions&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=onion&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;buffalo sauce&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=cup&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;roast beef sandwich&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">8.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;roast beef&#39;</span><span class="p">:</span> <span class="s1">&#39;1=lb&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mayo&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mustard&#39;</span><span class="p">:</span> <span class="s1">&#39;0.2=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;onion&#39;</span><span class="p">:</span> <span class="s1">&#39;0.3=onion&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;chicken parmesan sandwich&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">11.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;chicken&#39;</span><span class="p">:</span> <span class="s1">&#39;8=oz&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=hoagie roll&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mozzarella cheese&#39;</span><span class="p">:</span> <span class="s1">&#39;2=slices&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tomato sauce&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=cup&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;spaghetti and meatballs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">0.99</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;spaghetti&#39;</span><span class="p">:</span> <span class="s1">&#39;2.0=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tomato sauce&#39;</span><span class="p">:</span> <span class="s1">&#39;0.5=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;meatballs&#39;</span><span class="p">:</span> <span class="s1">&#39;3=meatball&#39;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;rock sandwich&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s1">&#39;ingredients&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;chicken&#39;</span><span class="p">:</span> <span class="s1">&#39;6=oz&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;buffalo sauce&#39;</span><span class="p">:</span> <span class="s1">&#39;0.25=cup&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;bun&#39;</span><span class="p">:</span> <span class="s1">&#39;1=hoagie roll&#39;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

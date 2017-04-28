@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.tests.test_int_auth &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.tests.test_int_auth</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">chefboyrd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">chefboyrd</span> <span class="k">import</span> <span class="n">auth</span>
+<span class="kn">import</span> <span class="nn">flask_login</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="n">User</span>
+
+
+<div class="viewcode-block" id="AuthTest"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest">[docs]</a><span class="k">class</span> <span class="nc">AuthTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Authentication and Authorization Tests&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="AuthTest.setUp"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Setup for the database and test client&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_name</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">()</span>
+        <span class="n">chefboyrd</span><span class="o">.</span><span class="n">init_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">chefboyrd</span><span class="o">.</span><span class="n">APP</span><span class="o">.</span><span class="n">test_client</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AuthTest.tearDown"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Deletion and unlinking of the database file&#39;&#39;&#39;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_fd</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthTest.test_login"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest.test_login">[docs]</a>    <span class="k">def</span> <span class="nf">test_login</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Test login/logout functionality with different users&#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">User</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s1">&#39;zac&#39;</span><span class="p">,</span> <span class="s1">&#39;zac&#39;</span><span class="p">,</span> <span class="s1">&#39;zac&#39;</span><span class="p">,</span> <span class="s1">&#39;manager&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/protected&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">&#39;zac&#39;</span><span class="p">,</span> <span class="s1">&#39;zac&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;After login should receive a 200&#39;</span><span class="p">)</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/protected&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;Protected should be 200 after login&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;After logout should receive a 200&#39;</span><span class="p">)</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/protected&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthTest.test_roles"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest.test_roles">[docs]</a>    <span class="k">def</span> <span class="nf">test_roles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Test the role requirement wrapper to make sure role-based</span>
+<span class="sd">        authorization works as expected.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">User</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s1">&#39;man&#39;</span><span class="p">,</span> <span class="s1">&#39;man&#39;</span><span class="p">,</span> <span class="s1">&#39;man&#39;</span><span class="p">,</span> <span class="s1">&#39;manager&#39;</span><span class="p">)</span>
+            <span class="n">User</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s1">&#39;nam&#39;</span><span class="p">,</span> <span class="s1">&#39;nam&#39;</span><span class="p">,</span> <span class="s1">&#39;nam&#39;</span><span class="p">,</span> <span class="s1">&#39;nomanager&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">&#39;nam&#39;</span><span class="p">,</span> <span class="s1">&#39;nam&#39;</span><span class="p">)</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">&#39;man&#39;</span><span class="p">,</span> <span class="s1">&#39;man&#39;</span><span class="p">)</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;Protected should be 200 after login&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;admintest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AuthTest.test_multi_role"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest.test_multi_role">[docs]</a>    <span class="k">def</span> <span class="nf">test_multi_role</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Ensure that the role-required wrapper can handle multiple roles&#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">User</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s1">&#39;man2&#39;</span><span class="p">,</span> <span class="s1">&#39;man2&#39;</span><span class="p">,</span> <span class="s1">&#39;man2&#39;</span><span class="p">,</span> <span class="s1">&#39;role1&#39;</span><span class="p">)</span>
+            <span class="n">User</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s1">&#39;nam3&#39;</span><span class="p">,</span> <span class="s1">&#39;nam3&#39;</span><span class="p">,</span> <span class="s1">&#39;nam3&#39;</span><span class="p">,</span> <span class="s1">&#39;role2&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/multiroletest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">&#39;man2&#39;</span><span class="p">,</span> <span class="s1">&#39;man2&#39;</span><span class="p">)</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/multiroletest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;roletest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;Should get a 200&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/multiroletest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="s1">&#39;Should get a 401&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">&#39;nam3&#39;</span><span class="p">,</span> <span class="s1">&#39;nam3&#39;</span><span class="p">)</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/multiroletest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;roletest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s1">&#39;Should get a 200&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="AuthTest.login"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest.login">[docs]</a>    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uname</span><span class="p">,</span> <span class="n">pw</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Logs a user in&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/auth/login&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">uname</span><span class="p">,</span> <span class="n">pw</span><span class="o">=</span><span class="n">pw</span><span class="p">),</span> <span class="n">follow_redirects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthTest.logout"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.AuthTest.logout">[docs]</a>    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Logs the user out&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/auth/logout&#39;</span><span class="p">)</span></div></div>
+
+<span class="nd">@chefboyrd</span><span class="o">.</span><span class="n">APP</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/protected&#39;</span><span class="p">)</span>
+<span class="nd">@auth</span><span class="o">.</span><span class="n">require_login</span>
+<div class="viewcode-block" id="req_login"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.req_login">[docs]</a><span class="k">def</span> <span class="nf">req_login</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Route which requires a  user to be loggd in to access&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;Stop&#39;</span></div>
+
+<span class="nd">@chefboyrd</span><span class="o">.</span><span class="n">APP</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/admintest&#39;</span><span class="p">)</span>
+<span class="nd">@auth</span><span class="o">.</span><span class="n">require_role</span><span class="p">(</span><span class="s1">&#39;manager&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="req_roles"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.req_roles">[docs]</a><span class="k">def</span> <span class="nf">req_roles</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Rout which requires a single role to be accessed&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;admintest&#39;</span></div>
+
+<span class="nd">@chefboyrd</span><span class="o">.</span><span class="n">APP</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/multiroletest&#39;</span><span class="p">)</span>
+<span class="nd">@auth</span><span class="o">.</span><span class="n">require_role</span><span class="p">([</span><span class="s1">&#39;role1&#39;</span><span class="p">,</span> <span class="s1">&#39;role2&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="req_multi_role"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_int_auth.req_multi_role">[docs]</a><span class="k">def</span> <span class="nf">req_multi_role</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Route which requires one of a list of roles to access&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;roletest&#39;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

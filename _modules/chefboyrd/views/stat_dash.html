@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>chefboyrd.views.stat_dash &#8212; ChefBoyRD 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chefboyrd.views.stat_dash</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;Statistics dashboard for the manager interface</span>
+
+
+<span class="sd">Will be able to render dashboards which include statistics from the database</span>
+<span class="sd">of the Point of sale system and other data systems for the business.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">abort</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">flash</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">TemplateNotFound</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">JOIN_LEFT_OUTER</span><span class="p">,</span> <span class="n">JOIN</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.auth</span> <span class="k">import</span> <span class="n">require_role</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="n">Orders</span><span class="p">,</span> <span class="n">Meals</span><span class="p">,</span> <span class="n">Ingredients</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">,</span> <span class="n">MealIngredients</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_agg</span> <span class="k">import</span> <span class="n">FigureCanvasAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="k">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.controllers</span> <span class="k">import</span> <span class="n">data_controller</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">quote</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="n">page</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;dashboard&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">,</span> <span class="n">template_folder</span><span class="o">=</span><span class="s1">&#39;./templates&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="get_datauri"><a class="viewcode-back" href="../../../autodoc/chefboyrd.views.html#chefboyrd.views.stat_dash.get_datauri">[docs]</a><span class="k">def</span> <span class="nf">get_datauri</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Build an image data URI &#39;&#39;&#39;</span>
+    <span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="n">imgdata</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">canvas</span><span class="o">.</span><span class="n">print_png</span><span class="p">(</span><span class="n">imgdata</span><span class="p">)</span>
+    <span class="n">imgdata</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">imgdata</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+    <span class="n">data_url</span> <span class="o">=</span> <span class="s1">&#39;data:image/png;base64,</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">quote</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">data_url</span></div>
+
+<div class="viewcode-block" id="create_jinja_object"><a class="viewcode-back" href="../../../autodoc/chefboyrd.views.html#chefboyrd.views.stat_dash.create_jinja_object">[docs]</a><span class="k">def</span> <span class="nf">create_jinja_object</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_figwidth</span><span class="p">()</span><span class="o">*</span><span class="n">fig</span><span class="o">.</span><span class="n">get_dpi</span><span class="p">()</span><span class="o">/</span><span class="mf">1.25</span><span class="p">,</span>
+        <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_figheight</span><span class="p">()</span><span class="o">*</span><span class="n">fig</span><span class="o">.</span><span class="n">get_dpi</span><span class="p">()</span><span class="o">/</span><span class="mf">1.25</span><span class="p">,</span>
+        <span class="s1">&#39;img&#39;</span><span class="p">:</span> <span class="n">get_datauri</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">graph</span>    </div>
+
+<span class="nd">@page</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@require_role</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span><span class="n">getrole</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Example of requireing a role(and authentication)</span>
+<div class="viewcode-block" id="dash_index"><a class="viewcode-back" href="../../../autodoc/chefboyrd.views.html#chefboyrd.views.stat_dash.dash_index">[docs]</a><span class="k">def</span> <span class="nf">dash_index</span><span class="p">(</span><span class="n">role</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Renders the index page of the dashboards</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Logged in always true because we require admin role</span>
+    <span class="n">graphs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">date_min</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">date_max</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;startdate&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)]</span>
+            <span class="n">date_min</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">month</span><span class="o">=</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">day</span><span class="o">=</span><span class="n">start</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">er</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">er</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enddate&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)]</span>
+            <span class="n">date_max</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">end</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">month</span><span class="o">=</span><span class="n">end</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">day</span><span class="o">=</span><span class="n">end</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">er</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">er</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">date_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">date_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">date_min</span> <span class="o">&gt;</span> <span class="n">date_max</span><span class="p">:</span>
+                <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;Start Date must be strictly before End Date&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;/dashboard/index.html&#39;</span><span class="p">,</span> <span class="n">logged_in</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">date_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">date_max</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">date_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">date_min</span> <span class="o">=</span> <span class="n">date_max</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Meals&#39;</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_controller</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">orders</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">date_min</span><span class="p">,</span> <span class="n">date_max</span><span class="p">)</span>
+            <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="o">.</span><span class="n">switch</span><span class="p">(</span><span class="n">Orders</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Meals</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Meals</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">))</span>
+            
+            <span class="n">ords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">orddays</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+                <span class="n">ords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span>
+                <span class="n">orddays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">date_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">date_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Plot of </span><span class="si">{}</span><span class="s1"> for </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> on Hours of the Day&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">),</span> <span class="n">date_min</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span> <span class="n">date_max</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Plot for </span><span class="si">{}</span><span class="s1"> over Hours of the Day&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">)))</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ords</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">)))</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Hours&#39;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+            <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">fig</span><span class="p">))</span>
+            <span class="n">fig2</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig2</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">orddays</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Plot of </span><span class="si">{}</span><span class="s1"> Over All Days&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">)))</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Days&#39;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+            <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">fig2</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Ingredients&#39;</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Ingredients</span><span class="o">.</span><span class="n">select</span><span class="p">()]</span>
+        <span class="c1"># Get a specific ingredient used over a timespan</span>
+        <span class="c1"># Show 2 graph - hourly usage (overall)</span>
+        <span class="c1"># and daily usage.</span>
+        <span class="n">ingred</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+                <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;That ingredient does not exist.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># We have all orders - we need to filter by specific ingredient.</span>
+                <span class="c1"># Must join on Meals, then Ingredients. Then filter on where</span>
+                <span class="c1"># Ingredient.name == parameter</span>
+                <span class="n">ingredient</span> <span class="o">=</span> <span class="n">Ingredients</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Ingredients</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">ingred</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">orders</span> <span class="o">=</span> <span class="p">(</span><span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">Orders</span><span class="p">,</span> <span class="n">MealIngredients</span><span class="p">,</span> <span class="n">Tabs</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Tabs</span><span class="p">)</span><span class="o">.</span><span class="n">switch</span><span class="p">(</span><span class="n">Orders</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MealIngredients</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">(</span><span class="n">MealIngredients</span><span class="o">.</span><span class="n">meal_id</span> <span class="o">==</span> <span class="n">Orders</span><span class="o">.</span><span class="n">meal</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;ingredient&#39;</span><span class="p">))</span>
+                        <span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">MealIngredients</span><span class="o">.</span><span class="n">ingredient_id</span> <span class="o">==</span> <span class="n">ingredient</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span> <span class="o">&amp;</span>
+                                <span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">date_min</span><span class="p">)</span> <span class="o">&amp;</span>
+                                <span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;=</span> <span class="n">date_max</span><span class="p">)))</span>
+                <span class="n">quantities</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">24</span>
+                <span class="n">days</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">date_max</span><span class="o">-</span><span class="n">date_min</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+                <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+                    <span class="n">hr</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">hour</span>
+                    <span class="n">day</span> <span class="o">=</span> <span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">-</span> <span class="n">date_min</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+                    <span class="n">quantities</span><span class="p">[</span><span class="n">hr</span><span class="p">]</span> <span class="o">+=</span> <span class="n">order</span><span class="o">.</span><span class="n">ingredient</span><span class="o">.</span><span class="n">quantity_amt</span>
+                    <span class="n">days</span><span class="p">[</span><span class="n">day</span><span class="p">]</span> <span class="o">+=</span> <span class="n">order</span><span class="o">.</span><span class="n">ingredient</span><span class="o">.</span><span class="n">quantity_amt</span>
+                <span class="c1"># print(quantities)</span>
+                <span class="c1"># print(days)</span>
+
+                <span class="n">qfig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+                <span class="n">ax1</span> <span class="o">=</span> <span class="n">qfig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">quantities</span><span class="p">)),</span> <span class="n">quantities</span><span class="p">)</span>
+                <span class="n">qfig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Used Per Hour from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ingred</span><span class="p">,</span> <span class="n">date_min</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span> <span class="n">date_max</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Hours&#39;</span><span class="p">)</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Amount&#39;</span><span class="p">)</span>
+                
+                <span class="n">dfig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+                <span class="n">ax1</span> <span class="o">=</span> <span class="n">dfig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">([(</span><span class="n">x</span><span class="o">*</span><span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">days</span><span class="p">))],</span> <span class="n">days</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([(</span><span class="n">x</span><span class="o">*</span><span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">days</span><span class="p">))])</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">((</span><span class="n">date_min</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">date_max</span><span class="o">-</span><span class="n">date_min</span><span class="p">)</span><span class="o">.</span><span class="n">days</span><span class="p">))</span>
+                <span class="n">dfig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Used Per Day from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ingred</span><span class="p">,</span> <span class="n">date_min</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span> <span class="n">date_max</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Days&#39;</span><span class="p">)</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Amount&#39;</span><span class="p">)</span>
+
+                <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">qfig</span><span class="p">))</span>
+                <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">dfig</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Performance&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">date_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">date_max</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">date_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">date_min</span> <span class="o">=</span> <span class="n">date_max</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            
+            <span class="n">day_diff</span> <span class="o">=</span> <span class="n">date_max</span> <span class="o">-</span> <span class="n">date_min</span>
+            <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">day_diff</span><span class="o">.</span><span class="n">days</span><span class="p">):</span>
+                <span class="n">curr_date</span> <span class="o">=</span> <span class="n">date_min</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
+                <span class="c1"># create graphs for the last 10 days, otherwise create a graph for every day in the timedelta</span>
+                <span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+                <span class="n">ax1</span> <span class="o">=</span> <span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">ords</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">orders</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">date_min</span><span class="o">-</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">date_max</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="n">curr_date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+                    <span class="n">ords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ords</span><span class="p">)</span>
+                <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Business activity for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curr_date</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Hours&#39;</span><span class="p">)</span>
+                <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Parties Served&#39;</span><span class="p">)</span>
+                <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">figure</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Tabs&#39;</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Tables Served&#39;</span><span class="p">,</span> <span class="s1">&#39;Reservations&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">date_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">date_max</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">date_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">date_min</span> <span class="o">=</span> <span class="n">date_max</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            
+            <span class="n">day_diff</span> <span class="o">=</span> <span class="n">date_max</span> <span class="o">-</span> <span class="n">date_min</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">options</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">day_diff</span><span class="o">.</span><span class="n">days</span><span class="p">):</span>
+                    <span class="n">curr_date</span> <span class="o">=</span> <span class="n">date_min</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
+                    <span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+                    <span class="n">ax1</span> <span class="o">=</span> <span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">ords</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">tabs</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">date_min</span><span class="o">-</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">date_max</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="n">curr_date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">:</span>
+                        <span class="n">ords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span>
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ords</span><span class="p">)</span>
+                    <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Tables Served on for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curr_date</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Hours&#39;</span><span class="p">)</span>
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+                    <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">figure</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;selector&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">options</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">day_diff</span><span class="o">.</span><span class="n">days</span><span class="p">):</span>
+                    <span class="n">curr_date</span> <span class="o">=</span> <span class="n">date_min</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
+                    <span class="n">figure</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+                    <span class="n">ax1</span> <span class="o">=</span> <span class="n">figure</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">ords</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                    <span class="n">tabs</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_tabs_range</span><span class="p">(</span><span class="n">date_min</span><span class="o">-</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">date_max</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Tabs</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="n">curr_date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">tab</span><span class="o">.</span><span class="n">had_reservation</span><span class="p">:</span>
+                            <span class="n">ords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mf">0.425</span><span class="p">,</span> <span class="mf">0.425</span><span class="o">+</span><span class="mf">0.85</span><span class="p">])</span>
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">((</span><span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="s1">&#39;No&#39;</span><span class="p">))</span>
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ords</span><span class="p">)),</span> <span class="n">ords</span><span class="p">)</span>
+                    <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Total Reservations on </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curr_date</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Hours&#39;</span><span class="p">)</span>
+                    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Count&#39;</span><span class="p">)</span>
+                    <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">figure</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Revenue&#39;</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Ingredients</span><span class="o">.</span><span class="n">select</span><span class="p">()]</span>
+        <span class="c1"># Show revenue over x days</span>
+        <span class="n">orders</span> <span class="o">=</span> <span class="n">data_controller</span><span class="o">.</span><span class="n">get_orders_date_range</span><span class="p">(</span><span class="n">date_min</span><span class="p">,</span> <span class="n">date_max</span><span class="p">)</span>
+        <span class="n">hrly_rev</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">24</span>
+        <span class="n">daily_rev</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">date_max</span><span class="o">-</span><span class="n">date_min</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+        <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+            <span class="n">hr</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">hour</span>
+            <span class="n">day</span> <span class="o">=</span> <span class="p">(</span><span class="n">order</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">-</span> <span class="n">date_min</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+            <span class="n">hrly_rev</span><span class="p">[</span><span class="n">hr</span><span class="p">]</span> <span class="o">+=</span> <span class="n">order</span><span class="o">.</span><span class="n">meal</span><span class="o">.</span><span class="n">price</span>
+            <span class="n">daily_rev</span><span class="p">[</span><span class="n">day</span><span class="p">]</span> <span class="o">+=</span> <span class="n">order</span><span class="o">.</span><span class="n">meal</span><span class="o">.</span><span class="n">price</span>
+        
+        <span class="n">qfig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">qfig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hrly_rev</span><span class="p">)),</span> <span class="n">hrly_rev</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">qfig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Dollars per Hour from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date_min</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span> <span class="n">date_max</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Hours&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Dollars&#39;</span><span class="p">)</span>
+        
+        <span class="n">dfig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">()</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">dfig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">([(</span><span class="n">x</span><span class="o">*</span><span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">daily_rev</span><span class="p">))],</span> <span class="n">daily_rev</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([(</span><span class="n">x</span><span class="o">*</span><span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">daily_rev</span><span class="p">))])</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">((</span><span class="n">date_min</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">date_max</span><span class="o">-</span><span class="n">date_min</span><span class="p">)</span><span class="o">.</span><span class="n">days</span><span class="p">))</span>
+        <span class="n">dfig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Dollars per Day from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date_min</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span> <span class="n">date_max</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Days&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Dollars&#39;</span><span class="p">)</span>
+
+        <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">qfig</span><span class="p">))</span>
+        <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_jinja_object</span><span class="p">(</span><span class="n">dfig</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;/dashboard/index.html&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">logged_in</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graphs</span><span class="o">=</span><span class="n">graphs</span><span class="p">,</span><span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../chefboyrd.html">chefboyrd</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Z. Blanco, R. Ahn, S. Shim, B. Smith B. Chen, J. Huang, J. Morin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
