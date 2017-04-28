@@ -14,3 +14,7 @@ receipts.json
 env/**
 docs/build/**
 docs/build/*
+
+*.html
+docs/_build/**
+receipts.json
