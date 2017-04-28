@@ -1,8 +1,5 @@
-"""settings
-This view is for displaying the settings page. Users with admin role can:
-    -add and remove users
-"""
-"""
+"""This view is for displaying the settings page. Users with admin role can add and remove users
+
 written by: Seo Bo Shim
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim

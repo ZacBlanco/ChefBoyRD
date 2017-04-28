@@ -1,7 +1,5 @@
-"""Rating.py
-Contains the Rating model, submitted by customers through the online interface
-"""
-"""
+"""Contains the Rating model, submitted by customers through the online interface
+
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim

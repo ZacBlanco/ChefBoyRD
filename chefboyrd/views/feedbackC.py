@@ -1,7 +1,5 @@
-"""feedbackC
-Contains methods that render the interface for customers to submit in-store ratings
-"""
-"""
+"""Contains methods that render the interface for customers to submit in-store ratings
+
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
