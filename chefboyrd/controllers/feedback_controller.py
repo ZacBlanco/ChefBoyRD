@@ -1,9 +1,6 @@
-"""FeedbackController 
-Houses all the functions to add or delete sms objects into the database
+"""Houses all the functions to add or delete sms objects into the database
 Includes the feedback analysis functions
 
-"""
-"""
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim, Jarod Morin
 debugged by: Seo Bo Shim, Jarod Morin

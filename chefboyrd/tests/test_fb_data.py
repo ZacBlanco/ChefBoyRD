@@ -1,8 +1,6 @@
-"""test_fb_data
-includes the functions required to generate random sms messages in case Twilio is not available
+"""Includes the functions required to generate random sms messages in case Twilio is not available.
+This is to help test the functionality of how sms stored in the database is read and interpreted.
 
-"""
-"""
 written by: Seo Bo Shim
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
@@ -16,8 +14,7 @@ from chefboyrd.models.sms import Sms
 from peewee import IntegrityError
 
 class TestMessages(object):
-    """
-    test class that emulates how twilio stores messages, so that this can be run to test the funtions without a connection to twilio
+    """Test class that emulates how twilio stores messages, so that this can be run to test the funtions without a connection to twilio
     """
     def __init__ (self, sid, date_sent, body, from_):
         self.sid = sid
@@ -26,8 +23,7 @@ class TestMessages(object):
         self.from_ = from_
 
 def test_sms_data(n,date_from):
-    """
-    Creates n samples of SMS of a pre-determined body, listed in sample_messages
+    """Creates n samples of SMS of a pre-determined body, listed in sample_messages
     If n is >5, then more sample feedback messages must be added to the list below
     """
     #d = random_date(date_from,datetime.now(), n)
@@ -44,7 +40,7 @@ def test_sms_data(n,date_from):
     return messages
 
 def auto_generate_sms_data(n=25, date_from=(datetime.now() - timedelta(days=60))):
-    '''Generates random feedback data
+    '''Helper function to generates random feedback data
     Arguments:
         n(int): number of items to generate
         date_from(datetime): starting date time. Ending date time used is datetime.now()

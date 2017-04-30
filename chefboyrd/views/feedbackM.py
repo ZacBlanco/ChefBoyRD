@@ -1,8 +1,5 @@
-"""feedbackM
-This view is specifically for the administrative staff's management of the feedback.
-"""
+"""This view is specifically for the administrative staff's management of the feedback.
 
-"""
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
