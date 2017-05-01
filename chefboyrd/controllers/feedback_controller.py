@@ -7,8 +7,8 @@ debugged by: Seo Bo Shim, Jarod Morin
 """
 
 from chefboyrd.models.sms import Sms
-from chefboyrd.models.statistics import Tabs
-from twilio.rest import Client
+from chefboyrd.models.statistics import from
+Tabs twilio.rest import Client
 import twilio.twiml
 from peewee import IntegrityError
 from string import punctuation
@@ -63,8 +63,10 @@ def update_db(*date_from, **kwargs):
         date_from (Date): a specified date, where we update db with sms sent after this date
         update_from (str): an optional argument. This should be "test" if messages are not coming from
         twilio, but from the test_fb_data file
+
     Returns:
-        1 on success. 0 on error
+        res(int): 1 on success. 0 on error
+        
     Throws:
         SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or
         auth_token
@@ -159,9 +161,11 @@ def process_incoming_sms(*one):
     TODO: Fix error with twilio, where the most recent message does not have a submission timep
 
     Args:
-        *one(int): optional argument
+        one(int): optional argument
+    
     Returns:
-        1 on success. 0 on error
+        res(int): 1 on success. 0 on error
+    
     Throws:
         SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or
         auth_token
@@ -296,8 +300,10 @@ def update_db_rating(rating):
 
     Args:
         rating(Rating): rating object that contains all the parameters
+
     Returns:
-        1 on success. 0 on error
+        res(int): 1 on success. 0 on error
+
     Throws:
         N/A
     """
@@ -321,8 +327,10 @@ def delete_twilio_feedback(sidd):
 
     Args:
         sidd(str): optional argument. Include a sid or a list of SMS sids to delete from the twilio DB
+    
     Returns:
-        1 on success. 0 if the feedback could not be deleted
+        res(int): 1 on success. 0 if the feedback could not be deleted
+    
     Raises:
         ValueError: sms could not be found in database
     """
@@ -372,11 +380,11 @@ def feedback_analysis(inStr):
     Extended description:
 
     Args:
-        inStr (string): String containing words separated by spaces or
+        inStr (str): String containing words separated by spaces or
                         non-apostrophe punctuation.
 
     Returns:
-        list(posFlag,negFlag,exceptionFlag,foodFlag,serviceFlag):
+        list (posFlag,negFlag,exceptionFlag,foodFlag,serviceFlag):
             A list of integers representing whether the input string
             meets the necessary criteria to be flagged as positive,
             negative, food-related, service-related or contains an exception.
@@ -470,7 +478,7 @@ def word_freq_counter(inStr):
                         non-apostrophe punctuation.
 
     Returns:
-        resultDict: A list of dictionary elements mapping the each distinct word within inStr
+        resultDict (dict[str]): A list of dictionary elements mapping the each distinct word within inStr
                     to its number of occurrences in the input.
 
     Throws:
