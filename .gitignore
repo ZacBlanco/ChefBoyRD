@@ -9,7 +9,12 @@ run.sh
 */.DS_Store
 **/.DS_Store
 */sms.cfg
+receipts.json
 
 env/**
 docs/build/**
 docs/build/*
+
+*.html
+docs/_build/**
+receipts.json

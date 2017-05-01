@@ -1,7 +1,7 @@
 requests
 flask
 peewee
-twilio
+twilio==6.0.0
 flask-login
 werkzeug
 gunicorn
@@ -15,4 +15,6 @@ phonenumbers
 scipy
 numpy
 scikit-learn
+hashids
 flask-ask
+sphinx

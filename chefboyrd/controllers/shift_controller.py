@@ -26,15 +26,15 @@ def checkAvailability(id, name, role):
         return False
     for workShift in Shift.select().where(Shift.name==name):
         if tryShift.shift_time_start==workShift.shift_time_start or tryShift.shift_time_end==workShift.shift_time_end:
-            print("Controller3: False")
+            # print("Controller3: False")
             return False
         elif workShift.shift_time_start<tryShift.shift_time_start and workShift.shift_time_end>tryShift.shift_time_end:
-            print("Controller2: False")
+            # print("Controller2: False")
             return False
         elif workShift.shift_time_start>tryShift.shift_time_start and workShift.shift_time_start<tryShift.shift_time_end:
-            print("Controller1: False")
+            # print("Controller1: False")
             return False
-    print("Controller: True")
+    # print("Controller: True")
     return True
 
 def checkPostConditions(id, name, role):

@@ -1,17 +1,22 @@
+<!--
+written by: Zachary Blanco, Seo Bo Shim
+tested by: Zachary Blanco, Seo Bo Shim
+debugged by: Zachary, Seo Bo Shim
+-->
 <div class="col-md-3">
     <header>
         <ul class="nav nav-pills nav-stacked">
             <li role="presentation" class="nav-element"><a href="/">Home</a></li>
-            {% if role != 'admin' and role != 'host' and role != 'chef' and role != 'waiter'%}
+            {% if role != 'admin' and role != 'host' and role != 'chef' and role != 'waiter' and role != 'notanadmin' %}
             <li role="presentation" class="nav-element"><a href="/reservationG">Guest Reservation</a></li>
             {% endif %}
-            {% if role == 'admin' or role == 'manager'%}
+            {%  if role == 'admin'%}
+            <li role="presentation" class="nav-element"><a href="/dashboard">Statistics</a></li>
+            <li role="presentation" class="nav-element"><a href="/prediction">Prediction</a></li>
             <li role="presentation" class="nav-element"><a href="/shift_manager">Shift Management</a></li>
-            <li role="presentation" class="nav-element"><a href="/dashboard">Dashboard</a></li>
             <li role="presentation" class="nav-element"><a href="/feedbackM">Feedback Management</a></li>
             <li role="presentation" class="nav-element"><a href="/reservationH">Reservation Host</a></li>
             <li role="presentation" class="nav-element"><a href="/table_manager">Table Management</a></li>
-            <li role="presentation" class="nav-element"><a href="/prediction">Prediction</a></li>
             <li role="presentation" class="nav-element"><a href="/settings">Settings</a></li>
             {% endif %}
             {% if role == 'host'%}
@@ -23,9 +28,13 @@
             <li role="presentation" class="nav-element"><a href="/prediction">Prediction</a></li>
             <li role="presentation" class="nav-element"><a href="/shift_manager">Shift Management</a></li>
             {% endif %}
-            {% if role == 'waiter'%}
+            {% if role == 'waiter' %}
             <li role="presentation" class="nav-element"><a href="/shift_manager">Shift Management</a></li>
             {% endif %}
+            {% if role == 'notanadmin' %}
+            <li role="presentation" class="nav-element"><a href="/feedbackC">Submit Rating</a></li>
+            {% endif %}
+
         </ul>
     </header>
 </div>
