@@ -1,3 +1,9 @@
+'''Used to check shift scheduling conflicts and shift permissions
+written by: Jeffrey Huang
+tested by: Jeffrey Huang
+debugged by: Jeffrey Huang
+'''
+
 from datetime import timedelta, datetime
 from chefboyrd.models.shifts import Shift
 

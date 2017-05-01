@@ -1,6 +1,10 @@
 '''
 Shift management dashboard for the manager interface
+written by: Jeffrey Huang
+tested by: Jeffrey Huang
+debugged by: Jeffrey Huang
 '''
+
 import json
 import flask_login
 from flask import Flask, Blueprint, render_template, request, url_for, redirect, flash
