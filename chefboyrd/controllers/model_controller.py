@@ -1,6 +1,7 @@
 '''ModelController
-This is a preprocessor for the prediction_controller. Given data in the form of
-our local models, it converts it into numbers usable by the prediction controller.
+
+This is a preprocessor for the prediction_controller. Given data in the form of our local models,
+it converts it into numbers usable by the prediction controller.
 
 '''
 from peewee import Model
@@ -15,10 +16,12 @@ def polynomialModel(x, *params):
     '''
     This is the polynomial model that will be fit by our algorithm. 
 
-    Args: x = input matrix where the features are rows and each predictor(data point) is a column
-          params = the parameters for the model
+    Args:
+        x : input matrix where the features are rows and each predictor(data point) is a column
+        params : the parameters for the model
 
-    Returns: sum = the output vector where each indice is a predictor
+    Returns:
+        sum : the output vector where each indice is a predictor
     '''
     complexity = 1
     sum = params[0]
@@ -31,10 +34,12 @@ def sinusoidalModel(x, *params):
     '''
     This is the sinusoidal model that will be fit by our algorithm. 
 
-    Args: x = input matrix where the features are rows and each predictor(data point) is a column
-          params = the parameters for the model
+    Args:
+        x : input matrix where the features are rows and each predictor(data point) is a column
+        params : the parameters for the model
 
-    Returns: sum = the output vector where each indice is a predictor
+    Returns:
+        list - the output vector where each indice is a predictor
     '''
     sum = params[9]
     for i in range(len(x)):
@@ -45,7 +50,8 @@ def orders_to_list(orders):
     '''
     Converts peewee query result set to a list of dictionary of lists
 
-    Args: accepts a list of orders made from a query for peewee
+    Args:
+        orders (list): Accepts a list of orders made from a query for peewee
     '''
     orders = orders.switch(Orders).join(Meals).order_by(Meals.name)
     currentMeal = ""
@@ -89,11 +95,11 @@ def train_regression(mealDict, modelType):
     This trains all of the meals and fits their data to their own set of parameters
 
     Args:
-    mealDict = The meal dictionary containing order data created by orders_to_list
-    modelType = the type of model to use(sinusoidal, polynomial)
+        mealDict : The meal dictionary containing order data created by orders_to_list
+        modelType : the type of model to use(sinusoidal, polynomial)
 
     Returns:
-    mealsParams = a dictionary that contains the parameters for each corresponding meal
+        mealsParams : a dictionary that contains the parameters for each corresponding meal
     '''
     mealsParams = {}
     for meal_key in mealDict:
@@ -108,12 +114,12 @@ def train_regression_single(x, y, modelType):
     Trains a single meal and fits it to a model to find its parameters
 
     Args:
-    x = The input vector(which is composed of rows 0 to 3 in the vector)
-    y = The expected output vector(the last row)
-    modelType = the type of model to use
+        x : The input vector(which is composed of rows 0 to 3 in the vector)
+        y : The expected output vector(the last row)
+        modelType : the type of model to use
 
     Returns:
-    params = a list of parameters
+        params : A list of parameters
     '''
     # Train the model
     initial_params = []
