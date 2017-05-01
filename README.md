@@ -114,7 +114,34 @@ This will start the debugging server at `http://localhost:5000` where you can na
       * Debugger is active!
       * Debugger pin code: 369-149-264
 
+## The Amazon Alexa Skill
+
+In order to run the Amazon Alexa skill you'll need to
+
+- Install **[ngrok](https://ngrok.com/)**
+- Create an AWS developer account
+
+Once you have both you'll need to create a new Amazon Alexa skill that utilizes the same skill schema found under `chefboyrd/alexa/skill.json`. Information on how to create an Alexa skill can be [found here (start from step 2)](https://developer.amazon.com/alexa-skills-kit/alexa-skill-quick-start-tutorial)
+
+When creating the skill select **https endpoint** rather than a lambda function. Leave this screen up.
+
+Open up your bash terminal to the ChefBoyRD repository. Follow the instructions to install all dependencies.
+
+```
+cd chefboyrd
+virutalenv -p python3 env
+source env/bin/activate
+pip install -r requirements.txt
+```
+
+After installing dependencies you can run
+
+        python skill.py
+
+Once the skill is running you'll need to open a 2nd terminal and type `ngrok http 5000`. This will open a localhost tunnel to HTTP 5000 on your computer and give you an https endpoint. Copy the https url from ngrok and paste it into the https endpoint on your Alexa skill configuration. Use your echo or go to [https://echosim.io](https://echosim.io) in order to test the chefboyrd skill.
+
 ## Deadlines:
+
 | Task	     | Due Date	     |
 |:----------:|:-------------:|
 | Proposal  | January 30th |
