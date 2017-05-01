@@ -7,8 +7,8 @@ debugged by: Seo Bo Shim, Jarod Morin
 """
 
 from chefboyrd.models.sms import Sms
-from chefboyrd.models.statistics import Tabs
-from twilio.rest import Client
+from chefboyrd.models.statistics import from
+Tabs twilio.rest import Client
 import twilio.twiml
 from peewee import IntegrityError
 from string import punctuation
@@ -332,10 +332,10 @@ def delete_twilio_feedback(sidd):
 
     Args:
         sidd(str): optional argument. Include a sid or a list of SMS sids to delete from the twilio DB
-
+    
     Returns:
         res(int): 1 on success. 0 if the feedback could not be deleted
-
+    
     Raises:
         ValueError: sms could not be found in database
     """
@@ -393,7 +393,7 @@ def feedback_analysis(inStr):
     Extended description:
 
     Args:
-        inStr (string): String containing words separated by spaces or
+        inStr (str): String containing words separated by spaces or
                         non-apostrophe punctuation.
 
     Returns:
