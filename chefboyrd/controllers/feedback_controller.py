@@ -7,8 +7,8 @@ debugged by: Seo Bo Shim, Jarod Morin
 """
 
 from chefboyrd.models.sms import Sms
-from chefboyrd.models.statistics import from
-Tabs twilio.rest import Client
+from chefboyrd.models.statistics import Tabs
+from twilio.rest import Client
 import twilio.twiml
 from peewee import IntegrityError
 from string import punctuation
