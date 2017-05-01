@@ -180,16 +180,16 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
                                                    ingredient_id=ingredient.get_id(),
                                                    quantity_meas_id=quant.get_id(),
                                                    quantity_amt=qna[0])
-    
+
     # Database tables are now properly populated with menu items, ingredients, prices, etc..
     # Now we need to create a number of tabs with each tab having 1 to n different orders.
     # This will simulate a real restaurant.
     if dt_start is None:
         dt_start = datetime.now()
-    
+
     for day in range(num_days):
         tab_date = dt_start + timedelta(days=day)
-        
+
         for tab in range(int(clamp_rng(random.gauss(num_tabs, 2), 1, 20000000))):
             # Create tab here
             tab_time = time(hour=int(clamp_rng(random.gammavariate(60.25, .1991701244813278), 6, 21)),
@@ -201,13 +201,13 @@ def generate_data(num_days=10, num_tabs=50, order_per_tab=3, dt_start=None):
                               minute=tab_time.minute)
             num_orders = int(clamp_rng(abs(random.gauss(order_per_tab, 1)), 1, 200)) #rng w/ mean of order_per_tab
             tab = Tabs.create(timestamp=tab_dt, had_reservation=randbool(), party_size=num_orders, 
-                fb_key= hashids.encode(int ( (tab_dt - datetime(1970, 8, 15, 6, 0, 0 )).total_seconds())))
+                              fb_key=hashids.encode(int((tab_dt - datetime(1970, 8, 15, 6, 0, 0)).total_seconds())))
             for order in range(num_orders):
                 # Pick a random meal
                 mealname = list(menu.keys())[random.randint(0, len(menu)-1)]
                 meal = Meals.select().where(Meals.name == mealname)[0]
                 # Add the order with the meal
-                new_meal = Orders.create(meal=meal.get_id(), tab=tab.get_id())
+                Orders.create(meal=meal.get_id(), tab=tab.get_id())
 
 def randbool():
     '''Return a random boolean (approx 50/50)'''
@@ -223,198 +223,198 @@ def clamp_rng(num, lo, hi):
 
 '''The menu used to generate data for our demos'''
 menu = {
-        'hamburger': {
-            'price': 8.99,
-            'ingredients': {
-                'beef': '2=patty',
-                'bun': '1=bun',
-                'lettuce': '2=leaves',
-                'ketchup': '2=teaspoon',
-                'mustard': '2=teaspoon'
-            }
-        },
-        "cheeseburger": {
-            'price': 9.99,
-            'ingredients': {
-                'beef': '2=patty',
-                'bun': '1=bun',
-                'lettuce': '2=leaves',
-                'ketchup': '2=teaspoon',
-                'mustard': '2=teaspoon',
-                'cheddar cheese': '2=slices'
-            }
+    'hamburger': {
+        'price': 8.99,
+        'ingredients': {
+            'beef': '2=patty',
+            'bun': '1=bun',
+            'lettuce': '2=leaves',
+            'ketchup': '2=teaspoon',
+            'mustard': '2=teaspoon'
+        }
+    },
+    "cheeseburger": {
+        'price': 9.99,
+        'ingredients': {
+            'beef': '2=patty',
+            'bun': '1=bun',
+            'lettuce': '2=leaves',
+            'ketchup': '2=teaspoon',
+            'mustard': '2=teaspoon',
+            'cheddar cheese': '2=slices'
+        }
 
-        },
-        'bacon burger': {
-            'price': 11.99,
-            'ingredients': {
-                'beef': '2=patty',
-                'bun': '1=bun',
-                'lettuce': '2=leaves',
-                'ketchup': '2=teaspoon',
-                'mustard': '2=teaspoon',
-                'cheddar cheese': '2=slices',
-                'bacon': '4=strips'
-            }
-        },
-        'cheesesteak': {
-            'price': 10.99,
-            'ingredients': {
-                'beef': '8=oz',
-                'bun': '1=hoagie roll',
-                'cheddar cheese': '2=slices',
-                'onions': '0.25=onion'
-            }
-        },
-        'blt': {
-            'price': 6.75,
-            'ingredients': {
-                'bread': '2=slices',
-                'bacon': '4=strips',
-                'lettuce':'2=leaves'
-            }
-        },
-        'hoagie': {
-            'price': 6.50,
-            'ingredients': {
-                'bun': '1=hoagie roll',
-                'salami': '4=slices',
-                'capicola': '4=slices',
-                'provolone cheese': '4=slices',
-                'onion': '0.5=onion',
-                'lettuce': '2=cup',
-                'tomato': '1=tomato'
-            }
-        },
-        'french fries': {
-            'price': 3.85,
-            'ingredients': {
-                'potato': '0.5=lb',
-                'salt': '1=teaspoon'
-            }
-        },
-        'onion rings': {
-            'price': 4.15,
-            'ingredients': {
-                'onion': '1=onion',
-                'salt': '0.25=teaspoon'
-            }
-        },
-        'grilled cheese': {
-            'price': 4.50,
-            'ingredients': {
-                'bread':'2=slices',
-                'cheese':'2=slices'
-            }
-        },
-        'tuna sandwich': {
-            'price': 5.50,
-            'ingredients': {
-                'tuna fish': '1=can',
-                'bun':'1=hoagie roll',
-                'mayo': '2=teaspoon',
-                'salt': '0.25=teaspoon'
-            }
-        },
-        'chicken quesadilla': {
-            'price': 6.99,
-            'ingredients': {
-                'butter': '1=tablespoon',
-                'tortilla': '1=tortilla',
-                'chicken': '1=lb',
-                'salsa': '1=cup',
-                'sour cream': '4=tablespoon'
-            }
-        },
-        'turkey sandwich': {
-            'price': 6.99,
-            'ingredients': {
-                'turkey': '0.5=lb',
-                'mayo': '2=teaspoon',
-                'bread': '2=slices',
-                'pepper': '0.5=teaspoon'
-            }
-        },
-        'ceasar wrap': {
-            'price': 5.99,
-            'ingredients': {
-                'ceasar dressing': '2=tablespoon',
-                'tortilla': '1=tortilla',
-                'chicken': '0.35=lb',
-                'lettuce': '0.5=cup'
-            }
-        },
-        'pizza steak': {
-            'price': 7.99,
-            'ingredients': {
-                'cheddar cheese': '0.5=cup',
-                'mozzarella cheese': '0.5=cup',
-                'bun': '1=hoagie roll',
-                'tomato sauce': '0.25=cup',
-                'steak': '1=steak'
-            }
-        },
-        'pulled pork': {
-            'price': 14.99,
-            'ingredients': {
-                'pork': '1=lb',
-                'spices': '0.5=tablespoon',
-                'potatoes': '1=lb',
-                'barbecue sauce': '0.3=cup'
-            }
-        },
-        'steak': {
-            'price': 17.99,
-            'ingredients': {
-                'steak':'2=lb',
-                'potatoes': '2=cups',
-                'A1': '0.25=cup',
-                'salt':'0.25=teaspoon',
-                'pepper': '0.3=teeaspoon'
-            }
-        },
-        'buffalo chicken cheesesteak': {
-            'price': 9.99,
-            'ingredients': {
-                'chicken': '8=oz',
-                'bun': '1=hoagie roll',
-                'mozzarella cheese': '2=slices',
-                'onions': '0.25=onion',
-                'buffalo sauce': '0.25=cup'
-            }
-        },
-        'roast beef sandwich': {
-            'price': 8.99,
-            'ingredients': {
-                'roast beef': '1=lb',
-                'mayo': '0.25=cup',
-                'mustard': '0.2=cup',
-                'onion': '0.3=onion'
-            }
-        },
-        'chicken parmesan sandwich': {
-            'price': 11.99,
-            'ingredients': {
-                'chicken': '8=oz',
-                'bun': '1=hoagie roll',
-                'mozzarella cheese': '2=slices',
-                'tomato sauce': '0.5=cup'
-            }
-        },
-        'spaghetti and meatballs': {
-            'price': 0.99,
-            'ingredients': {
-                'spaghetti': '2.0=cup',
-                'tomato sauce': '0.5=cup',
-                'meatballs': '3=meatball'
-            }
-        },
-        'rock sandwich': {
-            'price': 1.0,
-            'ingredients': {
-                'chicken': '6=oz',
-                'buffalo sauce': '0.25=cup',
-                'bun': '1=hoagie roll'
-            }
+    },
+    'bacon burger': {
+        'price': 11.99,
+        'ingredients': {
+            'beef': '2=patty',
+            'bun': '1=bun',
+            'lettuce': '2=leaves',
+            'ketchup': '2=teaspoon',
+            'mustard': '2=teaspoon',
+            'cheddar cheese': '2=slices',
+            'bacon': '4=strips'
+        }
+    },
+    'cheesesteak': {
+        'price': 10.99,
+        'ingredients': {
+            'beef': '8=oz',
+            'bun': '1=hoagie roll',
+            'cheddar cheese': '2=slices',
+            'onions': '0.25=onion'
+        }
+    },
+    'blt': {
+        'price': 6.75,
+        'ingredients': {
+            'bread': '2=slices',
+            'bacon': '4=strips',
+            'lettuce':'2=leaves'
+        }
+    },
+    'hoagie': {
+        'price': 6.50,
+        'ingredients': {
+            'bun': '1=hoagie roll',
+            'salami': '4=slices',
+            'capicola': '4=slices',
+            'provolone cheese': '4=slices',
+            'onion': '0.5=onion',
+            'lettuce': '2=cup',
+            'tomato': '1=tomato'
+        }
+    },
+    'french fries': {
+        'price': 3.85,
+        'ingredients': {
+            'potato': '0.5=lb',
+            'salt': '1=teaspoon'
+        }
+    },
+    'onion rings': {
+        'price': 4.15,
+        'ingredients': {
+            'onion': '1=onion',
+            'salt': '0.25=teaspoon'
+        }
+    },
+    'grilled cheese': {
+        'price': 4.50,
+        'ingredients': {
+            'bread':'2=slices',
+            'cheese':'2=slices'
+        }
+    },
+    'tuna sandwich': {
+        'price': 5.50,
+        'ingredients': {
+            'tuna fish': '1=can',
+            'bun':'1=hoagie roll',
+            'mayo': '2=teaspoon',
+            'salt': '0.25=teaspoon'
+        }
+    },
+    'chicken quesadilla': {
+        'price': 6.99,
+        'ingredients': {
+            'butter': '1=tablespoon',
+            'tortilla': '1=tortilla',
+            'chicken': '1=lb',
+            'salsa': '1=cup',
+            'sour cream': '4=tablespoon'
+        }
+    },
+    'turkey sandwich': {
+        'price': 6.99,
+        'ingredients': {
+            'turkey': '0.5=lb',
+            'mayo': '2=teaspoon',
+            'bread': '2=slices',
+            'pepper': '0.5=teaspoon'
+        }
+    },
+    'ceasar wrap': {
+        'price': 5.99,
+        'ingredients': {
+            'ceasar dressing': '2=tablespoon',
+            'tortilla': '1=tortilla',
+            'chicken': '0.35=lb',
+            'lettuce': '0.5=cup'
+        }
+    },
+    'pizza steak': {
+        'price': 7.99,
+        'ingredients': {
+            'cheddar cheese': '0.5=cup',
+            'mozzarella cheese': '0.5=cup',
+            'bun': '1=hoagie roll',
+            'tomato sauce': '0.25=cup',
+            'steak': '1=steak'
+        }
+    },
+    'pulled pork': {
+        'price': 14.99,
+        'ingredients': {
+            'pork': '1=lb',
+            'spices': '0.5=tablespoon',
+            'potatoes': '1=lb',
+            'barbecue sauce': '0.3=cup'
+        }
+    },
+    'steak': {
+        'price': 17.99,
+        'ingredients': {
+            'steak':'2=lb',
+            'potatoes': '2=cups',
+            'A1': '0.25=cup',
+            'salt':'0.25=teaspoon',
+            'pepper': '0.3=teeaspoon'
+        }
+    },
+    'buffalo chicken cheesesteak': {
+        'price': 9.99,
+        'ingredients': {
+            'chicken': '8=oz',
+            'bun': '1=hoagie roll',
+            'mozzarella cheese': '2=slices',
+            'onions': '0.25=onion',
+            'buffalo sauce': '0.25=cup'
+        }
+    },
+    'roast beef sandwich': {
+        'price': 8.99,
+        'ingredients': {
+            'roast beef': '1=lb',
+            'mayo': '0.25=cup',
+            'mustard': '0.2=cup',
+            'onion': '0.3=onion'
+        }
+    },
+    'chicken parmesan sandwich': {
+        'price': 11.99,
+        'ingredients': {
+            'chicken': '8=oz',
+            'bun': '1=hoagie roll',
+            'mozzarella cheese': '2=slices',
+            'tomato sauce': '0.5=cup'
+        }
+    },
+    'spaghetti and meatballs': {
+        'price': 0.99,
+        'ingredients': {
+            'spaghetti': '2.0=cup',
+            'tomato sauce': '0.5=cup',
+            'meatballs': '3=meatball'
+        }
+    },
+    'rock sandwich': {
+        'price': 1.0,
+        'ingredients': {
+            'chicken': '6=oz',
+            'buffalo sauce': '0.25=cup',
+            'bun': '1=hoagie roll'
         }
     }
+}

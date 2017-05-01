@@ -1,7 +1,7 @@
 '''Test some model creation and methods'''
 import os
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from datetime import datetime, date, timedelta
 import tempfile
 import chefboyrd
@@ -291,5 +291,7 @@ class ModelTest(unittest.TestCase):
         **Fails when**: Orders.create() is not called when generating data
         '''
         # print(Ingredients._meta.database.database)
-        data_controller.generate_data(num_days=1, num_tabs=5)
-        orders.assert_called_once()
+        Orders.create = MagicMock()
+        Orders.create.return_value = None
+        data_controller.generate_data(num_days=2, num_tabs=3)
+        self.assertEqual(Orders.create.called, True, "Order creation should have occurred")
