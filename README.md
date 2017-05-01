@@ -97,6 +97,11 @@ You should see something like the following
 
 If you see any failures then you should investigate the issue. If you think there is an error or missing dependency which needs to be installed notify the repository maintainers
 
+To under tests individually, specify the path to the desired test file. Here is an example:
+
+	python3 -m unittest chefboyrd/tests/test_fb.py
+
+
 ## Running the Debug Server
 
 Simply run the command

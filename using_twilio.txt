@@ -1,0 +1,67 @@
+To properly use Twilio's services for this demo, a valid account_sid and authorization token is needed. This can be obtained in two ways.
+
+Create a Twilio Account:
+
+You will need three items, which go directly into the twilio configuration file:
+	Account SID
+	Auth Token
+	Phone Number
+
+Account SID and Auth Token:
+
+Once you have made a Twilio account, go to their home page. You will find a menu option at the top to access the account console.
+https://www.twilio.com/console
+
+Phone Number:
+
+Once you're in the console, you want to get a phone number.
+https://www.twilio.com/console/phone-numbers/incoming
+
+
+Once you have these numbers, you want to change the configuration. 
+The configuration file is: "chefboyrd/controllers/sms.cfg"
+
+account_sid = {Your Account SID}
+auth_token = {Your Auth Token}
+restaurant_phone_number: {Your phone Number}
+
+
+Example sms.cfg file:
+
+[keys]
+account_sid: AC9e9804140123ad494f9f0g01aeb57be4
+auth_token: eb0996987502g6d378a3f8f2dbaef179 
+[test]
+cust_phone_number: +17326050815
+restaurant_phone_number: +10093325081
+
+
+
+
+The last thing you need to do is configure your Twilio to send a Request when a text message is received.
+Go to your Phone Numbers Section in your Account Console.
+Click on your active phone number.
+
+under the header:
+A MESSAGE COMES IN
+
+select Webhook
+
+type in http://{Your server web address}/feedbackM/twiliosms
+
+select HTTP POST
+
+
+This configures Twilio so that their service will send a HTTP POST request to that website url with the message details. This will happen in real-time when a message is received by Twilio.
+
+
+
+If you're running a server from localhost, I highly recommend using ngrok to set up a tunnel to a public IP address
+
+https://ngrok.com/
+
+
+
+You won't be charged for the first 2000 text messages that are sent or received on twilio. You can read more about Twilio's free trial policy here.
+https://support.twilio.com/hc/en-us/articles/223136107-How-does-Twilio-s-Free-Trial-work-
+
