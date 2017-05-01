@@ -89,9 +89,10 @@ def auto_generate_sms_data(n=25, date_from=(datetime.now() - timedelta(days=60))
 
 def random_word(allLists,max=13):
     '''Helper function to generate random sentence 
+
     Arguments:
         allLists(List(str)): List of strings of available words to use
-        max: max length of the sentence
+        max(int): max length of the sentence
     '''
     random_num_words = randrange(max)
     random_index = randrange(1,len(allLists)-1)

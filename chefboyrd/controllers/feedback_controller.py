@@ -63,8 +63,10 @@ def update_db(*date_from, **kwargs):
         date_from (Date): a specified date, where we update db with sms sent after this date
         update_from (str): an optional argument. This should be "test" if messages are not coming from
         twilio, but from the test_fb_data file
+
     Returns:
-        1 on success. 0 on error
+        res(int): 1 on success. 0 on error
+
     Throws:
         SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or
         auth_token
@@ -96,23 +98,28 @@ def update_db(*date_from, **kwargs):
         else:
             return 0
     else:
-        process_incoming_sms()
         try:
             client = Client(account_sid,auth_token)
             messages = client.messages.list(to=restaurant_phone_number)
+            process_incoming_sms()
+            if date_from == ():
+                messages = client.messages.list(to=restaurant_phone_number) # this may have a long random string first
+            else:
+                date_from = date_from[0]
+                if (date_from > datetime.now()):
+                    #raise ValueError
+                    return 0
+                messages = client.messages.list(date_sent=date_from,to=restaurant_phone_number)
         except:
-            raise SystemError
-        #better abstraction would be, twilio function returns a list of objects. this list of
-        #objects is sent to update to update
-        #TODO: check the dates so that it is not greater
-        if date_from == ():
-            messages = client.messages.list(to=restaurant_phone_number) # this may have a long random string first
-        else:
-            date_from = date_from[0]
-            if (date_from > datetime.now()):
-                #raise ValueError
-                return 0
-            messages = client.messages.list(date_sent=date_from,to=restaurant_phone_number)
+            if date_from==():
+                messages = auto_generate_sms_data()
+            else:
+                date_from = date_from[0]
+                if (date_from > datetime.now()):
+                    return 0
+                else:
+                    messages = auto_generate_sms_data(date_from=date_from)
+            #raise SystemError
     for message in messages:
         try:
             sms = Sms.get(message.sid == Sms.sid)
@@ -160,8 +167,10 @@ def process_incoming_sms(*one):
 
     Args:
         *one(int): optional argument
+
     Returns:
-        1 on success. 0 on error
+        res(int): 1 on success. 0 on error
+
     Throws:
         SystemError: When the Twilio Client cannot be started. Possibly invalid account_sid or
         auth_token
@@ -296,8 +305,10 @@ def update_db_rating(rating):
 
     Args:
         rating(Rating): rating object that contains all the parameters
+
     Returns:
-        1 on success. 0 on error
+        res(int): 1 on success. 0 on error
+
     Throws:
         N/A
     """
@@ -321,8 +332,10 @@ def delete_twilio_feedback(sidd):
 
     Args:
         sidd(str): optional argument. Include a sid or a list of SMS sids to delete from the twilio DB
+    
     Returns:
-        1 on success. 0 if the feedback could not be deleted
+        res(int): 1 on success. 0 if the feedback could not be deleted
+    
     Raises:
         ValueError: sms could not be found in database
     """
@@ -334,7 +347,31 @@ def delete_twilio_feedback(sidd):
                 raise ValueError
             for sid in sidd:
                 url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sid
+                try:
+                    response = request.delete(url)
+                except:
+                    print("max retries Error")
+                finally:
+                    if response.status_code == 204:
+                        return 1
+                    if response.status_code == 404:
+                        print(sid + " " + response.reason)
+                        return 0
+                    else:
+                        print(response.reason)
+                        return 0
+        elif type(sidd) is str:
+            sid = sidd
+            try:
+                sms = Sms.delete().where(Sms.sid==sid).execute()
+            except:
+                raise ValueError
+            url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sid
+            try:
                 response = request.delete(url)
+            except:
+                print("max retries Error")
+            finally:
                 if response.status_code == 204:
                     return 1
                 if response.status_code == 404:
@@ -343,22 +380,6 @@ def delete_twilio_feedback(sidd):
                 else:
                     print(response.reason)
                     return 0
-        elif type(sidd) is str:
-            sid = sidd
-            try:
-                sms = Sms.delete().where(Sms.sid==sid).execute()
-            except:
-                raise ValueError
-            url = "https://{}:{}@api.twilio.com/2010-04-01/Accounts/".format(account_sid,auth_token) + account_sid + '/Messages/' + sid
-            response = request.delete(url)
-            if response.status_code == 204:
-                return 1
-            if response.status_code == 404:
-                print(sid + " " + response.reason)
-                return 0
-            else:
-                print(response.reason)
-                return 0
         else:
             return 0
     else:
@@ -372,11 +393,11 @@ def feedback_analysis(inStr):
     Extended description:
 
     Args:
-        inStr (string): String containing words separated by spaces or
+        inStr (str): String containing words separated by spaces or
                         non-apostrophe punctuation.
 
     Returns:
-        list(posFlag,negFlag,exceptionFlag,foodFlag,serviceFlag):
+        list (posFlag,negFlag,exceptionFlag,foodFlag,serviceFlag):
             A list of integers representing whether the input string
             meets the necessary criteria to be flagged as positive,
             negative, food-related, service-related or contains an exception.
@@ -466,11 +487,11 @@ def word_freq_counter(inStr):
     Extended description:
 
     Args:
-        inStr (string): String containing words separated by spaces or
+        inStr (str): String containing words separated by spaces or
                         non-apostrophe punctuation.
 
     Returns:
-        resultDict: A list of dictionary elements mapping the each distinct word within inStr
+        resultDict (dict(str)): A list of dictionary elements mapping the each distinct word within inStr
                     to its number of occurrences in the input.
 
     Throws:

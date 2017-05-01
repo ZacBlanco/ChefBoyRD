@@ -44,10 +44,10 @@ def feedback_table(role):
     form: form that specifies the query instructions.
 
     Args:
-        role: correct role of user in this context acquired from the require_role wrapper
+        role(str): correct role of user in this context acquired from the require_role wrapper
     
     Returns:
-        The template to display with the appropriate parameters
+        template: The template to display with the appropriate parameters
     """
     #get all of the feedback objects and insert it into table
     form = DateSpecifyForm()
@@ -120,7 +120,7 @@ def delete_feedback():
     """Calls the delete_feedback function, returns a message confirming # of feedback entries deleted
 
     Returns:
-        Confirmation string
+        res(str): Confirmation string
     """
     query = Sms.delete() # deletes all SMS objects
     res = query.execute()
@@ -132,7 +132,7 @@ def delete_twilio_feedback():
     """Wipe all message history on twilio since a specified time. Only needs to be called once to clear data.
 
     Returns:
-        Confirmation string
+        res(str): Confirmation string
     """
     smss = Sms.select().where(Sms.submission_time >= datetime(2017, 4,25, 2,35,00))  #2017-04-25 02:49:49
     sidd = []
@@ -148,7 +148,7 @@ def update_all_sms():
     """Update sms data from external Twilio database
 
     Returns:
-        Confirmation string
+        res(str): Confirmation string
     """
     feedback_controller.update_db()
     return "db updates with all sms: Success"
@@ -160,7 +160,7 @@ def send_sms_route():
     When Twilio makes a POST request, db will be updated with new sms messages from today
 
     Returns:
-        Confirmation string
+        res(str): Confirmation string
     """
     feedback_controller.process_incoming_sms(1)
     return 'db updated'
