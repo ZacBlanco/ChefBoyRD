@@ -2,6 +2,11 @@
 {% block body %}
     <h2>Feedback Management</h2>
     <div>
+        <div>
+          <H3>Average Reatings
+          </H3>
+          {{current_rating}}
+        </div>
         <H3>Specify feedback range here:</H3>
         <br>
         <form name="fb_search"action="" method="post" onsubmit="return validateForm()">
@@ -54,9 +59,9 @@
 
         <script type="text/javascript">
         var currentDate = new Date();
-        var two_m_ago = new Date().setMonth((currentDate.getMonth()-2));
+        var defaultDateFrom = new Date().setMonth((currentDate.getMonth()-3));
         $("#datetimepicker2").datetimepicker({defaultDate: currentDate});
-        $("#datetimepicker1").datetimepicker({defaultDate: two_m_ago});
+        $("#datetimepicker1").datetimepicker({defaultDate: defaultDateFrom});
             $(function () {
                 $('#datetimepicker2').datetimepicker();
                 $('#datetimepicker1').datetimepicker();
@@ -78,7 +83,6 @@
         {% if wordcloud == True%}
             <div id= "wordcloud">
             </div>
-          
           <script type="text/javascript">
           //now.format("dd/MM/yyyy hh:mm TT");
           try{

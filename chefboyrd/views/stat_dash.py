@@ -128,8 +128,8 @@ def dash_index(role):
                     day = (order.tab.timestamp - date_min).days
                     quantities[hr] += order.ingredient.quantity_amt
                     days[day] += order.ingredient.quantity_amt
-                print(quantities)
-                print(days)
+                # print(quantities)
+                # print(days)
 
                 qfig = Figure()
                 ax1 = qfig.add_subplot(1, 1, 1)

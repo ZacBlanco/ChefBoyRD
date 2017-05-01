@@ -1,5 +1,10 @@
 '''Main file to register blueprints and run the flask application
 
+
+written by: Zachary Blanco, Jeffrey Huang, Seo Bo Shim, Brandon Smith, Jarod Morin
+tested by: Zachary Blanco, Jeffrey Huang, Seo Bo Shim, Brandon Smith, Jarod Morin
+debugged by: Zachary Blanco, Jeffrey Huang, Seo Bo Shim, Brandon Smith, Jarod Morin
+
 This is where most of the app setup is done. We shouldn't have to modify this file except
 for two different cases:
 
@@ -38,7 +43,6 @@ Other helpful sources of documentaiton and reading:
 
 
 '''
-
 import configparser
 import flask_login
 from flask import Flask, render_template
@@ -187,13 +191,15 @@ except:
     pass
 
 
-from chefboyrd.controllers import data_controller, feedback_controller
+from chefboyrd.controllers import data_controller, feedback_controller, receipt
 if Orders.select().count() < 1000:
     start_date = datetime.now() - timedelta(days=10)
     data_controller.generate_data(num_days=10, num_tabs=45, dt_start=start_date)
-
 try:
     feedback_controller.update_db() #updates the database with current text messages stored in twilio rest client
-except:
-    print ('Cannot Establish Twilio Connection. Check your Internet Connection. \nError in {}.'.format(__file__))
-    pass
+except SystemError:
+    print("Could not connect to Twilio")
+    feedback_controller.update_db(update_from="autogen")
+
+receipt.get_receipts()
+

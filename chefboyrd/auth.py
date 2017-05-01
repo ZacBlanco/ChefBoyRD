@@ -1,4 +1,11 @@
-'''Module for authentication
+'''Module for authentication and authorization
+
+- written by: Zachary Blanco
+- tested by: Zachary Blanco
+- debugged by: Zachary Blanco
+
+Uses the flask-login plugin as well as some custom wrapper functions to ensure
+that logged in users are only able to access authorized resources.
 '''
 from functools import wraps
 import flask
@@ -39,23 +46,27 @@ def require_login(func):
 
 def require_role(role,**kwargss):
     '''Decorate a function with this in order to require a specific role(s), to access a view.
-    Also decorates a function, so that you must pass the current user's role into it's first argument if it's needed.
+
+    Also decorates a function, so that you must pass the current user's role into it's first
+    argument if it's needed.
 
     By decorating a function with @require_role you are implicity forcing @login_required as well.
     Example:
 
-            @APP.route('/admin-dashboard')
-            @require_role('admin')
-            def view_dash():
-                ...
+    .. code-block:: python
 
-            @APP.route('/reservationH')
-            @require_role('admin','host',getrole=True)
-            def view_dash(role):
-                ...            
+        @APP.route('/admin-dashboard')
+        @require_role('admin')
+        def view_dash():
+        # Something here
+
+        @APP.route('/reservationH')
+        @require_role('admin','host',getrole=True)
+        def view_dash(role):
+            ...
+
     Args:
-        role(list or str):  A single role name or list of role names for which users are allowed
-        to access the specified resource
+        role(list or str):  A single role name or list of role names for which users are allowed to access the specified resource
 
     If a user is not authorized then the flask_login.unauthorized handler is called.
     '''
@@ -64,9 +75,9 @@ def require_role(role,**kwargss):
         @flask_login.login_required
         def wrapper(*args, **kwargs):
             user = flask_login.current_user
-            if (kwargss.get('getrole',False)):
+            if kwargss.get('getrole', False):
                 args = tuple([user.role])
-            if (isinstance(role, list) and user.role in role):
+            if isinstance(role, list) and user.role in role:
                 return func(*args, **kwargs)
             elif user.role == role:
                 return func(*args, **kwargs)
