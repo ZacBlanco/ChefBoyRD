@@ -1,7 +1,5 @@
-"""receipt
-Interfaces with an external system that generates receipts
-"""
-"""
+"""Interfaces with an external system that generates receipts
+
 written by: Seo Bo Shim
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
