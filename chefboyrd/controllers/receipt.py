@@ -18,6 +18,7 @@ import os
 
 def get_receipts():
 	"""Generates a .json file at the root directory with information for each tab, including unique ID
+
 	Returns:
 		N/A
 	"""
