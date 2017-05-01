@@ -35,8 +35,8 @@ def feedback_submit(role):
     Displays a confirmation message when submitted
 
     Returns:
-        The template to display with the appropriate parameters
-    form: form that specifies the query instructions.
+        template: The template to display with the appropriate parameters
+        form: form that specifies the query instructions.
     """
     #get all of the feedback objects and insert it into table
     form = CommentForm()
