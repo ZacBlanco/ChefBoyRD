@@ -1,7 +1,5 @@
-"""Sms
-Contains the SMS model. Feedback submitted
-"""
-"""
+"""Contains the SMS model. Feedback submitted
+
 written by: Seo Bo Shim, Jarod Morin
 tested by: Seo Bo Shim
 debugged by: Seo Bo Shim
