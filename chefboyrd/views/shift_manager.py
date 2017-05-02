@@ -1,6 +1,10 @@
 '''
 Shift management dashboard for the manager interface
+written by: Jeffrey Huang
+tested by: Jeffrey Huang
+debugged by: Jeffrey Huang
 '''
+
 import json
 import flask_login
 from flask import Flask, Blueprint, render_template, request, url_for, redirect, flash
@@ -111,6 +115,7 @@ def calendar():
     return render_template('/shift_manager/index.html', logged_in=True, name=employee_name, role=employee_role, freeTable=freeTable, claimTable = claimTable, form=form, userShift=form2, selection=selection)
 
 @page.route('/data')
+@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
@@ -127,6 +132,7 @@ def return_data():
     return json.dumps(shift_json)
 
 @page.route("/claim", methods=['GET', 'POST'])
+@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
 def claim():
     '''
     This handles when the user needs to claim a shift
@@ -143,6 +149,7 @@ def claim():
         return redirect(url_for('shift_manager.calendar'))
 
 @page.route("/post", methods=['GET', 'POST'])
+@require_role(['admin', 'chef', 'waiter', 'host', 'manager'])
 def post():
     '''
     This handles when the user needs to post a shift
@@ -169,5 +176,5 @@ def remove():
         Shift.remove_shift(id)
         flash("Successfully removed the shift")
     else:
-        flask("Insufficient Privileges: Unable to remove shift")
+        flash("Unable to remove shift")
     return redirect(url_for('shift_manager.calendar'))

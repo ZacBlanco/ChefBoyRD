@@ -1,3 +1,9 @@
+'''Used to check shift scheduling conflicts and shift permissions
+written by: Jeffrey Huang
+tested by: Jeffrey Huang
+debugged by: Jeffrey Huang
+'''
+
 from datetime import timedelta, datetime
 from chefboyrd.models.shifts import Shift
 
@@ -56,11 +62,11 @@ def checkPostConditions(id, name, role):
         return True
     else:
         return False
-    
+
 def checkRemoveConditions(id, role):
     """
-    This method checks the ability for the user to remove the shift and makes sure that
-    the user is not removing shifts without the proper permissions. The only exceptions are for admins
+    This method checks the ability for the user to post their shift and makes sure that
+    the user is not posting another user's shift. The only exceptions are for admins
     and managers.
 
     Args:
