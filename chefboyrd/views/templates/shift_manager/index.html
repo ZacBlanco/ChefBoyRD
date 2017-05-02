@@ -3,9 +3,8 @@
 <meta charset='utf-8' />
 <link href="{{ url_for('static', filename='fullcalendar.min.css') }}" rel='stylesheet' />
 <link href="{{ url_for('static', filename='fullcalendar.print.css') }}" rel='stylesheet' media='print' />
-<script src="{{ url_for('static', filename='lib/moment.min.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='fullcalendar.min.js') }}"></script>
+
 <script>
 	$(document).ready(function() {
 		var today = moment().format('YYYY-MM-DD');
@@ -18,7 +17,7 @@
 			defaultDate: today,
 			defaultView: 'agendaDay',
 			editable: false,
-			eventLimit: true, // allow "more" link when too many events
+			eventLimit: false, // allow "more" link when too many events
 			events: {
 				url: 'data',
 				error: function() {
@@ -80,7 +79,7 @@
 	}
 
 	#calendar {
-		max-width: 900px;
+		max-width: 1000px;
 		margin: 40px auto;
 		padding: 0 10px;
 	}
@@ -106,7 +105,6 @@
 				{{ claimTable }}
 		<h1>Add a Shift Here</h1>
 		<br>
-
 		<form action="" method=post>
 			<dl>
 				{{ form.hidden_tag() }}
@@ -142,11 +140,10 @@
 			</dl>
 			{{ form.submit }}
 		</form>
-    <div id='script-warning'>
-		Error getting data from <code>/data</code> endpoint.
-	</div>
-
-	<div id='loading'>loading...</div>
-	<div id='calendar'></div>
+			<div id='script-warning'>
+			Error getting data from <code>/data</code> endpoint.
+			</div>
+			<div id='loading'>loading...</div>
+			<div id='calendar'></div>
 </div>
 {% endblock %}
