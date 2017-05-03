@@ -158,10 +158,13 @@ def update_db(*date_from, **kwargs):
     return 1
 
 def process_incoming_sms(*one):
-    """Updates SMS table in database with the incoming SMS. Checks for the unique key to invalidate SMS or keep it
+    """Updates SMS table in database with the incoming SMS. Checks for the unique key to invalidate
+    SMS or keep it. 
+    
     Only for processing SMS in real time.
-    Precondition:
-        A Twilio POST request is received.
+
+    - Precondition: A Twilio POST request is received.
+
     TODO: Fix error with twilio, where the most recent message does not have a submission timep
 
     Args:

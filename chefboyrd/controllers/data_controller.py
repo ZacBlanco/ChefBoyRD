@@ -74,6 +74,7 @@ def get_dotw_orders(dotw):
     '''Gets all orders on a given day of the week
 
     Interesting challenge because we only have a datetime value.
+
     Args:
         dotw (int): An integer representing the day of the week. 0 for Monday, 6 for Sunday.
 
@@ -115,11 +116,14 @@ def get_meals_in_range(dt_min, dt_max):
 
 
 def people_in_range(dt_min=None, dt_max=None):
-    '''Returns the total number of people served in a range of dates
+    '''Gets the total number of people served in a range of dates
 
     Args:
         dt_min (datetime): Beginning datetime in range
         dt_max (datetime): Ending datetime in range
+
+    Returns:
+        int: The total number of people served in a range of dates
     '''
     tabs = get_tabs_range(dt_min, dt_max)
     total_people = 0
