@@ -148,7 +148,7 @@ Please modify this to fit our needs</p>
 <li><strong>name</strong> (<em>str</em>) &#8211; Name of person who made the reservation</li>
 <li><strong>num</strong> (<em>int</em>) &#8211; Number of people in the reservation</li>
 <li><strong>phone</strong> (<em>str</em>) &#8211; Phone number of person who made the reservation</li>
-<li><strong>start</strong> (<a class="reference internal" href="chefboyrd.views.html#chefboyrd.views.reservationH.ItemTable.time" title="chefboyrd.views.reservationH.ItemTable.time"><em>time</em></a>) &#8211; Starting time of reservation</li>
+<li><strong>start</strong> (<a class="reference internal" href="chefboyrd.views.html#chefboyrd.views.table_manager.ItemTable.time" title="chefboyrd.views.table_manager.ItemTable.time"><em>time</em></a>) &#8211; Starting time of reservation</li>
 </ul>
 </td>
 </tr>
@@ -192,62 +192,67 @@ Please modify this to fit our needs</p>
 </div>
 <div class="section" id="module-chefboyrd.models.sms">
 <span id="chefboyrd-models-sms-module"></span><h2>chefboyrd.models.sms module<a class="headerlink" href="#module-chefboyrd.models.sms" title="Permalink to this headline">¶</a></h2>
+<p>Contains the SMS model. Feedback submitted</p>
+<p>written by: Seo Bo Shim, Jarod Morin
+tested by: Seo Bo Shim
+debugged by: Seo Bo Shim</p>
 <dl class="class">
 <dt id="chefboyrd.models.sms.Sms">
 <em class="property">class </em><code class="descclassname">chefboyrd.models.sms.</code><code class="descname">Sms</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/sms.html#Sms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.sms.Sms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">peewee.Model</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
+<p>A model for SMS objects to be stored and analyzed. The many flags hold a range of values between -1 and 1</p>
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.sid">
 <code class="descname">sid</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.sid" title="Permalink to this definition">¶</a></dt>
-<dd><p>is an unique id assigned by twilio. it will help us keep track of sms that is in, or not in db</p>
+<dd><p><em>str</em> &#8211; is an unique id assigned by twilio. it will help us keep track of sms that is in, or not in db</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.submission_time">
 <code class="descname">submission_time</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.submission_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>is the date and time the feedback was submitted</p>
+<dd><p><em>datetime</em> &#8211; is the date and time the feedback was submitted</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.body">
 <code class="descname">body</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.body" title="Permalink to this definition">¶</a></dt>
-<dd><p>the message of the Sms</p>
+<dd><p><em>str</em> &#8211; the message of the Sms</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.phone_num">
 <code class="descname">phone_num</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.phone_num" title="Permalink to this definition">¶</a></dt>
-<dd><p>Phone number of person who sent in text</p>
+<dd><p><em>str</em> &#8211; Phone number of person who sent in text</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.pos_flag">
 <code class="descname">pos_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.pos_flag" title="Permalink to this definition">¶</a></dt>
-<dd><p>1 if body includes positive feedback. 0 if not. -1 default value</p>
+<dd><p><em>int</em> &#8211; 1 if body includes positive feedback. 0 if not. -1 default value</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.neg_flag">
 <code class="descname">neg_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.neg_flag" title="Permalink to this definition">¶</a></dt>
-<dd><p>1 if body includes negative feedback. 0 if not. -1 default value</p>
+<dd><p><em>int</em> &#8211; 1 if body includes negative feedback. 0 if not. -1 default value</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.exception_flag">
 <code class="descname">exception_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.exception_flag" title="Permalink to this definition">¶</a></dt>
-<dd><p>1 if body includes an exception to a present clause. 0 if not. -1 default value</p>
+<dd><p><em>int</em> &#8211; 1 if body includes an exception to a present clause. 0 if not. -1 default value</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.food_flag">
 <code class="descname">food_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.food_flag" title="Permalink to this definition">¶</a></dt>
-<dd><p>1 if body includes feedback about food. 0 if not. -1 default value</p>
+<dd><p><em>int</em> &#8211; 1 if body includes feedback about food. 0 if not. -1 default value</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="chefboyrd.models.sms.Sms.service_flag">
 <code class="descname">service_flag</code><a class="headerlink" href="#chefboyrd.models.sms.Sms.service_flag" title="Permalink to this definition">¶</a></dt>
-<dd><p>1 if indicating body includes feedback about service. 0 if not. -1 default value</p>
+<dd><p><em>int</em> &#8211; 1 if indicating body includes feedback about service. 0 if not. -1 default value</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -820,10 +825,16 @@ debugged by: Zachary Blanco</p>
 <dt id="chefboyrd.models.user.User">
 <em class="property">class </em><code class="descclassname">chefboyrd.models.user.</code><code class="descname">User</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/models/user.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.models.user.User" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">flask_login.mixins.UserMixin</span></code>, <a class="reference internal" href="#chefboyrd.models.base_model.BaseModel" title="chefboyrd.models.base_model.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">chefboyrd.models.base_model.BaseModel</span></code></a></p>
-<p>A User model for who will be using the software. Users have different levels of access with different roles
-Current active roles:</p>
+<p>A User model for who will be using the software. Users have different levels of access with different roles</p>
+<p>Current active roles:</p>
 <blockquote>
-<div>host, admin, chef, cust</div></blockquote>
+<div><ul class="simple">
+<li>host</li>
+<li>admin</li>
+<li>chef</li>
+<li>cust</li>
+</ul>
+</div></blockquote>
 <dl class="attribute">
 <dt id="chefboyrd.models.user.User.DoesNotExist">
 <code class="descname">DoesNotExist</code><a class="headerlink" href="#chefboyrd.models.user.User.DoesNotExist" title="Permalink to this definition">¶</a></dt>

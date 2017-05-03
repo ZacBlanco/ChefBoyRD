@@ -46,7 +46,7 @@
 <span></span><span class="sd">&#39;&#39;&#39;Test some model creation and methods&#39;&#39;&#39;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">unittest.mock</span> <span class="k">import</span> <span class="n">patch</span>
+<span class="kn">from</span> <span class="nn">unittest.mock</span> <span class="k">import</span> <span class="n">patch</span><span class="p">,</span> <span class="n">MagicMock</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">chefboyrd</span>
@@ -98,7 +98,14 @@
         <span class="c1"># Assertion??</span>
 
 <div class="viewcode-block" id="ModelTest.test_polynomialModel"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_polynomialModel">[docs]</a>    <span class="k">def</span> <span class="nf">test_polynomialModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Test the polynomial model for correct output&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;Test the polynomial model for correct output</span>
+
+<span class="sd">        **Passes when**: polynomial model outputs the correct prediction value of 7</span>
+<span class="sd">        given the set if input parameters ``iv=[1, 2, 3]`` and ``ip=[1, 1, 1, 1]``</span>
+
+<span class="sd">        **Fails when**: the polynomial model outputs the incorrect prediction</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">iv</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># Input vector</span>
         <span class="n">ip</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="c1"># Input parameters</span>
         <span class="n">ans</span> <span class="o">=</span> <span class="n">model_controller</span><span class="o">.</span><span class="n">polynomialModel</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="o">*</span><span class="n">ip</span><span class="p">)</span>
@@ -112,8 +119,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="mf">1.2936149395776206</span><span class="p">)</span> <span class="c1"># Expected output</span></div>
 
 <div class="viewcode-block" id="ModelTest.test_get_earliest_datetime"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_get_earliest_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_earliest_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Ensures that we always retrieve the earliest datetime from </span>
-<span class="sd">        a given set of data&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;Ensures that we always retrieve the earliest datetime from</span>
+<span class="sd">        a given set of data</span>
+
+<span class="sd">        **Passes when**: The datetime returned from ``data_controller.get_earliest_datetime`` is</span>
+<span class="sd">        the very earliest datetime in the input set from a set of generated data which has</span>
+<span class="sd">        ``datetime.now()`` as the earliest time</span>
+
+<span class="sd">        **Fails when**: The earliest date retrieved is not equal to ``datetime.now()``</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">data_controller</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">expected_earliest_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="n">earliest_datetime</span> <span class="o">=</span> <span class="n">model_controller</span><span class="o">.</span><span class="n">get_earliest_datetime</span><span class="p">()</span>
@@ -122,7 +137,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">earliest_datetime</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">expected_earliest_datetime</span><span class="o">.</span><span class="n">day</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ModelTest.test_create_meal"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_create_meal">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_meal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Ensures that we can make at least one meal in the database.&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;Ensures that we can make at least one meal in the database.</span>
+
+<span class="sd">        **Passes when**: We can successfully add a new meal to the database and retrieve</span>
+<span class="sd">        it back from the database after inserting it.</span>
+
+<span class="sd">        **Fails when**: We can&#39;t retrieve a meal from the Meals table which matches the</span>
+<span class="sd">        newly inserted meal. It will also fail if there is more than one meal in the database</span>
+<span class="sd">        with the same name.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">Meals</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">price</span><span class="o">=</span><span class="mf">12.99</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Cheeseburger&quot;</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
@@ -132,7 +156,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">meals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">price</span><span class="p">,</span> <span class="mf">12.99</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ModelTest.test_create_tab"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_create_tab">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Ensures that tab creation works&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;Ensures that tab creation works</span>
+
+<span class="sd">        **Passes when**: We can successfully create a new tab and assert that it is the only</span>
+<span class="sd">        tab contained within the tabs table.</span>
+
+<span class="sd">        **Fails when**: There are more tabs in the Tabs table which have 10 people in a party</span>
+<span class="sd">        or there are no tabs which have 12 people which had no reservation</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">Tabs</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">had_reservation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">party_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
                         <span class="n">fb_key</span><span class="o">=</span><span class="s2">&quot;~~~~~~~&quot;</span><span class="p">)</span>
@@ -145,7 +176,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">tabs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">had_reservation</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ModelTest.test_create_foreign_key_obj"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_create_foreign_key_obj">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_foreign_key_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Ensures that we can create an item with a foreign key field&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;Ensures that we can create an item with a foreign key field</span>
+<span class="sd">        </span>
+<span class="sd">        **Passes when**: We can create a new mealingredient in the MealIngredients table</span>
+<span class="sd">        which has specific attributes that we are able to retrieve after creation.</span>
+
+<span class="sd">        **Fails when**: We are unable to select the proper MealIngredient from the table</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">MealIngredients</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">quantity_amt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">meal_id</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">ingredient_id</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
                                    <span class="n">quantity_meas_id</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
@@ -154,14 +191,21 @@
         <span class="n">mis</span> <span class="o">=</span> <span class="n">MealIngredients</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">MealIngredients</span><span class="o">.</span><span class="n">quantity_amt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mis</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ModelTest.test_fpriorder_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_fpriorder_range">[docs]</a>    <span class="k">def</span> <span class="nf">test_fpriorder_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Tests the get_orders_date_range function.BaseException</span>
+<div class="viewcode-block" id="ModelTest.test_order_range"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_order_range">[docs]</a>    <span class="k">def</span> <span class="nf">test_order_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Tests the get_orders_date_range function.</span>
 
 <span class="sd">        Tests all edge cases to make sure that the constraints are not broken</span>
 
 <span class="sd">        We accomplish this by creating a set of tabs with different dates and</span>
 <span class="sd">        ensures that given certain inputs we return none, all, or a subset of the </span>
 <span class="sd">        tabs which we had just inserted.</span>
+
+<span class="sd">        **Passes When** we can ensure all orders created over a given range can be</span>
+<span class="sd">        returned through mulitple queries as well as ensuring dates which fall outside</span>
+<span class="sd">        our query range are not returned.BaseException</span>
+
+<span class="sd">        **Fails when**: We do not return orders that all fall within our queried range</span>
+<span class="sd">        or if we do not return all orders in the range.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">m1</span> <span class="o">=</span> <span class="n">Meals</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Burger&quot;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">8.99</span><span class="p">)</span>
         <span class="n">num</span> <span class="o">=</span> <span class="mi">20</span>
@@ -200,6 +244,10 @@
 <div class="viewcode-block" id="ModelTest.test_get_meals"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_get_meals">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_meals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Enures that the get_meals_in_range function gets only the meals within</span>
 <span class="sd">        the correct range</span>
+
+<span class="sd">        **Passes when**: We ensure we retrieve meals which include the daterange specified</span>
+
+<span class="sd">        **Fails when**: We are unable to retrieve the meals within the date range.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
@@ -214,6 +262,11 @@
 <span class="sd">        the table. Then we pick a few ranges of those times including the very</span>
 <span class="sd">        beginning and very last dates to ensure we cover edge cases and return</span>
 <span class="sd">        the correct number of tabs for the gien time ranges.</span>
+
+<span class="sd">        **Passes when**: We ensure that all tabs (and only the tabs) which were created</span>
+<span class="sd">        within a certain datetime range are returned</span>
+
+<span class="sd">        **Fails when**: We find a tab which does not reside within a date range.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">num</span> <span class="o">=</span> <span class="mi">20</span>
@@ -251,6 +304,13 @@
 <div class="viewcode-block" id="ModelTest.test_get_dotw"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_get_dotw">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_dotw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Ensures that we can reliably get the day of the week using the</span>
 <span class="sd">        get_dotw_orders function</span>
+
+<span class="sd">        **Passes when**: We get ensure all orders returned reside on the same date</span>
+<span class="sd">        and the correct day of the week.</span>
+
+<span class="sd">        **Fails when**: We don&#39;t retrieve the correct day of the week OR we return tabs</span>
+<span class="sd">        which are not on the same day and does not raise errors on bad inputs</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">m1</span> <span class="o">=</span> <span class="n">Meals</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Burger&quot;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">8.99</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
@@ -269,11 +329,17 @@
 
     <span class="nd">@patch</span><span class="p">(</span><span class="s1">&#39;chefboyrd.models.Orders.create&#39;</span><span class="p">,</span> <span class="n">return_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 <div class="viewcode-block" id="ModelTest.test_generate_data"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_predict.ModelTest.test_generate_data">[docs]</a>    <span class="k">def</span> <span class="nf">test_generate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orders</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Ensures we create some new Order name in on</span>
+        <span class="sd">&#39;&#39;&#39;Ensures that we can successfully create orders when generating data</span>
+
+<span class="sd">        **Passes when**: Data is generated by calling Orders.create()</span>
+
+<span class="sd">        **Fails when**: Orders.create() is not called when generating data</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># print(Ingredients._meta.database.database)</span>
-        <span class="n">data_controller</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">num_days</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_tabs</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-        <span class="n">orders</span><span class="o">.</span><span class="n">asser_called_once</span><span class="p">()</span></div></div>
+        <span class="n">Orders</span><span class="o">.</span><span class="n">create</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">()</span>
+        <span class="n">Orders</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">data_controller</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">num_days</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_tabs</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">Orders</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">called</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Order creation should have occurred&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

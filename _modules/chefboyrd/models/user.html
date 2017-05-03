@@ -57,10 +57,14 @@
 <span class="kn">from</span> <span class="nn">werkzeug.security</span> <span class="k">import</span> <span class="n">generate_password_hash</span>
 
 <div class="viewcode-block" id="User"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.user.User">[docs]</a><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">UserMixin</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A User model for who will be using the software. Users have different levels of access with different roles</span>
+    <span class="sd">&#39;&#39;&#39;A User model for who will be using the software. Users have different levels of access with different roles</span>
+
 <span class="sd">    Current active roles:</span>
-<span class="sd">        host, admin, chef, cust</span>
+
+<span class="sd">        - host</span>
+<span class="sd">        - admin</span>
+<span class="sd">        - chef</span>
+<span class="sd">        - cust</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">email</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">password</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>

@@ -64,7 +64,14 @@
 
 <span class="nd">@login_manager</span><span class="o">.</span><span class="n">user_loader</span>
 <div class="viewcode-block" id="user_loader"><a class="viewcode-back" href="../../autodoc/chefboyrd.html#chefboyrd.auth.user_loader">[docs]</a><span class="k">def</span> <span class="nf">user_loader</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Loads the user via a DB call&#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;Loads the user via a DB call</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        email (str): The email to load</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        User: The user object corresponding to the email passed, or None if it doesn&#39;t exist</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -79,8 +86,8 @@
 <div class="viewcode-block" id="require_login"><a class="viewcode-back" href="../../autodoc/chefboyrd.html#chefboyrd.auth.require_login">[docs]</a><span class="k">def</span> <span class="nf">require_login</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Wrapper around the login_required wrapper from flask-login</span>
 
-<span class="sd">        This allows us to keep the same style and also not have to have multiple imports for</span>
-<span class="sd">        roles and require_login</span>
+<span class="sd">    This allows us to keep the same style and also not have to have multiple imports for</span>
+<span class="sd">    roles and require_login</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="nd">@flask_login</span><span class="o">.</span><span class="n">login_required</span>
@@ -133,7 +140,7 @@
 
 <span class="nd">@auth_pages</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/login&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="login"><a class="viewcode-back" href="../../autodoc/chefboyrd.html#chefboyrd.auth.login">[docs]</a><span class="k">def</span> <span class="nf">login</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;Function which logs a user into the application&#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;Logs a user into the application&#39;&#39;&#39;</span>
 
     <span class="k">if</span> <span class="n">flask_login</span><span class="o">.</span><span class="n">current_user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">))</span>

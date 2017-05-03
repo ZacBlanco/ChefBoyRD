@@ -44,8 +44,9 @@
             
   <h1>Source code for chefboyrd.controllers.model_controller</h1><div class="highlight"><pre>
 <span></span><span class="sd">&#39;&#39;&#39;ModelController</span>
-<span class="sd">This is a preprocessor for the prediction_controller. Given data in the form of</span>
-<span class="sd">our local models, it converts it into numbers usable by the prediction controller.</span>
+
+<span class="sd">This is a preprocessor for the prediction_controller. Given data in the form of our local models,</span>
+<span class="sd">it converts it into numbers usable by the prediction controller.</span>
 
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">Model</span>
@@ -60,10 +61,12 @@
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This is the polynomial model that will be fit by our algorithm. </span>
 
-<span class="sd">    Args: x = input matrix where the features are rows and each predictor(data point) is a column</span>
-<span class="sd">          params = the parameters for the model</span>
+<span class="sd">    Args:</span>
+<span class="sd">        x : input matrix where the features are rows and each predictor(data point) is a column</span>
+<span class="sd">        params : the parameters for the model</span>
 
-<span class="sd">    Returns: sum = the output vector where each indice is a predictor</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        sum : the output vector where each indice is a predictor</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">complexity</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -76,10 +79,12 @@
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This is the sinusoidal model that will be fit by our algorithm. </span>
 
-<span class="sd">    Args: x = input matrix where the features are rows and each predictor(data point) is a column</span>
-<span class="sd">          params = the parameters for the model</span>
+<span class="sd">    Args:</span>
+<span class="sd">        x : input matrix where the features are rows and each predictor(data point) is a column</span>
+<span class="sd">        params : the parameters for the model</span>
 
-<span class="sd">    Returns: sum = the output vector where each indice is a predictor</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        list - the output vector where each indice is a predictor</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">sum</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
@@ -90,7 +95,8 @@
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Converts peewee query result set to a list of dictionary of lists</span>
 
-<span class="sd">    Args: accepts a list of orders made from a query for peewee</span>
+<span class="sd">    Args:</span>
+<span class="sd">        orders (list): Accepts a list of orders made from a query for peewee</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="o">.</span><span class="n">switch</span><span class="p">(</span><span class="n">Orders</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Meals</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Meals</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="n">currentMeal</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -134,11 +140,11 @@
 <span class="sd">    This trains all of the meals and fits their data to their own set of parameters</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    mealDict = The meal dictionary containing order data created by orders_to_list</span>
-<span class="sd">    modelType = the type of model to use(sinusoidal, polynomial)</span>
+<span class="sd">        mealDict : The meal dictionary containing order data created by orders_to_list</span>
+<span class="sd">        modelType : the type of model to use(sinusoidal, polynomial)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    mealsParams = a dictionary that contains the parameters for each corresponding meal</span>
+<span class="sd">        mealsParams : a dictionary that contains the parameters for each corresponding meal</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">mealsParams</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">meal_key</span> <span class="ow">in</span> <span class="n">mealDict</span><span class="p">:</span>
@@ -153,12 +159,12 @@
 <span class="sd">    Trains a single meal and fits it to a model to find its parameters</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    x = The input vector(which is composed of rows 0 to 3 in the vector)</span>
-<span class="sd">    y = The expected output vector(the last row)</span>
-<span class="sd">    modelType = the type of model to use</span>
+<span class="sd">        x : The input vector(which is composed of rows 0 to 3 in the vector)</span>
+<span class="sd">        y : The expected output vector(the last row)</span>
+<span class="sd">        modelType : the type of model to use</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    params = a list of parameters</span>
+<span class="sd">        params : A list of parameters</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="c1"># Train the model</span>
     <span class="n">initial_params</span> <span class="o">=</span> <span class="p">[]</span>

@@ -55,12 +55,12 @@
 <span class="sd">    creates a Booking on the database.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    restaurant: The id of the restaurant we want to make the booking for</span>
-<span class="sd">    booking_time_date: The starting time of the booking we want to make</span>
-<span class="sd">    people: The number of people that the booking is requesting</span>
-<span class="sd">    name: The name of the guest making the reservation</span>
-<span class="sd">    phone: The phone number of the guest making the reservation</span>
-<span class="sd">    minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</span>
+<span class="sd">        restaurant: The id of the restaurant we want to make the booking for</span>
+<span class="sd">        booking_time_date: The starting time of the booking we want to make</span>
+<span class="sd">        people: The number of people that the booking is requesting</span>
+<span class="sd">        name: The name of the guest making the reservation</span>
+<span class="sd">        phone: The phone number of the guest making the reservation</span>
+<span class="sd">        minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</span>
 
 <span class="sd">    Returns: A dictionary with the booking id, and the table id. If there is no table available at the requested time None is returned.</span>
 
@@ -82,12 +82,13 @@
 <span class="sd">    people and a booking date/time.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    restaurant: The id of the restaurant we want to make the booking for</span>
-<span class="sd">    booking_time_date: The starting time of the booking we want to make</span>
-<span class="sd">    people: The number of people that the booking is requesting</span>
-<span class="sd">    minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</span>
+<span class="sd">        restaurant: The id of the restaurant we want to make the booking for</span>
+<span class="sd">        booking_time_date: The starting time of the booking we want to make</span>
+<span class="sd">        people: The number of people that the booking is requesting</span>
+<span class="sd">        minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes</span>
 
-<span class="sd">    Returns: The first table available. If there are no tables available we return None</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The first table available. If there are no tables available we return None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># I make sure to check if the tables are not already booked within the time slot required</span>
     <span class="c1"># by the new booking</span>

@@ -82,27 +82,56 @@
 </div>
 <div class="section" id="module-chefboyrd.tests.test_fb">
 <span id="chefboyrd-tests-test-fb-module"></span><h2>chefboyrd.tests.test_fb module<a class="headerlink" href="#module-chefboyrd.tests.test_fb" title="Permalink to this headline">¶</a></h2>
-<p>test_fb for unittesting the feedback-related functions</p>
+<p>Unittesting the functions in feedback_controller. Includes feedback analysis and storage and deletion of
+sms objects in the database</p>
+<p>written by: Seo Bo Shim, Jarod Morin
+tested by: Seo Bo Shim, Jarod Morin
+debugged by: Seo Bo Shim, Jarod Morin</p>
 <dl class="class">
 <dt id="chefboyrd.tests.test_fb.MyModuleTest">
 <em class="property">class </em><code class="descclassname">chefboyrd.tests.test_fb.</code><code class="descname">MyModuleTest</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb.html#MyModuleTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb.MyModuleTest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
 <dl class="method">
-<dt id="chefboyrd.tests.test_fb.MyModuleTest.test_feedback_analysis">
-<code class="descname">test_feedback_analysis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb.html#MyModuleTest.test_feedback_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb.MyModuleTest.test_feedback_analysis" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tests for correct performance of feedback analysis on known string inputs.</p>
+<dt id="chefboyrd.tests.test_fb.MyModuleTest.test_delete_twilio_feedback">
+<code class="descname">test_delete_twilio_feedback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb.html#MyModuleTest.test_delete_twilio_feedback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb.MyModuleTest.test_delete_twilio_feedback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests for correct performance of method that deletes feedback in the Twilio API and in our database</p>
+<p><strong>Passes when</strong>: Cannot delete sms data with invalid sid. Method to delete feedback handles
+errors appropriately</p>
+<p><strong>Fails when</strong>: The controller attempts to delete sms that does not exist. Or if there
+is a problem with interfacing with the Twilio API</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="chefboyrd.tests.test_fb.MyModuleTest.test_update_db_delete">
-<code class="descname">test_update_db_delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb.html#MyModuleTest.test_update_db_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb.MyModuleTest.test_update_db_delete" title="Permalink to this definition">¶</a></dt>
-<dd><p>test the send_sms function</p>
+<dt id="chefboyrd.tests.test_fb.MyModuleTest.test_feedback_analysis">
+<code class="descname">test_feedback_analysis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb.html#MyModuleTest.test_feedback_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb.MyModuleTest.test_feedback_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests for correct performance of feedback analysis on known string inputs.
+Tests functionality of sms feedback use case, that the analysis is done accurately</p>
+<p><strong>Passes when</strong>: The feedback analysis algorithm correctly assigns appropriate flags to
+a set of example strings.</p>
+<p><strong>Fails when</strong>: The feedback analysis algorithm fails to assign correct flags to messages</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chefboyrd.tests.test_fb.MyModuleTest.test_update_db">
+<code class="descname">test_update_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb.html#MyModuleTest.test_update_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb.MyModuleTest.test_update_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests to make sure that Sms objects that are stored in the database are storing correctly.
+Tests the functionality of the Sms feedback use case: storing and accessing feedback</p>
+<p><strong>Passes when</strong>: The system can process Sms data that is sent and update the database.
+Can query with a date range while rejecting invalid dates. Can correctly read sms data</p>
+<p><strong>Fails when</strong>: System has errors in processing sms. Cannot read information from the Sms object
+The sms database is not empty when deleted and invalid date ranges are specified</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chefboyrd.tests.test_fb.MyModuleTest.test_word_freq_counter">
 <code class="descname">test_word_freq_counter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb.html#MyModuleTest.test_word_freq_counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb.MyModuleTest.test_word_freq_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tests for correct performance of word frequency counter on known string inputs.</p>
+<dd><p>Tests for correct performance of word frequency counter on known string inputs.
+Test for the sms feedback use case, where the result of the feedback analysis can then be displayed in
+a word cloud in the management&#8217;s feedback panel</p>
+<p><strong>Passes when</strong>: The word_frequency_counter can appropriately assign frequency values in the correct output format
+Handles invalid input with error</p>
+<p><strong>Fails when</strong>: The word_frequency_counter is not assigning correct frequency values to words
+Or does not respond appropriately to invalid input.</p>
 </dd></dl>
 
 </dd></dl>
@@ -110,11 +139,54 @@
 </div>
 <div class="section" id="module-chefboyrd.tests.test_fb_data">
 <span id="chefboyrd-tests-test-fb-data-module"></span><h2>chefboyrd.tests.test_fb_data module<a class="headerlink" href="#module-chefboyrd.tests.test_fb_data" title="Permalink to this headline">¶</a></h2>
+<p>Includes the functions required to generate random sms messages in case Twilio is not available.
+This is to help test the functionality of how sms stored in the database is read and interpreted.</p>
+<p>written by: Seo Bo Shim
+tested by: Seo Bo Shim
+debugged by: Seo Bo Shim</p>
 <dl class="class">
 <dt id="chefboyrd.tests.test_fb_data.TestMessages">
 <em class="property">class </em><code class="descclassname">chefboyrd.tests.test_fb_data.</code><code class="descname">TestMessages</code><span class="sig-paren">(</span><em>sid</em>, <em>date_sent</em>, <em>body</em>, <em>from_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb_data.html#TestMessages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb_data.TestMessages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>test class that emulates how twilio stores messages, so that this can be run to test the funtions without a connection to twilio</p>
+<p>Test class that emulates how twilio stores messages, so that this can be run to test the funtions without a connection to twilio</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.tests.test_fb_data.auto_generate_sms_data">
+<code class="descclassname">chefboyrd.tests.test_fb_data.</code><code class="descname">auto_generate_sms_data</code><span class="sig-paren">(</span><em>n=25</em>, <em>date_from=datetime.datetime(2017</em>, <em>3</em>, <em>4</em>, <em>1</em>, <em>12</em>, <em>5</em>, <em>569093)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb_data.html#auto_generate_sms_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb_data.auto_generate_sms_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to generates random feedback data
+:param n: number of items to generate
+:type n: int
+:param date_from: starting date time. Ending date time used is datetime.now()
+:type date_from: datetime</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">message with same format as Twilio message to store in database</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">messages(TestMessage)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="chefboyrd.tests.test_fb_data.random_word">
+<code class="descclassname">chefboyrd.tests.test_fb_data.</code><code class="descname">random_word</code><span class="sig-paren">(</span><em>allLists</em>, <em>max=13</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_fb_data.html#random_word"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_fb_data.random_word" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to generate random sentence</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>allLists</strong> (<em>List</em><em>(</em><em>str</em><em>)</em><em></em>) &#8211; List of strings of available words to use</li>
+<li><strong>max</strong> (<em>int</em>) &#8211; max length of the sentence</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -284,34 +356,38 @@ authorization works as expected.</p>
 <dt id="chefboyrd.tests.test_predict.ModelTest.test_create_foreign_key_obj">
 <code class="descname">test_create_foreign_key_obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_create_foreign_key_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_create_foreign_key_obj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensures that we can create an item with a foreign key field</p>
+<p><strong>Passes when</strong>: We can create a new mealingredient in the MealIngredients table
+which has specific attributes that we are able to retrieve after creation.</p>
+<p><strong>Fails when</strong>: We are unable to select the proper MealIngredient from the table</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chefboyrd.tests.test_predict.ModelTest.test_create_meal">
 <code class="descname">test_create_meal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_create_meal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_create_meal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensures that we can make at least one meal in the database.</p>
+<p><strong>Passes when</strong>: We can successfully add a new meal to the database and retrieve
+it back from the database after inserting it.</p>
+<p><strong>Fails when</strong>: We can&#8217;t retrieve a meal from the Meals table which matches the
+newly inserted meal. It will also fail if there is more than one meal in the database
+with the same name.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chefboyrd.tests.test_predict.ModelTest.test_create_tab">
 <code class="descname">test_create_tab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_create_tab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_create_tab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensures that tab creation works</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="chefboyrd.tests.test_predict.ModelTest.test_fpriorder_range">
-<code class="descname">test_fpriorder_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_fpriorder_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_fpriorder_range" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tests the get_orders_date_range function.BaseException</p>
-<p>Tests all edge cases to make sure that the constraints are not broken</p>
-<p>We accomplish this by creating a set of tabs with different dates and
-ensures that given certain inputs we return none, all, or a subset of the
-tabs which we had just inserted.</p>
+<p><strong>Passes when</strong>: We can successfully create a new tab and assert that it is the only
+tab contained within the tabs table.</p>
+<p><strong>Fails when</strong>: There are more tabs in the Tabs table which have 10 people in a party
+or there are no tabs which have 12 people which had no reservation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chefboyrd.tests.test_predict.ModelTest.test_generate_data">
 <code class="descname">test_generate_data</code><span class="sig-paren">(</span><em>orders</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_generate_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_generate_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ensures we create some new Order name in on</p>
+<dd><p>Ensures that we can successfully create orders when generating data</p>
+<p><strong>Passes when</strong>: Data is generated by calling Orders.create()</p>
+<p><strong>Fails when</strong>: Orders.create() is not called when generating data</p>
 </dd></dl>
 
 <dl class="method">
@@ -319,6 +395,10 @@ tabs which we had just inserted.</p>
 <code class="descname">test_get_dotw</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_get_dotw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_get_dotw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensures that we can reliably get the day of the week using the
 get_dotw_orders function</p>
+<p><strong>Passes when</strong>: We get ensure all orders returned reside on the same date
+and the correct day of the week.</p>
+<p><strong>Fails when</strong>: We don&#8217;t retrieve the correct day of the week OR we return tabs
+which are not on the same day and does not raise errors on bad inputs</p>
 </dd></dl>
 
 <dl class="method">
@@ -326,6 +406,10 @@ get_dotw_orders function</p>
 <code class="descname">test_get_earliest_datetime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_get_earliest_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_get_earliest_datetime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensures that we always retrieve the earliest datetime from
 a given set of data</p>
+<p><strong>Passes when</strong>: The datetime returned from <code class="docutils literal"><span class="pre">data_controller.get_earliest_datetime</span></code> is
+the very earliest datetime in the input set from a set of generated data which has
+<code class="docutils literal"><span class="pre">datetime.now()</span></code> as the earliest time</p>
+<p><strong>Fails when</strong>: The earliest date retrieved is not equal to <code class="docutils literal"><span class="pre">datetime.now()</span></code></p>
 </dd></dl>
 
 <dl class="method">
@@ -333,6 +417,8 @@ a given set of data</p>
 <code class="descname">test_get_meals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_get_meals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_get_meals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enures that the get_meals_in_range function gets only the meals within
 the correct range</p>
+<p><strong>Passes when</strong>: We ensure we retrieve meals which include the daterange specified</p>
+<p><strong>Fails when</strong>: We are unable to retrieve the meals within the date range.</p>
 </dd></dl>
 
 <dl class="method">
@@ -343,12 +429,33 @@ the correct range</p>
 the table. Then we pick a few ranges of those times including the very
 beginning and very last dates to ensure we cover edge cases and return
 the correct number of tabs for the gien time ranges.</p>
+<p><strong>Passes when</strong>: We ensure that all tabs (and only the tabs) which were created
+within a certain datetime range are returned</p>
+<p><strong>Fails when</strong>: We find a tab which does not reside within a date range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="chefboyrd.tests.test_predict.ModelTest.test_order_range">
+<code class="descname">test_order_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_order_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_order_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests the get_orders_date_range function.</p>
+<p>Tests all edge cases to make sure that the constraints are not broken</p>
+<p>We accomplish this by creating a set of tabs with different dates and
+ensures that given certain inputs we return none, all, or a subset of the
+tabs which we had just inserted.</p>
+<p><strong>Passes When</strong> we can ensure all orders created over a given range can be
+returned through mulitple queries as well as ensuring dates which fall outside
+our query range are not returned.BaseException</p>
+<p><strong>Fails when</strong>: We do not return orders that all fall within our queried range
+or if we do not return all orders in the range.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="chefboyrd.tests.test_predict.ModelTest.test_polynomialModel">
 <code class="descname">test_polynomialModel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/tests/test_predict.html#ModelTest.test_polynomialModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.tests.test_predict.ModelTest.test_polynomialModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test the polynomial model for correct output</p>
+<p><strong>Passes when</strong>: polynomial model outputs the correct prediction value of 7
+given the set if input parameters <code class="docutils literal"><span class="pre">iv=[1,</span> <span class="pre">2,</span> <span class="pre">3]</span></code> and <code class="docutils literal"><span class="pre">ip=[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></code></p>
+<p><strong>Fails when</strong>: the polynomial model outputs the incorrect prediction</p>
 </dd></dl>
 
 <dl class="method">

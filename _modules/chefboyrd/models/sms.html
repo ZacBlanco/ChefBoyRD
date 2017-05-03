@@ -43,33 +43,40 @@
           <div class="body" role="main">
             
   <h1>Source code for chefboyrd.models.sms</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">TextField</span><span class="p">,</span> <span class="n">DateTimeField</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">IntegerField</span><span class="p">,</span> <span class="n">BooleanField</span>
+<span></span><span class="sd">&quot;&quot;&quot;Contains the SMS model. Feedback submitted</span>
+
+<span class="sd">written by: Seo Bo Shim, Jarod Morin</span>
+<span class="sd">tested by: Seo Bo Shim</span>
+<span class="sd">debugged by: Seo Bo Shim</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">TextField</span><span class="p">,</span> <span class="n">DateTimeField</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">IntegerField</span><span class="p">,</span> <span class="n">BooleanField</span>
 <span class="kn">from</span> <span class="nn">chefboyrd.models</span> <span class="k">import</span> <span class="n">BaseModel</span>
 
-<div class="viewcode-block" id="Sms"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.sms.Sms">[docs]</a><span class="k">class</span> <span class="nc">Sms</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Sms"><a class="viewcode-back" href="../../../autodoc/chefboyrd.models.html#chefboyrd.models.sms.Sms">[docs]</a><span class="k">class</span> <span class="nc">Sms</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A model for SMS objects to be stored and analyzed. The many flags hold a range of values between -1 and 1</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        sid: is an unique id assigned by twilio. it will help us keep track of sms that is in, or not in db</span>
-<span class="sd">        submission_time: is the date and time the feedback was submitted</span>
-<span class="sd">        body: the message of the Sms</span>
-<span class="sd">        phone_num: Phone number of person who sent in text</span>
-<span class="sd">        pos_flag: 1 if body includes positive feedback. 0 if not. -1 default value</span>
-<span class="sd">        neg_flag: 1 if body includes negative feedback. 0 if not. -1 default value</span>
-<span class="sd">        exception_flag: 1 if body includes an exception to a present clause. 0 if not. -1 default value</span>
-<span class="sd">        food_flag: 1 if body includes feedback about food. 0 if not. -1 default value</span>
-<span class="sd">        service_flag: 1 if indicating body includes feedback about service. 0 if not. -1 default value</span>
+<span class="sd">        sid (str): is an unique id assigned by twilio. it will help us keep track of sms that is in, or not in db</span>
+<span class="sd">        submission_time (datetime): is the date and time the feedback was submitted</span>
+<span class="sd">        body (str): the message of the Sms</span>
+<span class="sd">        phone_num (str): Phone number of person who sent in text</span>
+<span class="sd">        pos_flag (int): 1 if body includes positive feedback. 0 if not. -1 default value</span>
+<span class="sd">        neg_flag (int): 1 if body includes negative feedback. 0 if not. -1 default value</span>
+<span class="sd">        exception_flag (int): 1 if body includes an exception to a present clause. 0 if not. -1 default value</span>
+<span class="sd">        food_flag (int): 1 if body includes feedback about food. 0 if not. -1 default value</span>
+<span class="sd">        service_flag (int): 1 if indicating body includes feedback about service. 0 if not. -1 default value</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sid</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">(</span><span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">submission_time</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">()</span>
     <span class="n">body</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span>
     <span class="n">phone_num</span> <span class="o">=</span> <span class="n">TextField</span><span class="p">()</span>
-    <span class="n">pos_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
-    <span class="n">neg_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
-    <span class="n">exception_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
-    <span class="n">food_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
-    <span class="n">service_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">pos_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">neg_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">exception_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">food_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">service_flag</span> <span class="o">=</span> <span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">invalid_field</span> <span class="o">=</span> <span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
     <span class="c1">#additional categories to associate</span>
 </pre></div>

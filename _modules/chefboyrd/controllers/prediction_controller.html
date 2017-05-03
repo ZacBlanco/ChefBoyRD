@@ -60,12 +60,14 @@
 
 <div class="viewcode-block" id="predict_regression"><a class="viewcode-back" href="../../../autodoc/chefboyrd.controllers.html#chefboyrd.controllers.prediction_controller.predict_regression">[docs]</a><span class="k">def</span> <span class="nf">predict_regression</span><span class="p">(</span><span class="n">regression_params</span><span class="p">,</span> <span class="n">modelType</span><span class="p">,</span> <span class="n">dt_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_max</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 	<span class="sd">&#39;&#39;&#39;Predicts the usage of ingredients according to our regression model</span>
+<span class="sd">	</span>
 <span class="sd">	Args: </span>
-<span class="sd">		regression_params - the parameters for oyur model</span>
-<span class="sd">		modelType - the type of model you&#39;re using</span>
-<span class="sd">		date range - the two dates that you want to predict the regression for</span>
+<span class="sd">		regression_params: the parameters for our model</span>
+<span class="sd">		modelType: the type of model you&#39;re using</span>
+<span class="sd">		date range: the two dates that you want to predict the regression for</span>
+<span class="sd">	</span>
 <span class="sd">	Returns: </span>
-<span class="sd">		mealUsage - a dictionary of meals with associated usage amounts</span>
+<span class="sd">		mealUsage: a dictionary of meals with associated usage amounts</span>
 <span class="sd">	&#39;&#39;&#39;</span>
 	<span class="k">if</span> <span class="n">dt_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dt_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 		<span class="n">dt_min</span> <span class="o">=</span> <span class="n">get_earliest_datetime</span><span class="p">()</span>

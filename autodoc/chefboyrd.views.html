@@ -50,8 +50,10 @@
 </div>
 <div class="section" id="module-chefboyrd.views.feedbackM">
 <span id="chefboyrd-views-feedbackm-module"></span><h2>chefboyrd.views.feedbackM module<a class="headerlink" href="#module-chefboyrd.views.feedbackM" title="Permalink to this headline">¶</a></h2>
-<p>feedbackM
-This view is specifically for the administrative staff&#8217;s management of the feedback</p>
+<p>This view is specifically for the administrative staff&#8217;s management of the feedback.</p>
+<p>written by: Seo Bo Shim, Jarod Morin
+tested by: Seo Bo Shim
+debugged by: Seo Bo Shim</p>
 <dl class="class">
 <dt id="chefboyrd.views.feedbackM.DateSpecifyForm">
 <em class="property">class </em><code class="descclassname">chefboyrd.views.feedbackM.</code><code class="descname">DateSpecifyForm</code><span class="sig-paren">(</span><em>formdata=&lt;object object&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/views/feedbackM.html#DateSpecifyForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.views.feedbackM.DateSpecifyForm" title="Permalink to this definition">¶</a></dt>
@@ -96,6 +98,8 @@ This view is specifically for the administrative staff&#8217;s management of the
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Confirmation string</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">res(str)</td>
+</tr>
 </tbody>
 </table>
 </dd></dl>
@@ -103,12 +107,14 @@ This view is specifically for the administrative staff&#8217;s management of the
 <dl class="function">
 <dt id="chefboyrd.views.feedbackM.delete_twilio_feedback">
 <code class="descclassname">chefboyrd.views.feedbackM.</code><code class="descname">delete_twilio_feedback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/views/feedbackM.html#delete_twilio_feedback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.views.feedbackM.delete_twilio_feedback" title="Permalink to this definition">¶</a></dt>
-<dd><p>wipe all message history on twilio. Only needs to be called once to clear data.</p>
+<dd><p>Wipe all message history on twilio since a specified time. Only needs to be called once to clear data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Confirmation string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">res(str)</td>
 </tr>
 </tbody>
 </table>
@@ -119,14 +125,18 @@ This view is specifically for the administrative staff&#8217;s management of the
 <code class="descclassname">chefboyrd.views.feedbackM.</code><code class="descname">feedback_table</code><span class="sig-paren">(</span><em>role</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/views/feedbackM.html#feedback_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.views.feedbackM.feedback_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>By default displays a webpage for user to make feedback DB query.
 Display a table of feedback sent in during a specified date-time range.
-Also, depending on whether category flags are specified, this page will only display</p>
+Also, depending on whether category flags are specified, this page will only display that category
+table: table of feedback to display
+form: form that specifies the query instructions.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The template to display with the appropriate parameters
-table: table of feedback to display
-form: form that specifies the query instructions.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>role</strong> (<em>str</em>) &#8211; correct role of user in this context acquired from the require_role wrapper</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The template to display with the appropriate parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">template</td>
 </tr>
 </tbody>
 </table>
@@ -135,9 +145,18 @@ form: form that specifies the query instructions.</td>
 <dl class="function">
 <dt id="chefboyrd.views.feedbackM.send_sms_route">
 <code class="descclassname">chefboyrd.views.feedbackM.</code><code class="descname">send_sms_route</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/views/feedbackM.html#send_sms_route"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.views.feedbackM.send_sms_route" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the directory we need to configure twilio for.
-When Twilio makes a POST request, db will be updated with new sms messages from today
-:returns: Confirmation string</p>
+<dd><p>This is the directory we need to configure twilio for. Configure Webhook POST for <a class="reference external" href="https:/">https:/</a>/{webserver}/feedbackM/twiliosms
+When Twilio makes a POST request, db will be updated with new sms messages from today</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Confirmation string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">res(str)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -149,6 +168,8 @@ When Twilio makes a POST request, db will be updated with new sms messages from 
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Confirmation string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">res(str)</td>
 </tr>
 </tbody>
 </table>

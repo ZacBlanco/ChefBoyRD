@@ -240,8 +240,11 @@
 <span class="k">if</span> <span class="n">Orders</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
     <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     <span class="n">data_controller</span><span class="o">.</span><span class="n">generate_data</span><span class="p">(</span><span class="n">num_days</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">num_tabs</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">dt_start</span><span class="o">=</span><span class="n">start_date</span><span class="p">)</span>
-
-<span class="n">feedback_controller</span><span class="o">.</span><span class="n">update_db</span><span class="p">()</span> <span class="c1">#updates the database with current text messages stored in twilio rest client</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">feedback_controller</span><span class="o">.</span><span class="n">update_db</span><span class="p">()</span> <span class="c1">#updates the database with current text messages stored in twilio rest client</span>
+<span class="k">except</span> <span class="ne">SystemError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not connect to Twilio&quot;</span><span class="p">)</span>
+    <span class="n">feedback_controller</span><span class="o">.</span><span class="n">update_db</span><span class="p">(</span><span class="n">update_from</span><span class="o">=</span><span class="s2">&quot;autogen&quot;</span><span class="p">)</span>
 
 <span class="n">receipt</span><span class="o">.</span><span class="n">get_receipts</span><span class="p">()</span>
 

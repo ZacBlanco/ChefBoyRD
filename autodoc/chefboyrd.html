@@ -115,7 +115,7 @@ that logged in users are only able to access authorized resources.</p>
 <dl class="function">
 <dt id="chefboyrd.auth.login">
 <code class="descclassname">chefboyrd.auth.</code><code class="descname">login</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/auth.html#login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.auth.login" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function which logs a user into the application</p>
+<dd><p>Logs a user into the application</p>
 </dd></dl>
 
 <dl class="function">
@@ -172,6 +172,18 @@ Example:</p>
 <dt id="chefboyrd.auth.user_loader">
 <code class="descclassname">chefboyrd.auth.</code><code class="descname">user_loader</code><span class="sig-paren">(</span><em>email</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chefboyrd/auth.html#user_loader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chefboyrd.auth.user_loader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads the user via a DB call</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>email</strong> (<em>str</em>) &#8211; The email to load</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The user object corresponding to the email passed, or None if it doesn&#8217;t exist</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="chefboyrd.models.html#chefboyrd.models.user.User" title="chefboyrd.models.user.User">User</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

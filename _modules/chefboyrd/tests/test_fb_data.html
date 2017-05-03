@@ -43,13 +43,23 @@
           <div class="body" role="main">
             
   <h1>Source code for chefboyrd.tests.test_fb_data</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span></span><span class="sd">&quot;&quot;&quot;Includes the functions required to generate random sms messages in case Twilio is not available.</span>
+<span class="sd">This is to help test the functionality of how sms stored in the database is read and interpreted.</span>
+
+<span class="sd">written by: Seo Bo Shim</span>
+<span class="sd">tested by: Seo Bo Shim</span>
+<span class="sd">debugged by: Seo Bo Shim</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">randrange</span>
-<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">chefboyrd.models.sms</span> <span class="k">import</span> <span class="n">Sms</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="n">IntegrityError</span>
 
 <div class="viewcode-block" id="TestMessages"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_fb_data.TestMessages">[docs]</a><span class="k">class</span> <span class="nc">TestMessages</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    test class that emulates how twilio stores messages, so that this can be run to test the funtions without a connection to twilio</span>
+    <span class="sd">&quot;&quot;&quot;Test class that emulates how twilio stores messages, so that this can be run to test the funtions without a connection to twilio</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">date_sent</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">from_</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="n">sid</span>
@@ -58,8 +68,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">from_</span> <span class="o">=</span> <span class="n">from_</span></div>
 
 <div class="viewcode-block" id="test_sms_data"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_fb_data.test_sms_data">[docs]</a><span class="k">def</span> <span class="nf">test_sms_data</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">date_from</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates n samples of SMS of a pre-determined body, listed in sample_messages</span>
+    <span class="sd">&quot;&quot;&quot;Creates n samples of SMS of a pre-determined body, listed in sample_messages</span>
 <span class="sd">    If n is &gt;5, then more sample feedback messages must be added to the list below</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#d = random_date(date_from,datetime.now(), n)</span>
@@ -75,7 +84,68 @@
         <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">messages</span></div>
 
+<div class="viewcode-block" id="auto_generate_sms_data"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_fb_data.auto_generate_sms_data">[docs]</a><span class="k">def</span> <span class="nf">auto_generate_sms_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">date_from</span><span class="o">=</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">60</span><span class="p">))):</span>
+    <span class="sd">&#39;&#39;&#39;Helper function to generates random feedback data</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        n(int): number of items to generate</span>
+<span class="sd">        date_from(datetime): starting date time. Ending date time used is datetime.now()</span>
 
+<span class="sd">    Returns:</span>
+<span class="sd">        messages(TestMessage): message with same format as Twilio message to store in database</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">Config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span><span class="s2">&quot;criteriaLists.ini&quot;</span><span class="p">)</span>
+    <span class="n">Config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">configDict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="s2">&quot;SectionOne&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">configDict</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SectionOne&quot;</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">configDict</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">allLists</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">]</span>
+    <span class="n">posWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;poslist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">negWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;neglist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">exceptionWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;exceptionlist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">negationWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;negationlist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">emphasisWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;emphasislist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">foodWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;foodlist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">serviceWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;servicelist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">stopWordList</span> <span class="o">=</span> <span class="n">configDict</span><span class="p">[</span><span class="s1">&#39;stoplist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">posWordList</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">negWordList</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">stopWordList</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">exceptionWordList</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">negationWordList</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">emphasisWordList</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">foodWordList</span><span class="p">)</span>
+    <span class="n">allLists</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">serviceWordList</span><span class="p">)</span>
+
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">date_from</span>
+    <span class="n">int_delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">days</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="n">delta</span><span class="o">.</span><span class="n">seconds</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">random_second</span> <span class="o">=</span> <span class="n">randrange</span><span class="p">(</span><span class="n">int_delta</span><span class="p">)</span>
+        <span class="n">rand_time</span> <span class="o">=</span> <span class="n">date_from</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">random_second</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">TestMessages</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">rand_time</span><span class="p">,</span> <span class="n">random_word</span><span class="p">(</span><span class="n">allLists</span><span class="p">),</span> <span class="s2">&quot;+1231234123&quot;</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">messages</span></div>
+
+<div class="viewcode-block" id="random_word"><a class="viewcode-back" href="../../../autodoc/chefboyrd.tests.html#chefboyrd.tests.test_fb_data.random_word">[docs]</a><span class="k">def</span> <span class="nf">random_word</span><span class="p">(</span><span class="n">allLists</span><span class="p">,</span><span class="nb">max</span><span class="o">=</span><span class="mi">13</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Helper function to generate random sentence </span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        allLists(List(str)): List of strings of available words to use</span>
+<span class="sd">        max(int): max length of the sentence</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">random_num_words</span> <span class="o">=</span> <span class="n">randrange</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
+    <span class="n">random_index</span> <span class="o">=</span> <span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">allLists</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sentence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">random_num_words</span><span class="p">):</span>
+        <span class="n">random_index</span> <span class="o">=</span> <span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">allLists</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sentence</span> <span class="o">=</span> <span class="n">sentence</span> <span class="o">+</span> <span class="n">allLists</span><span class="p">[</span><span class="n">random_index</span><span class="p">]</span> <span class="o">+</span><span class="s1">&#39; &#39;</span>
+    <span class="k">return</span> <span class="n">sentence</span></div>
 </pre></div>
 
           </div>
