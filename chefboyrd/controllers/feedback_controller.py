@@ -57,7 +57,6 @@ def update_db(*date_from, **kwargs):
     """Updates the sms in the database starting from the date_from specified (at time midnight)
     no param = updates the sms feedback in database with all message entries
     analyze feedback when sms is sent
-    TODO: Fix error with twilio, where the most recent message does not have a submission timep
 
     Args:
         date_from (Date): a specified date, where we update db with sms sent after this date
@@ -159,10 +158,13 @@ def update_db(*date_from, **kwargs):
     return 1
 
 def process_incoming_sms(*one):
-    """Updates SMS table in database with the incoming SMS. Checks for the unique key to invalidate SMS or keep it
+    """Updates SMS table in database with the incoming SMS. Checks for the unique key to invalidate
+    SMS or keep it. 
+    
     Only for processing SMS in real time.
-    Precondition:
-        A Twilio POST request is received.
+
+    - Precondition: A Twilio POST request is received.
+
     TODO: Fix error with twilio, where the most recent message does not have a submission timep
 
     Args:
@@ -404,12 +406,12 @@ def feedback_analysis(inStr):
 
     Throws:
         TypeError: When argument is not a string.
-        
+
     """
 
     if not isinstance(inStr, str):
         raise TypeError("Input must be a string")
-    
+
     posFlag = 0
     negFlag = 0
     exceptionFlag = 0
@@ -496,7 +498,7 @@ def word_freq_counter(inStr):
 
     Throws:
         TypeError: When argument is not a string.
-        
+
     """
 
     if not isinstance(inStr, str):
@@ -505,17 +507,17 @@ def word_freq_counter(inStr):
     inStrProcessed = inStr
     for p in list(punctuation):
         if p != '\'':
-            inStrProcessed = inStrProcessed.replace(p,' ')
+            inStrProcessed = inStrProcessed.replace(p, ' ')
 
     inStrProcessed = inStrProcessed.lower()
 
     wordsProcessed = inStrProcessed.split(' ')
-    wordsProcessed = list(filter(bool,wordsProcessed))
+    wordsProcessed = list(filter(bool, wordsProcessed))
 
     #print("Stop word list: ")
     #print(stopWordList,"\n")
 
-    result = list();
+    result = list()
 
     for word in wordsProcessed:
         if word not in stopWordList:

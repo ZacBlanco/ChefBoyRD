@@ -1,7 +1,7 @@
 '''Test some model creation and methods'''
 import os
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from datetime import datetime, date, timedelta
 import tempfile
 import chefboyrd
@@ -53,7 +53,14 @@ class ModelTest(unittest.TestCase):
         # Assertion??
 
     def test_polynomialModel(self):
-        '''Test the polynomial model for correct output'''
+        '''Test the polynomial model for correct output
+
+        **Passes when**: polynomial model outputs the correct prediction value of 7
+        given the set if input parameters ``iv=[1, 2, 3]`` and ``ip=[1, 1, 1, 1]``
+
+        **Fails when**: the polynomial model outputs the incorrect prediction
+
+        '''
         iv = [1, 2, 3] # Input vector
         ip = [1, 1, 1, 1] # Input parameters
         ans = model_controller.polynomialModel(iv, *ip)
@@ -67,8 +74,16 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(ans, 1.2936149395776206) # Expected output
 
     def test_get_earliest_datetime(self):
-        '''Ensures that we always retrieve the earliest datetime from 
-        a given set of data'''
+        '''Ensures that we always retrieve the earliest datetime from
+        a given set of data
+
+        **Passes when**: The datetime returned from ``data_controller.get_earliest_datetime`` is
+        the very earliest datetime in the input set from a set of generated data which has
+        ``datetime.now()`` as the earliest time
+
+        **Fails when**: The earliest date retrieved is not equal to ``datetime.now()``
+
+        '''
         data_controller.generate_data(1, 1, 1)
         expected_earliest_datetime = datetime.now()
         earliest_datetime = model_controller.get_earliest_datetime()
@@ -77,7 +92,16 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(earliest_datetime.day, expected_earliest_datetime.day)
 
     def test_create_meal(self):
-        '''Ensures that we can make at least one meal in the database.'''
+        '''Ensures that we can make at least one meal in the database.
+
+        **Passes when**: We can successfully add a new meal to the database and retrieve
+        it back from the database after inserting it.
+
+        **Fails when**: We can't retrieve a meal from the Meals table which matches the
+        newly inserted meal. It will also fail if there is more than one meal in the database
+        with the same name.
+
+        '''
         try:
             Meals.create(price=12.99, name="Cheeseburger")
         except:
@@ -87,7 +111,14 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(meals[0].price, 12.99)
 
     def test_create_tab(self):
-        '''Ensures that tab creation works'''
+        '''Ensures that tab creation works
+
+        **Passes when**: We can successfully create a new tab and assert that it is the only
+        tab contained within the tabs table.
+
+        **Fails when**: There are more tabs in the Tabs table which have 10 people in a party
+        or there are no tabs which have 12 people which had no reservation
+        '''
         try:
             Tabs.create(had_reservation=False, party_size=12, timestamp=datetime.now(),
                         fb_key="~~~~~~~")
@@ -100,7 +131,13 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(tabs[0].had_reservation, False)
 
     def test_create_foreign_key_obj(self):
-        '''Ensures that we can create an item with a foreign key field'''
+        '''Ensures that we can create an item with a foreign key field
+        
+        **Passes when**: We can create a new mealingredient in the MealIngredients table
+        which has specific attributes that we are able to retrieve after creation.
+
+        **Fails when**: We are unable to select the proper MealIngredient from the table
+        '''
         try:
             MealIngredients.create(quantity_amt=1, meal_id=12, ingredient_id=9,
                                    quantity_meas_id=12)
@@ -109,14 +146,21 @@ class ModelTest(unittest.TestCase):
         mis = MealIngredients.select().where(MealIngredients.quantity_amt == 1)
         self.assertEqual(len(mis), 1)
 
-    def test_fpriorder_range(self):
-        '''Tests the get_orders_date_range function.BaseException
+    def test_order_range(self):
+        '''Tests the get_orders_date_range function.
 
         Tests all edge cases to make sure that the constraints are not broken
 
         We accomplish this by creating a set of tabs with different dates and
         ensures that given certain inputs we return none, all, or a subset of the 
         tabs which we had just inserted.
+
+        **Passes When** we can ensure all orders created over a given range can be
+        returned through mulitple queries as well as ensuring dates which fall outside
+        our query range are not returned.BaseException
+
+        **Fails when**: We do not return orders that all fall within our queried range
+        or if we do not return all orders in the range.
         '''
         m1 = Meals.create(name="Burger", price=8.99)
         num = 20
@@ -155,6 +199,10 @@ class ModelTest(unittest.TestCase):
     def test_get_meals(self):
         '''Enures that the get_meals_in_range function gets only the meals within
         the correct range
+
+        **Passes when**: We ensure we retrieve meals which include the daterange specified
+
+        **Fails when**: We are unable to retrieve the meals within the date range.
         '''
         start = datetime.now()
         end = start + timedelta(days=5)
@@ -169,6 +217,11 @@ class ModelTest(unittest.TestCase):
         the table. Then we pick a few ranges of those times including the very
         beginning and very last dates to ensure we cover edge cases and return
         the correct number of tabs for the gien time ranges.
+
+        **Passes when**: We ensure that all tabs (and only the tabs) which were created
+        within a certain datetime range are returned
+
+        **Fails when**: We find a tab which does not reside within a date range.
 
         '''
         num = 20
@@ -206,6 +259,13 @@ class ModelTest(unittest.TestCase):
     def test_get_dotw(self):
         '''Ensures that we can reliably get the day of the week using the
         get_dotw_orders function
+
+        **Passes when**: We get ensure all orders returned reside on the same date
+        and the correct day of the week.
+
+        **Fails when**: We don't retrieve the correct day of the week OR we return tabs
+        which are not on the same day and does not raise errors on bad inputs
+
         '''
         m1 = Meals.create(name="Burger", price=8.99)
         for x in range(5):
@@ -224,8 +284,14 @@ class ModelTest(unittest.TestCase):
 
     @patch('chefboyrd.models.Orders.create', return_value=None)
     def test_generate_data(self, orders):
-        '''Ensures we create some new Order name in on
+        '''Ensures that we can successfully create orders when generating data
+
+        **Passes when**: Data is generated by calling Orders.create()
+
+        **Fails when**: Orders.create() is not called when generating data
         '''
         # print(Ingredients._meta.database.database)
-        data_controller.generate_data(num_days=1, num_tabs=5)
-        orders.asser_called_once()
+        Orders.create = MagicMock()
+        Orders.create.return_value = None
+        data_controller.generate_data(num_days=2, num_tabs=3)
+        self.assertEqual(Orders.create.called, True, "Order creation should have occurred")

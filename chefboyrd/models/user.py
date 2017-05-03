@@ -12,10 +12,14 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash
 
 class User(UserMixin, BaseModel):
-    '''
-    A User model for who will be using the software. Users have different levels of access with different roles
+    '''A User model for who will be using the software. Users have different levels of access with different roles
+
     Current active roles:
-        host, admin, chef, cust
+
+        - host
+        - admin
+        - chef
+        - cust
     '''
     email = CharField(unique=True)
     password = CharField()

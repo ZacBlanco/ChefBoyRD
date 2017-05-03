@@ -1,7 +1,7 @@
 '''Customer Controller
 
 A controller houses all functions that has to do with taking arguments
-and moifying the underlying data store. The controllers also perform all
+and modifying the underlying data store. The controllers also perform all
 of the data analysis that might be taking place.abs
 
 Essentially controllers are for the 'business logic' of the application.

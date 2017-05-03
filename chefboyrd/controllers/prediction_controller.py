@@ -15,12 +15,14 @@ from chefboyrd.controllers.model_controller import polynomialModel, sinusoidalMo
 
 def predict_regression(regression_params, modelType, dt_min=None, dt_max=None):
 	'''Predicts the usage of ingredients according to our regression model
+	
 	Args: 
-		regression_params - the parameters for oyur model
-		modelType - the type of model you're using
-		date range - the two dates that you want to predict the regression for
+		regression_params: the parameters for our model
+		modelType: the type of model you're using
+		date range: the two dates that you want to predict the regression for
+	
 	Returns: 
-		mealUsage - a dictionary of meals with associated usage amounts
+		mealUsage: a dictionary of meals with associated usage amounts
 	'''
 	if dt_min is None and dt_max is None:
 		dt_min = get_earliest_datetime()
