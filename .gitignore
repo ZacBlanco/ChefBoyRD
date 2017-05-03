@@ -1,0 +1,17 @@
+_site
+.sass-cache
+.jekyll-metadata
+*.pyc
+env/**
+.vscode/**
+*.pyc
+__pycache__/**
+*.db
+run.sh
+
+.DS_Store
+*.DS_Store
+*/.DS_Store
+**/.DS_Store
+*/sms.cfg
+*receipts.json
