@@ -19,7 +19,14 @@ auth_pages = Blueprint('auth_pages', __name__, template_folder="./views/template
 
 @login_manager.user_loader
 def user_loader(email):
-    '''Loads the user via a DB call'''
+    '''Loads the user via a DB call
+
+    Args:
+        email (str): The email to load
+
+    Returns:
+        User: The user object corresponding to the email passed, or None if it doesn't exist
+    '''
     users = User.select().where(User.email == email)
     if len(users) > 0:
         return users[0]
@@ -34,8 +41,8 @@ def unauth():
 def require_login(func):
     '''Wrapper around the login_required wrapper from flask-login
 
-        This allows us to keep the same style and also not have to have multiple imports for
-        roles and require_login
+    This allows us to keep the same style and also not have to have multiple imports for
+    roles and require_login
     '''
     @wraps(func)
     @flask_login.login_required
@@ -88,7 +95,7 @@ def require_role(role,**kwargss):
 
 @auth_pages.route('/login', methods=['GET', 'POST'])
 def login():
-    '''Function which logs a user into the application'''
+    '''Logs a user into the application'''
 
     if flask_login.current_user.is_authenticated:
         return redirect(url_for('index'))

@@ -10,12 +10,12 @@ def book_restaurant_table(restaurant, booking_date_time, people, name, phone, mi
     creates a Booking on the database.
 
     Args:
-    restaurant: The id of the restaurant we want to make the booking for
-    booking_time_date: The starting time of the booking we want to make
-    people: The number of people that the booking is requesting
-    name: The name of the guest making the reservation
-    phone: The phone number of the guest making the reservation
-    minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes
+        restaurant: The id of the restaurant we want to make the booking for
+        booking_time_date: The starting time of the booking we want to make
+        people: The number of people that the booking is requesting
+        name: The name of the guest making the reservation
+        phone: The phone number of the guest making the reservation
+        minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes
 
     Returns: A dictionary with the booking id, and the table id. If there is no table available at the requested time None is returned.
 
@@ -37,12 +37,13 @@ def get_first_table_available(restaurant, booking_date_time, people, minutes_slo
     people and a booking date/time.
 
     Args:
-    restaurant: The id of the restaurant we want to make the booking for
-    booking_time_date: The starting time of the booking we want to make
-    people: The number of people that the booking is requesting
-    minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes
+        restaurant: The id of the restaurant we want to make the booking for
+        booking_time_date: The starting time of the booking we want to make
+        people: The number of people that the booking is requesting
+        minutes_slot: The amount of time that the reservation is made for. Default is 90 minutes
 
-    Returns: The first table available. If there are no tables available we return None
+    Returns:
+        The first table available. If there are no tables available we return None
     """
     # I make sure to check if the tables are not already booked within the time slot required
     # by the new booking
